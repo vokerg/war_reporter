@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://war-reporter.invalid/schemas/task-manifest.schema.json",
+  "title": "Task manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "task_type",
+    "state",
+    "window",
+    "scope",
+    "exclusions",
+    "allowed_output_paths",
+    "definition_of_done",
+    "idempotency_key"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "pattern": "^task_[a-z0-9][a-z0-9_-]*$"
+    },
+    "task_type": {
+      "enum": [
+        "campaign",
+        "source_scan",
+        "open_web_discovery",
+        "extract_observations",
+        "investigate_claim",
+        "source_profile_review",
+        "map_update",
+        "daily_report",
+        "weekly_report",
+        "snapshot_report",
+        "correction",
+        "validation"
+      ]
+    },
+    "state": {
+      "enum": [
+        "planned",
+        "ready",
+        "leased",
+        "collecting",
+        "pr_open",
+        "validating",
+        "review",
+        "merged",
+        "blocked",
+        "lease_expired",
+        "rejected",
+        "cancelled",
+        "duplicate"
+      ]
+    },
+    "parent_issue": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "to": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_ids",
+        "regions",
+        "topics",
+        "content_types"
+      ],
+      "properties": {
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^src_[a-z0-9][a-z0-9_-]*$"
+          },
+          "uniqueItems": true
+        },
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "content_types": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "exclusions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "allowed_output_paths": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"
+      },
+      "uniqueItems": true
+    },
+    "definition_of_done": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 8
+    },
+    "lease": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "worker_id",
+        "leased_at",
+        "lease_until"
+      ],
+      "properties": {
+        "worker_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "leased_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "lease_until": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

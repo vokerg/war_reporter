@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://war-reporter.invalid/schemas/report.schema.json",
+  "title": "Report manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "report_id",
+    "report_type",
+    "language",
+    "period",
+    "as_of",
+    "content_path",
+    "claim_ids",
+    "assessment_ids",
+    "claim_set_sha256",
+    "record_status",
+    "generated_at"
+  ],
+  "properties": {
+    "report_id": {
+      "type": "string",
+      "pattern": "^rpt_[a-z0-9][a-z0-9_-]*$"
+    },
+    "report_type": {
+      "enum": [
+        "daily",
+        "weekly",
+        "snapshot"
+      ]
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"
+    },
+    "period": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start",
+        "end"
+      ],
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "content_path": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+\\.md$"
+    },
+    "claim_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^clm_[a-z0-9][a-z0-9_-]*$"
+      },
+      "uniqueItems": true
+    },
+    "assessment_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^asm_[a-z0-9][a-z0-9_-]*$"
+      },
+      "uniqueItems": true
+    },
+    "claim_set_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "record_status": {
+      "enum": [
+        "draft",
+        "in_review",
+        "approved",
+        "rejected",
+        "superseded",
+        "withdrawn"
+      ]
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "translation_of_report_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^rpt_[a-z0-9][a-z0-9_-]*$"
+    },
+    "source_commit": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{40}$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "translation_of_report_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "translation_of_report_id"
+        ]
+      },
+      "then": {
+        "required": [
+          "source_commit"
+        ],
+        "properties": {
+          "source_commit": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{40}$"
+          }
+        }
+      }
+    }
+  ]
+}

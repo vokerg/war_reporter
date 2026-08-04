@@ -1,0 +1,62 @@
+name: Investigate claim
+description: Search supporting, contradicting, upstream, and corrective evidence.
+title: "[claim-review] "
+body:
+  - type: input
+    id: task_manifest
+    attributes:
+      label: Task manifest path
+      placeholder: tasks/task_investigate_claim_....json
+    validations:
+      required: true
+  - type: input
+    id: claim
+    attributes:
+      label: Claim ID
+    validations:
+      required: true
+  - type: input
+    id: cutoff
+    attributes:
+      label: Research cutoff
+      placeholder: "2026-08-04T18:00:00Z"
+    validations:
+      required: true
+  - type: textarea
+    id: questions
+    attributes:
+      label: Verification questions
+      description: Include support, contradiction, common upstream origin, alternatives, corrections, and retractions.
+    validations:
+      required: true
+  - type: textarea
+    id: exclusions
+    attributes:
+      label: Exclusions and known coverage limitations
+    validations:
+      required: true
+  - type: textarea
+    id: paths
+    attributes:
+      label: Allowed output paths
+    validations:
+      required: true
+  - type: input
+    id: idempotency
+    attributes:
+      label: Idempotency key
+    validations:
+      required: true
+  - type: checkboxes
+    id: done
+    attributes:
+      label: Definition of done
+      options:
+        - label: Strongest support and contradiction documented
+          required: true
+        - label: Evidence independence and circular citation checked
+          required: true
+        - label: Assessment outcome, confidence, and rationale remain separate
+          required: true
+        - label: Unavailable connectors or sources disclosed
+          required: true

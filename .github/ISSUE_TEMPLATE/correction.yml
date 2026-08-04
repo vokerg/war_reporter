@@ -1,0 +1,45 @@
+name: Correction
+description: Correct a released factual, confidence, attribution, translation, or map error.
+title: "[correction] "
+body:
+  - type: textarea
+    id: affected
+    attributes:
+      label: Affected record IDs and public artifacts
+    validations:
+      required: true
+  - type: textarea
+    id: previous
+    attributes:
+      label: Previous published meaning
+    validations:
+      required: true
+  - type: textarea
+    id: corrected
+    attributes:
+      label: Corrected meaning
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Triggering observation IDs and explanation
+    validations:
+      required: true
+  - type: textarea
+    id: propagation
+    attributes:
+      label: Dependent reports, translations, maps, and snapshots to update
+    validations:
+      required: true
+  - type: checkboxes
+    id: done
+    attributes:
+      label: Correction gate
+      options:
+        - label: Correction record will be added under data/corrections
+          required: true
+        - label: Public notice and propagation have owners
+          required: true
+        - label: Harmful or private material will not be republished
+          required: true

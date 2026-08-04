@@ -1,0 +1,18 @@
+{
+  "task_id": "task_20260804_10_reactions_corrections",
+  "task_type": "open_web_discovery",
+  "role": "open-web-discovery",
+  "state": "ready",
+  "priority": 70,
+  "created_at": "2026-08-04T18:28:29Z",
+  "parent_issue": 5,
+  "issue_number": null,
+  "depends_on_task_ids": [],
+  "window": {"from": "2026-08-03T18:00:00Z", "to": "2026-08-04T18:00:00Z"},
+  "scope": {"source_ids": [], "source_groups": [], "regions": ["ukraine-war"], "topics": ["reactions", "criticism", "corrections", "retractions"], "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"]},
+  "exclusions": ["Items already represented by canonical URL, platform ID, or content hash", "Access-control bypass, private material, and unsafe non-public geodata", "Precise current operational positions or targeting-enabling detail"],
+  "allowed_output_paths": ["catalogs/sources/2026/08/04/reactions-corrections.json", "data/source-items/2026/08/04/reactions-corrections.ndjson", "data/artifacts/2026/08/04/reactions-corrections.ndjson", "raw-manifests/2026/08/04/reactions-corrections.json"],
+  "definition_of_done": ["The assigned public-web discovery shard and UTC window were searched", "Primary publications, corrections, and retractions were preferred and upstream lineage was recorded", "Canonical URLs, timestamps, language, quote locators, and access failures were recorded", "Candidate source profiles and follow-up task proposals were persisted when justified", "No final truth assessment, territorial conclusion, or report narrative was added"],
+  "idempotency_key": "open_web_discovery:reactions-corrections:20260803T1800Z:20260804T1800Z:ukraine-war",
+  "lease": null
+}

@@ -26,6 +26,19 @@ class WorkerQueueTests(unittest.TestCase):
             self.assertEqual("ready", task["state"])
             self.assertIsNone(task["lease"])
 
+    def test_bootstrap_tasks_are_runnable_without_source_catalog(self) -> None:
+        schema = json.loads((ROOT / "schemas" / "task-manifest.schema.json").read_text(encoding="utf-8"))
+        validator = Draft202012Validator(schema, format_checker=FormatChecker())
+        tasks = build_tasks(datetime(2026, 8, 4, tzinfo=UTC).date(), 10, "ukraine-war")
+        errors = [error.message for task in tasks for error in validator.iter_errors(task)]
+        self.assertEqual([], errors)
+        self.assertTrue(all(task["task_type"] == "open_web_discovery" for task in tasks))
+        self.assertTrue(all(task["role"] == "open-web-discovery" for task in tasks))
+        self.assertTrue(all(task["scope"]["source_ids"] == [] for task in tasks))
+        self.assertTrue(all(task["scope"]["source_groups"] == [] for task in tasks))
+        self.assertTrue(all(any(path.startswith("catalogs/sources/") for path in task["allowed_output_paths"]) for task in tasks))
+        self.assertEqual(10, len({task["idempotency_key"] for task in tasks}))
+
     def test_ten_pilot_fixtures_validate_against_task_schema(self) -> None:
         schema = json.loads((ROOT / "schemas" / "task-manifest.schema.json").read_text(encoding="utf-8"))
         validator = Draft202012Validator(schema, format_checker=FormatChecker())

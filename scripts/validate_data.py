@@ -23,12 +23,14 @@ TARGETS = {
 def iter_documents(path: Path):
     if path.suffix == ".json":
         value = json.loads(path.read_text(encoding="utf-8"))
-        if value.get("type") == "FeatureCollection":
-            yield from value.get("features", [])
-        elif isinstance(value, list):
+        if isinstance(value, list):
             yield from value
-        else:
+        elif isinstance(value, dict) and value.get("type") == "FeatureCollection":
+            yield from value.get("features", [])
+        elif isinstance(value, dict):
             yield value
+        else:
+            raise ValueError(f"{path}: top-level JSON value must be an object or array")
     elif path.suffix == ".ndjson":
         for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
             if line.strip():

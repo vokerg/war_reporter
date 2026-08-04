@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://war-reporter.invalid/schemas/reaction.schema.json",
+  "title": "Reaction",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reaction_id",
+    "reacting_entity_id",
+    "observation_id",
+    "relation",
+    "published_at",
+    "record_status"
+  ],
+  "properties": {
+    "reaction_id": {
+      "type": "string",
+      "pattern": "^react_[a-z0-9][a-z0-9_-]*$"
+    },
+    "reacting_entity_id": {
+      "type": "string",
+      "pattern": "^src_[a-z0-9][a-z0-9_-]*$"
+    },
+    "target_item_id": {
+      "type": "string",
+      "pattern": "^item_[a-z0-9][a-z0-9_-]*$"
+    },
+    "target_claim_id": {
+      "type": "string",
+      "pattern": "^clm_[a-z0-9][a-z0-9_-]*$"
+    },
+    "observation_id": {
+      "type": "string",
+      "pattern": "^obs_[a-z0-9][a-z0-9_-]*$"
+    },
+    "relation": {
+      "enum": [
+        "supports",
+        "partially_supports",
+        "disputes",
+        "partially_disputes",
+        "contextualizes",
+        "corrects",
+        "questions_methodology",
+        "questions_evidence",
+        "quotes_without_endorsement",
+        "retracts"
+      ]
+    },
+    "published_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "record_status": {
+      "enum": [
+        "draft",
+        "in_review",
+        "approved",
+        "rejected",
+        "superseded",
+        "withdrawn"
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "target_item_id"
+      ]
+    },
+    {
+      "required": [
+        "target_claim_id"
+      ]
+    }
+  ]
+}

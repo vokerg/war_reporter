@@ -2,35 +2,44 @@
 
 ## Evidence chain
 
-`source entity → source item → observation → claim → event → assessment → report/map`
+`source entity → source item → artifact → observation → claim → event → assessment → report/map`
 
-A report must never cite an untracked statement directly. Every factual passage must resolve to one or more claim IDs, and each claim must resolve to attributable observations.
+A factual publication statement must resolve to claim IDs. Each claim must resolve to attributable observations, and each observation must resolve to a source item and, where applicable, an immutable artifact manifest.
 
-## Confidence labels
+## Three separate axes
 
-- `confirmed` — multiple genuinely independent channels or strong direct evidence.
-- `probable` — persuasive evidence with a material unresolved gap.
-- `plausible` — possible and partially supported.
-- `unverified` — reported without adequate independent confirmation.
-- `contested` — substantial conflicting evidence exists.
-- `misleading` — factual core may exist, but framing, scale, or implication is distorted.
-- `false` — contradicted by strong evidence.
-- `obsolete` — superseded by a later assessment.
+Do not collapse these concepts:
 
-Internal numeric scores may assist ranking, but publication must show a label and written rationale.
+- **Record status:** `draft`, `in_review`, `approved`, `rejected`, `superseded`, or `withdrawn`.
+- **Assessment outcome:** `confirmed`, `probable`, `plausible`, `unverified`, `contested`, `misleading`, or `refuted`.
+- **Assessment confidence:** `high`, `medium`, or `low`, meaning confidence in the assigned outcome—not confidence that the underlying proposition is true.
 
-## Independence
+Example: a claim may be `approved`, assessed as `contested`, with `high` confidence that substantial conflict exists.
 
-Multiple publications are not independent when they share one upstream post, document, image, briefing, ownership network, or anonymous source. Provenance lineage must be recorded before evidence count is used in confidence assessment.
+## Independence and lineage
 
-## Source assessment
+Evidence count is meaningless until upstream lineage is resolved. Publications are not independent when they share a post, document, image, briefing, owner-controlled network, anonymous source, or circular citation. Store upstream item IDs and distinguish original evidence from repetition.
 
-Source reliability is multidimensional and topic-specific. Evaluate identity, access, historical accuracy, methodology transparency, correction behavior, affiliation, incentives, and recurring framing. Never assign one permanent global trust score.
+## Source profiles
 
-## Quotations
+Assess sources by topic and time period. Separate identity, access, historical accuracy, methodology transparency, correction behavior, independence, affiliation, incentives, and recurring framing. Bias metadata is contextual information, not an automatic truth-value judgment. Every reputation assessment requires documented rationale and resolved evidence.
 
-Store short, necessary excerpts in the original language with URL, author, publication time, and retrieval time. Store translations separately. Do not replace the original quotation with a translation.
+## Observations and claims
+
+An observation records what a source communicated. A claim is a normalized testable proposition. Extraction must not upgrade source language such as “reportedly,” “may,” or “appears” into certainty. Preserve qualifiers, speaker attribution, event-time uncertainty, and location uncertainty.
+
+## Quotations and rights
+
+Store only short excerpts necessary for verification, with original language, URL, publication time, retrieval time, and page/paragraph/timecode locator. Store translations separately. Do not bulk-copy articles, transcripts, image sets, or proprietary maps. Artifact manifests must record access classification and rights notes.
+
+## Temporal semantics
+
+Use RFC 3339 UTC timestamps where time is known. Use explicit precision when publication or event time is uncertain. Never substitute retrieval time for publication time or assessment time.
+
+## Coverage claims
+
+A completed source scan means only that the assigned source list and time window were checked using the documented access method. It does not mean the open internet was exhaustively searched. Reports must disclose material coverage gaps, inaccessible sources, and platform/API failures.
 
 ## Corrections
 
-Never silently rewrite an assessment. Supersede it, retain prior state in Git history, explain the reason, and link the correction to affected claims and reports.
+Released records are append-only in meaning. Supersede or correct them; do not silently mutate history. Corrections must propagate to dependent assessments, reports, and map snapshots.

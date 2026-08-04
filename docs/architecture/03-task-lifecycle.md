@@ -1,40 +1,25 @@
 # Task lifecycle
 
-## Task contract
+## Canonical contract
 
-Every research issue should define:
+The file in `tasks/` is authoritative. The GitHub issue is the human coordination surface and links the manifest. Issue-form Markdown is not a machine-stable task protocol.
 
-- task type;
-- parent campaign;
-- UTC time window;
-- source group or discovery scope;
-- regions and topics;
-- explicit exclusions;
-- allowed output paths;
-- definition of done;
-- idempotency key.
+A manifest defines task type, parent, UTC window, source/region/topic/content scope, exclusions, allowed output paths, definition of done, idempotency key, state, and optional lease.
 
 ## States
 
-`planned → ready → leased → collecting → PR open → validating → review → merged`
+`planned → ready → leased → collecting → pr_open → validating → review → merged`
 
-Failure states: `blocked`, `lease expired`, `rejected`, `cancelled`, `duplicate`.
+Terminal or recovery states: `blocked`, `lease_expired`, `rejected`, `cancelled`, `duplicate`.
+
+Only the dispatcher changes lease ownership. State transitions must be monotonic except an explicitly recorded recovery from `blocked` or `lease_expired`.
 
 ## Parallelization
 
-Shard work deterministically by:
+Shard deterministically by source group, non-overlapping time window, region/topic partition, and content type. An idempotency key represents the normalized scope, not a randomly generated issue identifier.
 
-`source group × time window × region × content type`
+Before lease creation, check open tasks, merged manifests, canonical URLs, platform IDs, hashes, and upstream lineage. Workers must not broaden scope to “everything important.”
 
-The dispatcher is the sole owner of leases and idempotency keys. A worker receives one bounded issue, writes only allowed paths, and opens one PR. Expired leases return to the queue.
+## Pull-request gate
 
-## Pull request gate
-
-A PR must:
-
-- link its issue;
-- list generated and modified IDs;
-- identify upstream sources;
-- pass schema, provenance, duplication, editorial, translation, and map-safety checks as applicable;
-- receive independent review;
-- be squash-merged by a controller.
+A PR links its issue and manifest, lists generated/modified IDs, stays inside allowed paths, documents coverage gaps, passes deterministic validation, and receives independent research/safety review as applicable. The merge controller verifies the expected head SHA and squash-merges.

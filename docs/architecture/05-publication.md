@@ -2,27 +2,20 @@
 
 ## Outputs
 
-- Daily brief: material changes, confidence changes, contested claims, notable reactions, and unresolved questions.
-- Weekly assessment: operational trends, territorial change, strike campaign, force generation, logistics, external support, information environment, competing interpretations, and indicators to watch.
-- Monthly snapshot: durable processes, discarded noise, changed source track records, analytical misses, and map change over the period.
+- **Daily brief:** material changes, confidence changes, contested claims, notable reactions, unresolved questions, and coverage gaps.
+- **Weekly assessment:** operational trends, territorial change, strike campaign, force generation, logistics, external support, information environment, competing interpretations, and indicators.
+- **Snapshot:** durable processes, discarded noise, analytical misses, source-track-record changes, and map change over a requested period.
+
+## Frozen inputs
+
+Each report manifest records its period, `as_of`, claim IDs, assessment IDs, and claim-set hash. Editors do not browse while composing. New evidence requires a new claim-set version and rerun.
 
 ## Languages
 
-Structured data is language-neutral where possible. English is the primary editorial narrative; Russian is a derived translation. Original quotations remain in their source language and translations are stored alongside them.
+Structured records use canonical-language fields plus translations. English is the primary editorial report for the initial implementation; Russian is derived. Original quotations remain in their source language. A translation records the source report ID and exact source commit and fails when either changes.
 
-A translated report must reference the source report commit and frozen claim-set hash. Translation fails when the source changes during work.
+## Public routes
 
-## Site routes
+Planned routes include `/latest`, `/daily`, `/weekly`, `/snapshots`, `/map`, `/events/{id}`, `/claims/{id}`, `/sources/{id}`, `/methodology`, and `/corrections`.
 
-- `/latest`
-- `/daily`
-- `/weekly`
-- `/snapshots`
-- `/map`
-- `/events/{id}`
-- `/claims/{id}`
-- `/sources/{id}`
-- `/methodology`
-- `/corrections`
-
-Each claim page should expose current status, supporting and contradicting evidence, source lineage, reactions, map references, assessment history, corrections, and the responsible commit/PR.
+Claim pages expose outcome, confidence, lifecycle, supporting/disputing evidence, lineage, reactions, map references, assessment history, corrections, and responsible commits.

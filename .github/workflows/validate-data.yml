@@ -1,12 +1,22 @@
-name: Validate structured data
+name: Validate repository contracts
 
 on:
   pull_request:
     paths:
+      - ".github/**"
+      - "catalogs/**"
       - "data/**"
+      - "docs/**"
       - "maps/**"
+      - "reports/**"
       - "schemas/**"
-      - "scripts/validate_data.py"
+      - "scripts/**"
+      - "tasks/**"
+      - "tests/**"
+      - "AGENTS.md"
+      - "METHODOLOGY.md"
+      - "SECURITY_AND_SAFETY.md"
+      - "CORRECTIONS.md"
       - "requirements-dev.txt"
   push:
     branches: [main]
@@ -14,13 +24,32 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: validate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONHASHSEED: "0"
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
-      - run: python -m pip install -r requirements-dev.txt
-      - run: python scripts/validate_data.py
+
+      - name: Install validation dependency
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Run validator tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Validate repository records
+        run: python scripts/validate_data.py

@@ -1,50 +1,29 @@
 # Domain model
 
-## Entities
+## Core records
 
-### Source entity
+- **Source profile:** person, organization, outlet, account, channel, official body, or project; reliability assessments vary by topic and period.
+- **Source item:** one concrete publication and its retrieval/access metadata.
+- **Artifact manifest:** hash, media type, size, storage pointer, rights note, and access classification for preserved evidence.
+- **Observation:** one attributable atomic statement or visual observation.
+- **Claim:** a normalized testable proposition linked to evidence relations.
+- **Event:** a grouping of related claims about an occurrence or process.
+- **Reaction:** an attributable response to a source item or claim.
+- **Assessment:** a time-bounded editorial conclusion from a frozen claim set.
+- **Correction:** a visible change record with propagation requirements.
+- **Report manifest:** content path, period, language, frozen claim-set hash, and translation lineage.
+- **Map feature:** provenance-linked GeoJSON with uncertainty and publication controls.
+- **Map snapshot:** an immutable manifest of map layer files and claim-set hash.
+- **Task manifest:** canonical scope, exclusions, paths, lease, and idempotency contract.
 
-A person, organization, outlet, account, channel, or official body. Reliability and bias are modeled by topic and time period.
+## Identifier conventions
 
-### Source item
+Stable lowercase prefixes with opaque suffixes:
 
-A concrete publication: post, article, video, report, briefing, image, map, or document.
+`src_`, `item_`, `art_`, `obs_`, `clm_`, `evt_`, `react_`, `asm_`, `corr_`, `rpt_`, `geo_`, `map_`, `task_`.
 
-### Observation
+Identifiers are immutable and must not encode conclusions that may change.
 
-An attributable atomic statement extracted from one source item. It records what the source said without deciding whether it is true.
+## Lifecycle
 
-### Claim
-
-A normalized, testable proposition. Evidence relations may support, partially support, dispute, contextualize, or correct it.
-
-### Event
-
-A group of related claims concerning one occurrence or process.
-
-### Assessment
-
-A time-bounded editorial conclusion based on a frozen set of reviewed claims.
-
-### Reaction
-
-A source entity's response to a source item or claim. Allowed relations include `supports`, `partially_supports`, `disputes`, `partially_disputes`, `contextualizes`, `corrects`, `questions_methodology`, `questions_evidence`, and `quotes_without_endorsement`.
-
-### Map feature
-
-A GeoJSON feature derived from approved claims, with temporal validity, uncertainty, provenance, precision, and sensitivity metadata.
-
-## Identifier convention
-
-Use stable lowercase prefixes and opaque sortable suffixes:
-
-- `src_...`
-- `item_...`
-- `obs_...`
-- `clm_...`
-- `evt_...`
-- `asm_...`
-- `react_...`
-- `geo_...`
-
-Identifiers are immutable and must not encode a conclusion that may later change.
+Record lifecycle is independent of analytical outcome. Supersession retains the old record and points to the replacement. Released facts are not rewritten in place.

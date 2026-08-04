@@ -1,0 +1,72 @@
+name: ChatGPT Project worker task
+description: Human dashboard entry for one canonical task manifest.
+title: "[worker-task] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The canonical task contract is the referenced JSON manifest under `tasks/`.
+        A worker claims this task only by creating `work/<task_id>`.
+  - type: input
+    id: task_id
+    attributes:
+      label: Task ID
+      placeholder: task_source_scan_20260804_001
+    validations:
+      required: true
+  - type: input
+    id: manifest
+    attributes:
+      label: Manifest path
+      placeholder: tasks/2026/08/04/task_source_scan_20260804_001.json
+    validations:
+      required: true
+  - type: input
+    id: task_type
+    attributes:
+      label: Task type
+    validations:
+      required: true
+  - type: input
+    id: priority
+    attributes:
+      label: Priority
+      placeholder: "70"
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependency task IDs
+      description: One dependency per line, or `none`.
+    validations:
+      required: true
+  - type: input
+    id: idempotency
+    attributes:
+      label: Idempotency key
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and exclusions
+    validations:
+      required: true
+  - type: textarea
+    id: outputs
+    attributes:
+      label: Allowed output paths
+    validations:
+      required: true
+  - type: checkboxes
+    id: ready
+    attributes:
+      label: Queue gate
+      options:
+        - label: Manifest validates
+          required: true
+        - label: Dependencies and overlap were checked
+          required: true
+        - label: Required connectors and safety constraints are explicit
+          required: true

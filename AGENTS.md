@@ -2,29 +2,38 @@
 
 This file applies to every human and AI contributor.
 
+## ChatGPT Project entrypoint
+
+When an ordinary ChatGPT Project chat receives the user command **`копай`**, it must follow `CHATGPT_PROJECT.md`. The user does not choose a task or role. The worker selects one eligible task from `main`, acquires it through the deterministic `work/<task_id>` branch mutex, resolves the role through `config/worker-routing.json`, persists work in GitHub, and opens a draft PR.
+
+Project memory is context, not a lock. Task ownership exists only after successful deterministic branch creation.
+
 ## Required sequence
 
 1. Read the assigned issue and the referenced file in `tasks/`.
-2. Read `docs/architecture/00-overview.md`, `METHODOLOGY.md`, and `SECURITY_AND_SAFETY.md`.
-3. Select exactly one role from `.github/agents/`.
-4. Confirm the task state, lease, time window, exclusions, and allowed output paths.
-5. Modify only allowed paths and produce only the role's declared outputs.
+2. Read `CHATGPT_PROJECT.md`, `docs/architecture/00-overview.md`, `METHODOLOGY.md`, and `SECURITY_AND_SAFETY.md`.
+3. Resolve exactly one role through `config/worker-routing.json`.
+4. Confirm the task state, dependencies, lease, time window, exclusions, and allowed output paths.
+5. Modify only allowed paths and the task manifest.
 6. Run tests and validation.
-7. Open a PR linked to the issue and task manifest.
+7. Open or update a draft PR linked to the issue and task manifest.
 8. Never approve or merge your own work.
 
 ## Role routing
 
-- Task decomposition and leases → `dispatcher.agent.md`
-- Bounded source collection → `source-researcher.agent.md`
-- Open-web discovery → `open-web-discovery.agent.md`
-- Atomic extraction → `extractor.agent.md`
-- Claim verification → `corroborator.agent.md`
-- Source profile review → `source-analyst.agent.md`
-- Geospatial work → `geo-verifier.agent.md`
-- Report production → `report-editor.agent.md`
-- Russian translation → `translator.agent.md`
-- Release checks → `release-validator.agent.md`
+The machine-readable source of truth is `config/worker-routing.json`.
+
+- Campaign decomposition → `.github/agents/dispatcher.agent.md`
+- Bounded source collection → `.github/agents/source-researcher.agent.md`
+- Open-web discovery → `.github/agents/open-web-discovery.agent.md`
+- Atomic extraction → `.github/agents/extractor.agent.md`
+- Claim verification → `.github/agents/corroborator.agent.md`
+- Source profile review → `.github/agents/source-analyst.agent.md`
+- Geospatial work → `.github/agents/geo-verifier.agent.md`
+- Report production → `.github/agents/report-editor.agent.md`
+- Russian translation → `.github/agents/translator.agent.md`
+- Corrections → `.github/agents/correction-editor.agent.md`
+- Release checks → `.github/agents/release-validator.agent.md`
 
 ## Non-negotiable invariants
 
@@ -39,10 +48,11 @@ This file applies to every human and AI contributor.
 - Public outputs must not reveal precise current positions of active units, vulnerable people, or sensitive infrastructure.
 - Reports may use only an explicitly frozen approved claim and assessment set.
 - A model-generated statement is not evidence.
+- Research returned only in chat is not complete; the task requires persisted records and a draft PR.
 
 ## Stop conditions
 
-Mark the task blocked and make no substantive inference when required evidence is inaccessible, the task overlaps another lease, source identity is ambiguous, instructions conflict, a safety classification is uncertain, or the approved research connector is unavailable.
+Mark the task blocked and make no substantive inference when required evidence is inaccessible, the task overlaps another lease, source identity is ambiguous, instructions conflict, a safety classification is uncertain, the approved research connector is unavailable, or GitHub write access is missing.
 
 ## Pull-request boundary
 

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://war-reporter.invalid/schemas/worker-routing.schema.json",
+  "title": "ChatGPT Project worker routing",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "default_command", "task_type_to_role", "agent_files"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "version": {"const": 1},
+    "default_command": {"const": "копай"},
+    "task_type_to_role": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"}
+    },
+    "agent_files": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "string", "pattern": "^\\.github/agents/[a-z0-9-]+\\.agent\\.md$"}
+    }
+  }
+}

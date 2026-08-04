@@ -7,6 +7,8 @@ import unittest
 from datetime import UTC, datetime
 from pathlib import Path
 
+from jsonschema import Draft202012Validator, FormatChecker
+
 from scripts.bootstrap_pilot import build_tasks
 from scripts.validate_worker_queue import validate_queue
 from scripts.worker_queue import Task, claim_local, deterministic_branch, generate_worker_run_id, ready_tasks, release_local, role_for_task
@@ -23,6 +25,14 @@ class WorkerQueueTests(unittest.TestCase):
             self.assertEqual(task["role"], role_for_task(task["task_type"], ROUTING))
             self.assertEqual("ready", task["state"])
             self.assertIsNone(task["lease"])
+
+    def test_ten_pilot_fixtures_validate_against_task_schema(self) -> None:
+        schema = json.loads((ROOT / "schemas" / "task-manifest.schema.json").read_text(encoding="utf-8"))
+        validator = Draft202012Validator(schema, format_checker=FormatChecker())
+        fixtures = json.loads((ROOT / "examples" / "pilot" / "ready-tasks.json").read_text(encoding="utf-8"))
+        self.assertEqual(10, len(fixtures))
+        errors = [error.message for task in fixtures for error in validator.iter_errors(task)]
+        self.assertEqual([], errors)
 
     def test_worker_run_id_and_branch_are_deterministic_shape(self) -> None:
         run_id = generate_worker_run_id(datetime(2026, 8, 4, 12, 30, tzinfo=UTC), "abcdef12")

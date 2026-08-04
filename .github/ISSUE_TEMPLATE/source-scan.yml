@@ -1,0 +1,57 @@
+name: Source scan
+description: Collect publications from an explicitly bounded source shard.
+title: "[source-scan] "
+labels: ["task:source-scan"]
+body:
+  - type: input
+    id: parent
+    attributes:
+      label: Parent campaign
+      placeholder: "#123"
+    validations:
+      required: true
+  - type: input
+    id: window
+    attributes:
+      label: UTC time window
+      placeholder: "2026-08-04T00:00:00Z/2026-08-04T06:00:00Z"
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Source IDs
+      description: One catalog source ID per line.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Regions and topics
+    validations:
+      required: true
+  - type: textarea
+    id: paths
+    attributes:
+      label: Allowed output paths
+    validations:
+      required: true
+  - type: input
+    id: idempotency
+    attributes:
+      label: Idempotency key
+    validations:
+      required: true
+  - type: checkboxes
+    id: done
+    attributes:
+      label: Definition of done
+      options:
+        - label: Entire window checked
+          required: true
+        - label: Original excerpts and timestamps recorded
+          required: true
+        - label: Duplicate lineage recorded
+          required: true
+        - label: No analytical conclusions added
+          required: true

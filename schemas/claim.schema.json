@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://war-reporter.invalid/schemas/claim.schema.json",
+  "title": "Claim",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["claim_id", "statement", "claim_type", "status", "confidence", "evidence"],
+  "properties": {
+    "claim_id": {"type": "string", "pattern": "^clm_[a-z0-9_-]+$"},
+    "statement": {
+      "type": "object",
+      "required": ["en"],
+      "properties": {"en": {"type": "string", "minLength": 1}, "ru": {"type": "string"}},
+      "additionalProperties": false
+    },
+    "claim_type": {"type": "string", "minLength": 1},
+    "status": {"enum": ["confirmed", "probable", "plausible", "unverified", "contested", "misleading", "false", "obsolete"]},
+    "confidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "assessed_at", "rationale"],
+      "properties": {
+        "label": {"enum": ["confirmed", "probable", "plausible", "unverified", "contested", "misleading", "false", "obsolete"]},
+        "score_internal": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "assessed_at": {"type": "string", "format": "date-time"},
+        "rationale": {"type": "string", "minLength": 1}
+      }
+    },
+    "event_time": {
+      "type": ["object", "null"],
+      "properties": {"earliest": {"type": "string", "format": "date-time"}, "latest": {"type": "string", "format": "date-time"}},
+      "additionalProperties": false
+    },
+    "location_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["observation_id", "relation"],
+        "properties": {
+          "observation_id": {"type": "string", "pattern": "^obs_[a-z0-9_-]+$"},
+          "relation": {"enum": ["supports", "partially_supports", "disputes", "partially_disputes", "contextualizes", "corrects"]}
+        }
+      }
+    }
+  }
+}

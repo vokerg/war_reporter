@@ -1,0 +1,31 @@
+name: Map update
+description: Convert approved claims into uncertainty-aware map features.
+title: "[map-update] "
+labels: ["task:map"]
+body:
+  - type: textarea
+    id: claims
+    attributes:
+      label: Approved claim IDs
+      description: One claim ID per line.
+    validations:
+      required: true
+  - type: input
+    id: snapshot
+    attributes:
+      label: Snapshot timestamp
+      placeholder: "2026-08-04T18:00:00Z"
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Precision, delay, and safety constraints
+    validations:
+      required: true
+  - type: textarea
+    id: paths
+    attributes:
+      label: Allowed output paths
+    validations:
+      required: true

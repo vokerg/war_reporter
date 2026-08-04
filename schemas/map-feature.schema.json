@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://war-reporter.invalid/schemas/map-feature.schema.json",
+  "title": "Map feature",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "id", "geometry", "properties"],
+  "properties": {
+    "type": {"const": "Feature"},
+    "id": {"type": "string", "pattern": "^geo_[a-z0-9_-]+$"},
+    "geometry": {"type": "object"},
+    "properties": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feature_type", "status", "valid_from", "assessed_at", "precision_m", "publication_delay_hours", "sensitivity", "claim_ids", "evidence_ids"],
+      "properties": {
+        "feature_type": {"type": "string"},
+        "status": {"enum": ["confirmed", "probable", "plausible", "unverified", "contested", "obsolete"]},
+        "valid_from": {"type": "string", "format": "date-time"},
+        "valid_to": {"type": ["string", "null"], "format": "date-time"},
+        "assessed_at": {"type": "string", "format": "date-time"},
+        "precision_m": {"type": "integer", "minimum": 1},
+        "publication_delay_hours": {"type": "integer", "minimum": 0},
+        "sensitivity": {"enum": ["public", "delayed", "coarsened", "withheld"]},
+        "claim_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^clm_[a-z0-9_-]+$"}, "uniqueItems": true},
+        "evidence_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^obs_[a-z0-9_-]+$"}, "uniqueItems": true},
+        "supersedes": {"type": ["string", "null"], "pattern": "^geo_[a-z0-9_-]+$"}
+      }
+    }
+  }
+}

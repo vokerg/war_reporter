@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://war-reporter.invalid/schemas/observation.schema.json",
+  "title": "Observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["observation_id", "source_item_id", "observation_type", "original_text", "extracted_statement"],
+  "properties": {
+    "observation_id": {"type": "string", "pattern": "^obs_[a-z0-9_-]+$"},
+    "source_item_id": {"type": "string", "pattern": "^item_[a-z0-9_-]+$"},
+    "observation_type": {"enum": ["reported_event", "assessment", "reaction", "correction", "visual_evidence", "official_statement"]},
+    "original_text": {"type": "string", "minLength": 1},
+    "original_language": {"type": "string", "minLength": 2},
+    "translations": {"type": "object", "additionalProperties": {"type": "string"}},
+    "extracted_statement": {"type": "string", "minLength": 1},
+    "reported_time": {"type": ["string", "null"], "format": "date-time"},
+    "location_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+  }
+}

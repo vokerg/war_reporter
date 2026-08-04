@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://war-reporter.invalid/schemas/source-item.schema.json",
+  "title": "Source item",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["source_item_id", "source_entity_id", "canonical_url", "published_at", "retrieved_at", "language", "item_type"],
+  "properties": {
+    "source_item_id": {"type": "string", "pattern": "^item_[a-z0-9_-]+$"},
+    "source_entity_id": {"type": "string", "pattern": "^src_[a-z0-9_-]+$"},
+    "canonical_url": {"type": "string", "format": "uri"},
+    "published_at": {"type": "string", "format": "date-time"},
+    "retrieved_at": {"type": "string", "format": "date-time"},
+    "language": {"type": "string", "minLength": 2},
+    "item_type": {"enum": ["post", "article", "report", "video", "audio", "image", "map", "briefing", "document"]},
+    "title": {"type": ["string", "null"]},
+    "upstream_item_ids": {"type": "array", "items": {"type": "string", "pattern": "^item_[a-z0-9_-]+$"}, "uniqueItems": true},
+    "content_sha256": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"}
+  }
+}

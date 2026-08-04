@@ -62,6 +62,14 @@ def validate_queue(tasks_root: Path, routing_path: Path) -> list[str]:
         if routing_errors:
             return [f"{routing_path}: {'.'.join(str(part) for part in error.absolute_path) or '<root>'}: {error.message}" for error in routing_errors]
         routing = load_routing(routing_path)
+        task_schema_path = REPOSITORY_ROOT / "schemas" / "task-manifest.schema.json"
+        task_schema = json.loads(task_schema_path.read_text(encoding="utf-8"))
+        schema_task_types = set(task_schema["properties"]["task_type"]["enum"])
+        routing_task_types = set(routing)
+        for task_type in sorted(schema_task_types - routing_task_types):
+            errors.append(f"{routing_path}: missing route for schema task_type {task_type}")
+        for task_type in sorted(routing_task_types - schema_task_types):
+            errors.append(f"{routing_path}: route exists for unknown task_type {task_type}")
         agent_files = routing_document.get("agent_files", {})
         for role in set(routing.values()):
             relative_path = agent_files.get(role)
@@ -69,7 +77,7 @@ def validate_queue(tasks_root: Path, routing_path: Path) -> list[str]:
                 errors.append(f"{routing_path}: no agent file configured for role {role}")
             elif not (REPOSITORY_ROOT / relative_path).is_file():
                 errors.append(f"{routing_path}: agent file does not exist for role {role}: {relative_path}")
-    except (OSError, json.JSONDecodeError, ValueError) as exc:
+    except (OSError, json.JSONDecodeError, ValueError, KeyError, TypeError) as exc:
         return [str(exc)]
 
     idempotency: dict[str, str] = {}

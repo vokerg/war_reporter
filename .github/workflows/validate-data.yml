@@ -67,6 +67,9 @@ jobs:
       - name: Validate repository records and raw manifests
         run: python scripts/validate_data.py
 
+      - name: Validate daily report input eligibility
+        run: python scripts/validate_report_input_eligibility.py
+
       - name: Validate task and proposal scope references
         run: python scripts/validate_queue_references.py
 

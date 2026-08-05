@@ -2,7 +2,7 @@
   "task_id": "task_20260804_05_international_media",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "leased",
+  "state": "pr_open",
   "priority": 80,
   "created_at": "2026-08-04T18:28:29Z",
   "parent_issue": 5,
@@ -59,5 +59,17 @@
     "base_sha": "7d8f3e13261f24e121ec4f8b63c6d200df4e2eb1",
     "leased_at": "2026-08-05T04:41:20Z",
     "lease_until": "2026-08-05T06:41:20Z"
+  },
+  "result": {
+    "branch": "work/task_20260804_05_international_media",
+    "pr_number": 18,
+    "completed_at": "2026-08-05T04:47:30Z",
+    "summary": "Registered four international-media items with verified publication timestamps inside the bounded UTC window, three draft source profiles, explicit lineage notes, exclusions, access failures, and follow-up task proposals.",
+    "coverage_gaps": [
+      "Only four items from two outlets had publication timestamps verified inside the bounded UTC window.",
+      "Associated Press candidates were excluded because exact publication timestamps could not be verified against the cutoff.",
+      "BBC, CNN, DW and France 24 candidate pages were not retrievable through the approved connector because of robots/access restrictions.",
+      "No image, video, map or immutable webpage artifacts were captured."
+    ]
   }
 }

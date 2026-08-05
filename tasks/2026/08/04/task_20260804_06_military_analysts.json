@@ -2,7 +2,7 @@
   "task_id": "task_20260804_06_military_analysts",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "leased",
+  "state": "pr_open",
   "priority": 80,
   "created_at": "2026-08-04T18:28:29Z",
   "parent_issue": 5,
@@ -59,5 +59,16 @@
     "base_sha": "7d8f3e13261f24e121ec4f8b63c6d200df4e2eb1",
     "leased_at": "2026-08-05T04:41:21Z",
     "lease_until": "2026-08-05T06:41:21Z"
+  },
+  "result": {
+    "branch": "work/task_20260804_06_military_analysts",
+    "pr_number": 17,
+    "completed_at": "2026-08-05T04:47:27Z",
+    "summary": "Completed the bounded public-web military-analyst scan. Added four draft source candidates, recorded one inaccessible ISW August 3 candidate with day-level time uncertainty, found no publication verifiably inside the exact UTC window, and persisted out-of-window leads, access failures, and follow-up proposals.",
+    "coverage_gaps": [
+      "Search and connector indexes lagged several live analyst sites and did not expose complete August 3-4 archives.",
+      "The exact publication timestamp and full text of the ISW August 3 candidate were unavailable because the primary page returned HTTP 403.",
+      "No site-native RSS/API or authenticated archive access was available; the open internet was not exhaustively searched."
+    ]
   }
 }

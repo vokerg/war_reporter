@@ -1,0 +1,100 @@
+{
+  "manifest_version": 1,
+  "task_id": "task_20260805_07_strikes_infrastructure",
+  "worker_run_id": "run_20260805T103403Z_5f7a2c91",
+  "retrieved_at": "2026-08-05T10:38:16Z",
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
+  },
+  "scope": {
+    "method": "bounded public-web discovery",
+    "region": "ukraine-war",
+    "topics": [
+      "strikes",
+      "air-defense",
+      "infrastructure"
+    ]
+  },
+  "search_queries": [
+    "Russian attacks kill one in Ukrainian capital Kyiv trigger fires Reuters August 4 2026",
+    "site:t.me/vitaliy_klitschko Kyiv attack August 4 5 2026",
+    "site:t.me/VA_Kyiv Kyiv attack August 5 2026",
+    "site:t.me/kyivoda attack Kyiv region August 5 2026",
+    "site:kyivcity.gov.ua/news 05 серпня 2026 атака Київ",
+    "site:grids.dtek.com 05 серпня 2026 атака",
+    "site:mev.gov.ua 05 серпня 2026 атака енергетична інфраструктура",
+    "official Ukraine regional administration August 5 2026 infrastructure attack",
+    "official air-defense reporting August 5 2026 Ukraine"
+  ],
+  "discovered_items": [
+    {
+      "source_item_id": "item_20260805_klitschko_attack_consolidated",
+      "quote_locator": "Telegram post 7127, consolidated update displayed at 00:20 Kyiv summer time on the overnight August 4/5 attack context page.",
+      "short_excerpt": "Emergency services continue addressing consequences in several districts.",
+      "attribution_note": "The post is an official mayoral account update. Damage and casualty descriptions remain attributed statements and were not independently assessed.",
+      "lineage_note": "The post predates the in-window Reuters article and is treated as a direct upstream publication rather than independent corroboration of Reuters. The public context page exposed stable post IDs and local displayed times; Kyiv summer time was normalized to UTC."
+    },
+    {
+      "source_item_id": "item_20260805_klitschko_casualty_update",
+      "quote_locator": "Telegram post 7134, update displayed at 06:26 Kyiv summer time on the same overnight attack context page.",
+      "short_excerpt": "Nine of fifteen injured people remained in city hospitals.",
+      "attribution_note": "The figures are attributed to the Kyiv mayor's official account and were not converted into assessed facts.",
+      "lineage_note": "Recorded as a later update to item_20260805_klitschko_attack_consolidated. It overlaps the same incident cluster as Reuters and DSNS publications and is not counted as independent corroboration."
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "url": "https://www.reuters.com/world/europe/russian-forces-attack-ukrainian-capital-kyiv-with-ballistic-missiles-mayor-says-2026-08-04/",
+      "reason": "Already represented in the merged international-media shard as item_20260805_reuters_kyiv_attack; excluded by canonical URL deduplication."
+    },
+    {
+      "url": "https://t.me/dsns_telegram/70733",
+      "reason": "Already represented in the merged Ukrainian-official shard as item_20260805_dsns_kyiv_region_initial."
+    },
+    {
+      "url": "https://t.me/dsns_telegram/70738",
+      "reason": "Already represented in the merged Ukrainian-official shard as item_20260805_dsns_kyiv_casualty_update."
+    },
+    {
+      "url": "https://t.me/dsns_telegram/70744",
+      "reason": "Already represented in the merged Ukrainian-official shard as item_20260805_dsns_kyiv_region_update."
+    },
+    {
+      "url": "https://t.me/s/KyivCityOfficial?before=16082",
+      "reason": "Search result described the November 29 attack rather than the assigned August 4/5 window."
+    },
+    {
+      "url": "https://t.me/GeneralStaffZSU/41760",
+      "reason": "Already represented in the Ukrainian-official shard and operationally broader than this strike/infrastructure discovery shard."
+    },
+    {
+      "url": "https://t.me/kpszsu",
+      "reason": "Live air-raid and target-direction notices were excluded because preserving current movement or direction detail could create operational risk; no safe, distinct, in-window retrospective summary was verified before the cutoff."
+    }
+  ],
+  "access_failures": [
+    {
+      "url": "https://www.reuters.com/world/europe/russian-forces-attack-ukrainian-capital-kyiv-with-ballistic-missiles-mayor-says-2026-08-04/",
+      "reason": "Direct article retrieval through the research connector failed; the already-merged canonical repository record was used only for deduplication and lineage. No bypass was attempted."
+    }
+  ],
+  "follow_up_task_proposals": [
+    {
+      "task_type": "source_profile_review",
+      "purpose": "Review the draft identity-only profile for the official Vitali Klitschko Telegram account without assigning reliability from this discovery pass."
+    },
+    {
+      "task_type": "extract_observations",
+      "purpose": "After source-item review, extract atomic attributed observations from the two accepted posts while preserving qualifiers, update lineage, and safety generalization."
+    }
+  ],
+  "coverage_gaps": [
+    "The narrow eleven-hour window was dominated by one Kyiv attack cluster; only two unique upstream official posts were retained after global deduplication.",
+    "Public Telegram context pages exposed stable post IDs and displayed local times, but did not provide immutable captures or content hashes.",
+    "Search indexing for same-day official websites and infrastructure operators lagged the event; no distinct DTEK, Ukrenergo, ministry, or municipal-operator publication with a verifiable in-window timestamp was retained.",
+    "Live air-defense warnings and movement-direction notices were intentionally excluded for operational safety.",
+    "No binaries, photographs, videos, maps, or full-text artifacts were downloaded or hashed.",
+    "This shard records discovery and provenance only; it does not verify casualties, damage, weapon type, interception performance, targeting intent, or attribution."
+  ]
+}

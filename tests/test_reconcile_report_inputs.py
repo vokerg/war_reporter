@@ -152,4 +152,18 @@ class ReconcileReportInputTests(unittest.TestCase):
 
         frozen = reconcile.frozen_report_inputs(
             root,
-            datetime(2026, 8,
+            datetime(2026, 8, 5, tzinfo=UTC),
+            datetime(2026, 8, 6, tzinfo=UTC),
+        )
+        self.assertIsNotNone(frozen)
+        assert frozen is not None
+        payload = {"claims": [first, second], "assessments": []}
+        expected = hashlib.sha256(
+            json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+        self.assertEqual(frozen["claim_ids"], ["clm_alpha", "clm_beta"])
+        self.assertEqual(frozen["claim_set_sha256"], expected)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

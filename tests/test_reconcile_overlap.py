@@ -44,6 +44,7 @@ class ReconcileOverlapTests(unittest.TestCase):
             {
                 "task_type_to_role": {
                     "open_web_discovery": "open-web-discovery",
+                    "investigate_claim": "corroborator",
                     "daily_report": "report-editor",
                 }
             },
@@ -105,6 +106,20 @@ class ReconcileOverlapTests(unittest.TestCase):
             }
         dump(root / f"tasks/{task_id}.json", task)
 
+    @staticmethod
+    def add_approved_claim(root: Path) -> None:
+        dump(
+            root / "data/claims/2026/08/06/clm_fixture.json",
+            {
+                "claim_id": "clm_fixture",
+                "record_status": "approved",
+                "event_time": {
+                    "start": "2026-08-06T12:00:00Z",
+                    "precision": "hour",
+                },
+            },
+        )
+
     def test_clean_day_still_materializes_daily_campaign(self) -> None:
         root = self.make_root()
         plan = reconcile.plan_duties(root, self.now())
@@ -132,6 +147,7 @@ class ReconcileOverlapTests(unittest.TestCase):
                 "2026-08-07T05:00:00Z",
                 "2026-08-07",
             )
+        self.add_approved_claim(root)
         plan = reconcile.plan_duties(root, self.now())
         kinds = [duty["kind"] for duty in plan["duties"]]
         self.assertNotIn("discovery_campaign", kinds)
@@ -139,6 +155,7 @@ class ReconcileOverlapTests(unittest.TestCase):
         self.assertEqual(plan["blockers"], [])
         snapshot = next(duty for duty in plan["duties"] if duty["kind"] == "daily_snapshot")
         self.assertEqual(len(snapshot["depends_on_task_ids"]), 20)
+        self.assertEqual(snapshot["report_inputs"]["claim_ids"], ["clm_fixture"])
 
     def test_partial_legacy_coverage_with_owned_outputs_blocks_full_day_campaign(self) -> None:
         root = self.make_root()

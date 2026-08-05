@@ -120,6 +120,10 @@ def daily_report_key(day: date, region: str) -> str:
     return f"daily_report:{day.isoformat()}:{region}"
 
 
+def daily_report_inputs_key(day: date, region: str) -> str:
+    return f"daily_report_inputs:{day.isoformat()}:{region}"
+
+
 def task_path(root: Path, day: date, task_id: str) -> Path:
     return root / "tasks" / f"{day:%Y/%m/%d}" / f"{task_id}.json"
 
@@ -136,6 +140,112 @@ def discovery_data_paths(day: date, slug: str) -> tuple[str, str, str, str]:
         f"data/artifacts/{dated}/{slug}.ndjson",
         f"raw-manifests/{dated}/{slug}.json",
     )
+
+
+def iter_records(root: Path, relative_root: str) -> Iterable[dict[str, Any]]:
+    record_root = root / relative_root
+    if not record_root.exists():
+        return
+    for path in sorted(record_root.rglob("*")):
+        if not path.is_file() or path.name == ".gitkeep":
+            continue
+        if path.suffix == ".json":
+            value = load(path)
+            values = value if isinstance(value, list) else [value]
+        elif path.suffix == ".ndjson":
+            values = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+        else:
+            continue
+        for value in values:
+            if isinstance(value, dict):
+                yield value
+
+
+def point_in_window(value: str, start: datetime, end: datetime) -> bool:
+    moment = parse(value)
+    return start <= moment < end
+
+
+def claim_overlaps_window(claim: dict[str, Any], start: datetime, end: datetime) -> bool:
+    event_time = claim.get("event_time")
+    if not isinstance(event_time, dict):
+        return False
+    lower_value = event_time.get("start")
+    upper_value = event_time.get("end")
+    if isinstance(lower_value, str) and isinstance(upper_value, str):
+        return parse(lower_value) < end and parse(upper_value) > start
+    if isinstance(lower_value, str):
+        return point_in_window(lower_value, start, end)
+    if isinstance(upper_value, str):
+        moment = parse(upper_value)
+        return start < moment <= end
+    return False
+
+
+def frozen_report_inputs(root: Path, start: datetime, end: datetime) -> dict[str, Any] | None:
+    claims_by_id: dict[str, dict[str, Any]] = {}
+    for claim in iter_records(root, "data/claims"):
+        claim_id = claim.get("claim_id")
+        if not isinstance(claim_id, str):
+            continue
+        if claim_id in claims_by_id:
+            raise ValueError(f"duplicate claim_id: {claim_id}")
+        claims_by_id[claim_id] = claim
+
+    assessments_by_id: dict[str, dict[str, Any]] = {}
+    for assessment in iter_records(root, "data/assessments"):
+        assessment_id = assessment.get("assessment_id")
+        if not isinstance(assessment_id, str):
+            continue
+        if assessment_id in assessments_by_id:
+            raise ValueError(f"duplicate assessment_id: {assessment_id}")
+        assessments_by_id[assessment_id] = assessment
+
+    approved_claims = {
+        claim_id: claim
+        for claim_id, claim in claims_by_id.items()
+        if claim.get("record_status") == "approved"
+    }
+    selected_claim_ids = {
+        claim_id
+        for claim_id, claim in approved_claims.items()
+        if claim_overlaps_window(claim, start, end)
+    }
+    selected_assessment_ids: set[str] = set()
+    for assessment_id, assessment in assessments_by_id.items():
+        if assessment.get("record_status") != "approved":
+            continue
+        as_of = assessment.get("as_of")
+        claim_ids = assessment.get("claim_ids")
+        if not isinstance(as_of, str) or not point_in_window(as_of, start, end):
+            continue
+        if not isinstance(claim_ids, list) or not claim_ids or not all(
+            isinstance(claim_id, str) and claim_id in approved_claims for claim_id in claim_ids
+        ):
+            continue
+        selected_assessment_ids.add(assessment_id)
+        selected_claim_ids.update(str(claim_id) for claim_id in claim_ids)
+
+    if not selected_claim_ids and not selected_assessment_ids:
+        return None
+
+    claim_ids = sorted(selected_claim_ids)
+    assessment_ids = sorted(selected_assessment_ids)
+    frozen_payload = {
+        "claims": [approved_claims[claim_id] for claim_id in claim_ids],
+        "assessments": [assessments_by_id[assessment_id] for assessment_id in assessment_ids],
+    }
+    canonical = json.dumps(
+        frozen_payload,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return {
+        "claim_ids": claim_ids,
+        "assessment_ids": assessment_ids,
+        "claim_set_sha256": hashlib.sha256(canonical).hexdigest(),
+    }
 
 
 def discovery_shard_slug(task: dict[str, Any]) -> str | None:
@@ -270,13 +380,28 @@ def pending_proposals(root: Path, tasks: dict[str, tuple[Path, dict[str, Any]]],
                 continue
             if producer not in proposal.get("depends_on_task_ids", []):
                 continue
+            report_inputs = None
+            if proposal.get("task_type") == "daily_report":
+                window = proposal.get("window")
+                if not isinstance(window, dict):
+                    continue
+                lower = window.get("from")
+                upper = window.get("to")
+                if not isinstance(lower, str) or not isinstance(upper, str):
+                    continue
+                report_inputs = frozen_report_inputs(root, parse(lower), parse(upper))
+                if report_inputs is None:
+                    continue
             seen.add(key)
-            duties.append({
+            duty = {
                 "kind": "task_proposal",
                 "producer_task_id": producer,
                 "proposal_path": path.relative_to(root).as_posix(),
                 "proposal": proposal,
-            })
+            }
+            if report_inputs is not None:
+                duty["report_inputs"] = report_inputs
+            duties.append(duty)
     return duties
 
 
@@ -343,6 +468,10 @@ def plan_duties(root: Path, now: datetime | None = None) -> dict[str, Any]:
             })
 
     report_exists = any(task.get("idempotency_key") == daily_report_key(day, region) for _, task in tasks.values())
+    report_inputs_task_exists = any(
+        task.get("idempotency_key") == daily_report_inputs_key(day, region)
+        for _, task in tasks.values()
+    )
     proposal_for_day = any(
         parse(duty["proposal"]["window"]["from"]) < end and parse(duty["proposal"]["window"]["to"]) > start
         for duty in proposal_duties
@@ -361,13 +490,28 @@ def plan_duties(root: Path, now: datetime | None = None) -> dict[str, Any]:
             if related and all(task.get("state") in COMPLETE_STATES for task in related):
                 merged_dependencies = sorted(task["task_id"] for task in related if task.get("state") == "merged")
                 if merged_dependencies:
-                    duties.append({
-                        "kind": "daily_snapshot",
-                        "day": day.isoformat(),
-                        "window": {"from": iso(start), "to": iso(end)},
-                        "region": region,
-                        "depends_on_task_ids": merged_dependencies,
-                    })
+                    report_inputs = frozen_report_inputs(root, start, end)
+                    if report_inputs is not None:
+                        duties.append({
+                            "kind": "daily_snapshot",
+                            "day": day.isoformat(),
+                            "window": {"from": iso(start), "to": iso(end)},
+                            "region": region,
+                            "depends_on_task_ids": merged_dependencies,
+                            "report_inputs": report_inputs,
+                        })
+                    else:
+                        blockers.append(
+                            f"daily snapshot {day} deferred: no approved claims or assessments overlap the frozen UTC window"
+                        )
+                        if not report_inputs_task_exists:
+                            duties.append({
+                                "kind": "report_input_assessment",
+                                "day": day.isoformat(),
+                                "window": {"from": iso(start), "to": iso(end)},
+                                "region": region,
+                                "depends_on_task_ids": merged_dependencies,
+                            })
                 else:
                     blockers.append(f"daily snapshot {day} skipped: no merged inputs")
     return {
@@ -466,7 +610,59 @@ def task_from_proposal(root: Path, duty: dict[str, Any], created_at: str, tasks:
         "idempotency_key": key,
         "lease": None,
     }
+    if proposal["task_type"] == "daily_report":
+        report_inputs = duty.get("report_inputs")
+        if not isinstance(report_inputs, dict):
+            raise ValueError(f"daily_report proposal {key} has no approved frozen report inputs")
+        task["report_inputs"] = report_inputs
     day = parse(task["window"]["from"]).date()
+    return task_path(root, day, task_id), task
+
+
+def build_report_input_assessment(root: Path, duty: dict[str, Any], created_at: str) -> tuple[Path, dict[str, Any]]:
+    day = date.fromisoformat(duty["day"])
+    task_id = f"task_daily_{day:%Y%m%d}_80_report_inputs"
+    routes = routing(root)
+    dated = f"{day:%Y/%m/%d}"
+    task = {
+        "task_id": task_id,
+        "task_type": "investigate_claim",
+        "role": routes.get("investigate_claim", "corroborator"),
+        "state": "ready",
+        "priority": 75,
+        "created_at": created_at,
+        "parent_issue": None,
+        "issue_number": None,
+        "depends_on_task_ids": duty["depends_on_task_ids"],
+        "window": duty["window"],
+        "scope": {
+            "source_ids": [],
+            "source_groups": [],
+            "regions": [duty["region"]],
+            "topics": ["daily-report-readiness", "claim-assessment"],
+            "content_types": ["claim", "assessment"],
+        },
+        "exclusions": [
+            "Do not convert raw source items or observations directly into report prose",
+            "Do not approve a claim without explicit evidence lineage and adversarial corroboration",
+            "Do not add precise current operational locations or targeting-enabling detail",
+        ],
+        "allowed_output_paths": [
+            f"data/claims/{dated}/**",
+            f"data/assessments/{dated}/**",
+            f"queue/proposals/{task_id}.json",
+            f"review/self/{task_id}.json",
+        ],
+        "definition_of_done": [
+            "Merged evidence overlapping the frozen UTC window was reviewed for reportable claims",
+            "Any created claim or assessment has explicit provenance, uncertainty, and approved or non-approved editorial status",
+            "Unsupported or insufficiently corroborated material remains unapproved and is documented as a coverage gap",
+            "A queue proposal file records any narrower follow-up duties or an explicit empty proposals list",
+            "Two separate self-review rounds passed and a receipt was persisted",
+        ],
+        "idempotency_key": daily_report_inputs_key(day, duty["region"]),
+        "lease": None,
+    }
     return task_path(root, day, task_id), task
 
 
@@ -474,6 +670,11 @@ def build_daily_snapshot(root: Path, duty: dict[str, Any], created_at: str) -> t
     day = date.fromisoformat(duty["day"])
     task_id = f"task_daily_{day:%Y%m%d}_90_snapshot"
     routes = routing(root)
+    report_inputs = duty.get("report_inputs")
+    if not isinstance(report_inputs, dict) or not (
+        report_inputs.get("claim_ids") or report_inputs.get("assessment_ids")
+    ):
+        raise ValueError(f"daily snapshot {day} has no approved frozen report inputs")
     task = {
         "task_id": task_id,
         "task_type": "daily_report",
@@ -492,6 +693,7 @@ def build_daily_snapshot(root: Path, duty: dict[str, Any], created_at: str) -> t
             "topics": ["daily-snapshot"],
             "content_types": ["report"],
         },
+        "report_inputs": report_inputs,
         "exclusions": [
             "Unmerged or unreviewed evidence",
             "New web browsing by the report editor",
@@ -504,7 +706,8 @@ def build_daily_snapshot(root: Path, duty: dict[str, Any], created_at: str) -> t
             f"review/self/{task_id}.json",
         ],
         "definition_of_done": [
-            "Only merged repository inputs for the frozen UTC day were used",
+            "Only the exact approved claim and assessment IDs frozen in report_inputs were used",
+            "The produced report manifest repeats the frozen claim IDs, assessment IDs, and claim-set SHA-256",
             "Material changes, confidence changes, contested claims, corrections, unresolved questions, and coverage gaps were represented",
             "No new evidence was introduced during editing",
             "Two separate self-review rounds passed and a receipt was persisted",
@@ -541,6 +744,12 @@ def apply_plan(root: Path, plan: dict[str, Any], parent_issue: int | None = None
                     dump(path, task)
                     tasks[task["task_id"]] = (path, task)
                     created.append(task["task_id"])
+        elif kind == "report_input_assessment":
+            path, task = build_report_input_assessment(root, duty, created_at)
+            if task["task_id"] not in tasks:
+                dump(path, task)
+                tasks[task["task_id"]] = (path, task)
+                created.append(task["task_id"])
         elif kind == "daily_snapshot":
             path, task = build_daily_snapshot(root, duty, created_at)
             if task["task_id"] not in tasks:

@@ -40,6 +40,7 @@ jobs:
         run: |
           cat .hardening/bootstrap/payload-*.b64 | tr -d '\n' | base64 --decode | tar -xz
           rm -rf .hardening/bootstrap
+          rm -f .hardening/validation-errors.txt
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -50,7 +51,7 @@ jobs:
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
 
       - name: Apply canonicalization and queue repair
-        run: python scripts/harden_repository.py --delete-stale-branches
+        run: python scripts/hardening_runner.py --delete-stale-branches
 
       - name: Run regression tests
         run: python -m unittest discover -s tests -v

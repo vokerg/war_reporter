@@ -34,12 +34,14 @@ jobs:
           cp .patch-staging/test_reconcile_overlap.py tests/test_reconcile_overlap.py
           cat .patch-staging/test_reconcile_report_inputs.part* > tests/test_reconcile_report_inputs.py
           cp .patch-staging/report-editor.agent.md .github/agents/report-editor.agent.md
+          python .patch-staging/patch-test-autonomy.py
           printf '%s  %s\n' \
             adae82ccf2360c6fcf1f3463061fed927cff1b35a71ac91600819d70c2f6b697 scripts/reconcile_repository.py \
             73be82a0d93ce70d26e89235a5316629c51129a51895d95712b47df9eac9731c schemas/task-manifest.schema.json \
             d9e6a1f4bdacc8179b46c16ecfebb12cb7141f8e5512f473837ff58c5f1f18cd tests/test_reconcile_overlap.py \
             2038ef038729d8067262374e7f7c4b0761dd9d59dab9b818013099fcd790620a tests/test_reconcile_report_inputs.py \
             0cdf58d615673b05baab946315f68a30a9fb9eb6d98f12715a07520ac24ee9fa .github/agents/report-editor.agent.md | sha256sum --check
+          git diff --check
 
       - name: Validate repository
         run: |

@@ -2,7 +2,7 @@
   "task_id": "task_20260805_10_reactions_corrections",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "review",
+  "state": "merged",
   "priority": 70,
   "created_at": "2026-08-05T05:06:14Z",
   "parent_issue": 33,
@@ -54,17 +54,11 @@
     "No final truth assessment, territorial conclusion, or report narrative was added"
   ],
   "idempotency_key": "open_web_discovery:reactions-corrections:20260804T1800Z:20260805T0500Z:ukraine-war",
-  "lease": {
-    "worker_run_id": "run_20260805T103530Z_8c41d7ab",
-    "lease_branch": "work/task_20260805_10_reactions_corrections",
-    "base_sha": "93d3f7b500def6af2006ef36e5de427522557938",
-    "leased_at": "2026-08-05T10:35:30Z",
-    "lease_until": "2026-08-05T12:35:30Z"
-  },
+  "lease": null,
   "result": {
     "branch": "work/task_20260805_10_reactions_corrections",
     "pr_number": 54,
-    "completed_at": "2026-08-05T12:00:00Z",
+    "completed_at": "2026-08-05T12:04:36Z",
     "summary": "Completed the bounded reactions, criticism, corrections and retractions scan. Registered one unique Guardian article first published at 03:53Z that records attributable criticism of delayed air-defence deliveries and a request for additional sanctions. Existing Kyiv-attack publications were deduplicated, a same-day AP item without a verifiable cutoff timestamp was excluded, and no formal correction or retraction notice was verified in the exact window.",
     "coverage_gaps": [
       "The accepted article was retrieved after a later edit; the exact first-published text was not captured.",
@@ -72,6 +66,8 @@
       "AP's relevant same-day article did not expose a verifiable publication timestamp in the retrieved representation.",
       "No clearly timestamped formal correction or retraction notice was verified in the exact window.",
       "This bounded search is not an exhaustive survey of every outlet, language, correction page or social platform."
-    ]
+    ],
+    "merge_sha": "9c1c6da4441fc433435187bc032d903d811f0675",
+    "merged_at": "2026-08-05T12:04:36Z"
   }
 }

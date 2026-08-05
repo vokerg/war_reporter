@@ -1,0 +1,92 @@
+{
+  "manifest_version": 1,
+  "task_id": "task_20260805_03_ua_analysis_media",
+  "worker_run_id": "run_20260805T051039Z_4d8c1a2f",
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
+  },
+  "retrieved_at": "2026-08-05T05:14:18Z",
+  "scope": {
+    "region": "ukraine-war",
+    "topics": [
+      "ukrainian-analysis",
+      "ukrainian-media",
+      "operations"
+    ],
+    "method": "bounded public-web discovery"
+  },
+  "search_queries": [
+    "Ukrainian media August 5 2026 operations overnight",
+    "site:suspilne.media archive August 5 2026 war operations",
+    "site:pravda.com.ua August 4 2026 evening frontline",
+    "Ukrainian analysis media August 4 2026 21:00 operations"
+  ],
+  "discovered_items": [
+    {
+      "source_item_id": "item_suspilne_1368948",
+      "quote_locator": "Headline and sections beginning ‘На Костянтинівському напрямку’ and ‘РФ штурмує малими групами’. Precise operational details were not copied into this manifest.",
+      "short_excerpt": "The live analysis describes how drones, small groups and logistics pressures are changing combat conditions in eastern Ukraine.",
+      "attribution_note": "The page attributes observations to named Ukrainian service members, broadcasts, unit representatives and General Staff reporting. This discovery record does not validate their statements.",
+      "lineage_note": "The page is an editorial live compilation drawing on interviews, broadcasts and official posts; those upstream items were not separately registered in this bounded shard."
+    },
+    {
+      "source_item_id": "item_suspilne_1371680",
+      "quote_locator": "Headline, introductory summary and continuously updated sections on the 1624th day of the war.",
+      "short_excerpt": "Suspilne opened a continuously updated live page collecting major war-related developments for August 5.",
+      "attribution_note": "Individual entries are attributed to emergency services, local authorities, security agencies and linked Suspilne reports. No underlying allegation was upgraded to fact.",
+      "lineage_note": "This is a rolling editorial compilation; later updates may postdate the initial publication time. Retrieval time fixes the reviewed version boundary."
+    },
+    {
+      "source_item_id": "item_suspilne_1371716",
+      "quote_locator": "Headline, introductory paragraph and the morning-news section headings.",
+      "short_excerpt": "The morning digest summarizes overnight attacks and other major Ukraine-war developments reported by Suspilne.",
+      "attribution_note": "The digest links and summarizes earlier Suspilne reports and attributed official statements. It is not independent corroboration of the linked live page.",
+      "lineage_note": "The item directly links the Suspilne live page registered as item_suspilne_1371680 and shares several upstream official sources with it."
+    },
+    {
+      "source_item_id": "item_up_8047285",
+      "quote_locator": "Headline, publication line, source line and first explanatory paragraphs.",
+      "short_excerpt": "Ukrainska Pravda reported the General Staff's evening count of combat activity.",
+      "attribution_note": "The article explicitly identifies the Ukrainian General Staff's Facebook situation report as its source. The reported figures remain attributed observations.",
+      "lineage_note": "The direct General Staff post was not separately registered here and may also be represented in Ukrainian-official discovery work. This media item is not additional independent evidence."
+    }
+  ],
+  "access_failures": [
+    {
+      "url": "https://www.pravda.com.ua/news/date_05082026/",
+      "reason": "The exact dated archive URL was not indexed by the search connector during the run; current homepage and article links were used instead."
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "url": "https://www.pravda.com.ua/articles/2026/08/04/8047260/",
+      "reason": "Published at 2026-08-04T16:48:00Z, before the task window opened at 18:00Z."
+    },
+    {
+      "url": "https://suspilne.media/dnipro/1371130-bijki-strilanina-i-skargi-na-tck-ak-vidbuvaetsa-mobilizacia-na-dnipropetrovsini-ta-de-meza-povnovazen-vijskovih/",
+      "reason": "Previously registered item and outside the current time window."
+    },
+    {
+      "url": "https://suspilne.media/archive/2026/8/5/",
+      "reason": "Archive entries focused only on weather, non-war events or official-only reporting were outside this shard's media-analysis emphasis and were not registered."
+    }
+  ],
+  "coverage_gaps": [
+    "The bounded window spans eleven hours and contains fewer long-form Ukrainian analytical publications than a full-day scan.",
+    "Direct upstream Facebook, Telegram, broadcast and unit statements cited by the media items were not exhaustively registered.",
+    "Rolling live pages may have been updated after retrieval; this manifest records publication and retrieval times separately.",
+    "No maps, images, video, full-text articles or other binaries were downloaded or hashed.",
+    "Potentially targeting-enabling operational detail present in source pages was not copied into repository records."
+  ],
+  "follow_up_task_proposals": [
+    {
+      "task_type": "source_scan",
+      "purpose": "Collect and timestamp the direct official, broadcast and unit statements cited by the accepted media items, without duplicating work in active official-source shards."
+    },
+    {
+      "task_type": "extract_observations",
+      "purpose": "After source-item review, extract atomic attributed observations while preserving speaker qualifications, update times and common upstream lineage."
+    }
+  ]
+}

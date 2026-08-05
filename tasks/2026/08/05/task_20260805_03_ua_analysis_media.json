@@ -2,17 +2,60 @@
   "task_id": "task_20260805_03_ua_analysis_media",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "ready",
+  "state": "merged",
   "priority": 85,
   "created_at": "2026-08-05T05:06:14Z",
   "parent_issue": 33,
-  "issue_number": null,
+  "issue_number": 37,
   "depends_on_task_ids": [],
-  "window": {"from": "2026-08-04T18:00:00Z", "to": "2026-08-05T05:00:00Z"},
-  "scope": {"source_ids": [], "source_groups": [], "regions": ["ukraine-war"], "topics": ["ukrainian-analysis", "ukrainian-media", "operations"], "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"]},
-  "exclusions": ["Items already represented by canonical URL, platform ID, or content hash", "Access-control bypass, private material, and unsafe non-public geodata", "Precise current operational positions or targeting-enabling detail"],
-  "allowed_output_paths": ["catalogs/sources/2026/08/05/ua-analysis-media.json", "data/source-items/2026/08/05/ua-analysis-media.ndjson", "data/artifacts/2026/08/05/ua-analysis-media.ndjson", "raw-manifests/2026/08/05/ua-analysis-media.json"],
-  "definition_of_done": ["The assigned public-web discovery shard and UTC window were searched", "Primary publications were preferred and upstream lineage was recorded", "Canonical URLs, timestamps, language, quote locators, and access failures were recorded", "Candidate source profiles and follow-up task proposals were persisted when justified", "No final truth assessment, territorial conclusion, or report narrative was added"],
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
+  },
+  "scope": {
+    "source_ids": [],
+    "source_groups": [],
+    "regions": ["ukraine-war"],
+    "topics": ["ukrainian-analysis", "ukrainian-media", "operations"],
+    "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"]
+  },
+  "exclusions": [
+    "Items already represented by canonical URL, platform ID, or content hash",
+    "Access-control bypass, private material, and unsafe non-public geodata",
+    "Precise current operational positions or targeting-enabling detail"
+  ],
+  "allowed_output_paths": [
+    "catalogs/sources/2026/08/05/ua-analysis-media.json",
+    "data/source-items/2026/08/05/ua-analysis-media.ndjson",
+    "data/artifacts/2026/08/05/ua-analysis-media.ndjson",
+    "raw-manifests/2026/08/05/ua-analysis-media.json"
+  ],
+  "definition_of_done": [
+    "The assigned public-web discovery shard and UTC window were searched",
+    "Primary publications were preferred and upstream lineage was recorded",
+    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
+    "Candidate source profiles and follow-up task proposals were persisted when justified",
+    "No final truth assessment, territorial conclusion, or report narrative was added"
+  ],
   "idempotency_key": "open_web_discovery:ua-analysis-media:20260804T1800Z:20260805T0500Z:ukraine-war",
-  "lease": null
+  "lease": {
+    "worker_run_id": "run_20260805T051039Z_4d8c1a2f",
+    "lease_branch": "work/task_20260805_03_ua_analysis_media",
+    "base_sha": "38f03b1edb29ee38762460a653474f9d52b6c89b",
+    "leased_at": "2026-08-05T05:11:02Z",
+    "lease_until": "2026-08-05T07:11:02Z"
+  },
+  "result": {
+    "branch": "work/task_20260805_03_ua_analysis_media",
+    "pr_number": 39,
+    "completed_at": "2026-08-05T05:15:48Z",
+    "summary": "Bounded public-web discovery registered one new draft media profile and four source items from Suspilne and Ukrainska Pravda, covering an eastern-front analytical live page, two editorial war roundups, and an attributed evening General Staff report. Common upstream lineage and live-page update risk were recorded without truth assessment.",
+    "coverage_gaps": [
+      "The eleven-hour window contained fewer long-form analytical publications than a full-day scan.",
+      "Direct upstream official, broadcast, unit and social-media statements were not exhaustively registered.",
+      "Rolling live pages may have changed after the recorded retrieval time.",
+      "No maps, images, video, full-text articles or other binaries were downloaded or hashed.",
+      "Potentially targeting-enabling operational detail was not copied into repository records."
+    ]
+  }
 }

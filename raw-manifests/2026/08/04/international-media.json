@@ -1,0 +1,122 @@
+{
+  "task_id": "task_20260804_05_international_media",
+  "worker_run_id": "run_20260805T044109Z_5e6c91a4",
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
+  },
+  "retrieved_at": "2026-08-05T04:45:09Z",
+  "scope": {
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "international-media",
+      "operations",
+      "external-support"
+    ],
+    "languages": [
+      "en"
+    ],
+    "access_method": "public_web"
+  },
+  "search_log": [
+    {
+      "outlet": "Reuters",
+      "status": "searched",
+      "notes": "Admitted only articles with publication timestamps verified inside the UTC window."
+    },
+    {
+      "outlet": "The Guardian",
+      "status": "searched",
+      "notes": "Admitted one briefing with a publication timestamp verified inside the UTC window."
+    },
+    {
+      "outlet": "Associated Press",
+      "status": "partial",
+      "notes": "Relevant candidates were found, but exact publication timestamps were not exposed in the retrieved page representation, so they were not admitted against the 18:00 UTC cutoff."
+    },
+    {
+      "outlet": "BBC, CNN, DW, France 24",
+      "status": "access_failed",
+      "notes": "The approved research connector could not retrieve candidate pages because of robots/access restrictions. No bypass was attempted."
+    }
+  ],
+  "included_items": [
+    {
+      "source_item_id": "item_20260804_reuters_port_strikes",
+      "quote_locator": "Article body, paragraphs 1-3",
+      "verification_excerpt": "Reuters could not independently verify the ministry’s claims.",
+      "lineage_note": "The report attributes the central strike claims to the Russian Defence Ministry; no independent verification is asserted."
+    },
+    {
+      "source_item_id": "item_20260804_reuters_fire_point_freyja",
+      "quote_locator": "Article body, paragraphs 4-10",
+      "verification_excerpt": "Pretty much everything is agreed.",
+      "lineage_note": "The report is based on a Reuters interview with Fire Point’s chief executive and descriptions of partner integration."
+    },
+    {
+      "source_item_id": "item_20260804_reuters_grain_routes",
+      "quote_locator": "Article body, paragraphs 1-12",
+      "verification_excerpt": "There is no alternative to the ports of Odesa.",
+      "lineage_note": "The report relies on an interview with Ukraine’s agriculture minister and ministry-supplied figures; those upstream assertions require separate extraction and corroboration."
+    },
+    {
+      "source_item_id": "item_20260804_guardian_war_briefing",
+      "quote_locator": "Briefing sections under the headline",
+      "verification_excerpt": "A compiled briefing covering NATO, frontline, drone and diplomatic developments.",
+      "lineage_note": "The page is a staff-and-agencies aggregation. Exact upstream article and dispatch lineage was not fully resolved during this bounded scan."
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "canonical_url": "https://www.theguardian.com/world/2026/aug/03/ukraine-war-briefing-kyiv-hit-wildberries-again",
+      "reason": "Published before the task window opened at 2026-08-03T18:00:00Z."
+    },
+    {
+      "canonical_url": "https://www.reuters.com/world/europe/russian-forces-attack-ukrainian-capital-kyiv-with-ballistic-missiles-mayor-says-2026-08-04/",
+      "reason": "Published after the task window closed at 2026-08-04T18:00:00Z."
+    },
+    {
+      "canonical_url": "https://apnews.com/article/222d8755b524c231faa8fd6de10f38ef",
+      "reason": "Relevant AP candidate, but the exact publication timestamp was not exposed in the retrieved page representation; admission relative to the cutoff could not be verified."
+    },
+    {
+      "canonical_url": "https://apnews.com/article/9e4000f63b54cf814704ff60373f2bb9",
+      "reason": "Relevant AP candidate, but the exact publication timestamp was not exposed in the retrieved page representation; admission relative to the cutoff could not be verified."
+    }
+  ],
+  "artifact_capture": {
+    "count": 0,
+    "reason": "No permitted immutable snapshot or object-store capture was available in this worker environment. Source pages are represented by canonical URLs and retrieval metadata only."
+  },
+  "follow_up_task_proposals": [
+    {
+      "task_type": "extract_observations",
+      "subject": "Reuters reporting on claimed strikes against Ukrainian port facilities",
+      "reason": "Extract the ministry attribution, qualifiers and Reuters non-verification statement without upgrading the claim."
+    },
+    {
+      "task_type": "extract_observations",
+      "subject": "Fire Point Freyja European technology integration",
+      "reason": "Separate direct company statements, partner references and future-tense plans into atomic observations."
+    },
+    {
+      "task_type": "investigate_claim",
+      "subject": "Ukraine port damage and grain-export losses",
+      "reason": "Resolve the ministry figures, affected facilities and alternative-route assertions against primary and independent sources."
+    },
+    {
+      "task_type": "source_scan",
+      "subject": "Guardian briefing upstream lineage",
+      "reason": "Resolve the exact agency dispatches and primary statements underlying the compiled briefing."
+    }
+  ],
+  "coverage_gaps": [
+    "Only four items from two outlets had publication timestamps verified inside the bounded UTC window.",
+    "Associated Press candidates were excluded because exact publication timestamps could not be verified against the cutoff.",
+    "BBC, CNN, DW and France 24 candidate pages were not retrievable through the approved connector because of robots/access restrictions.",
+    "No paywall, access-control or robots restriction was bypassed.",
+    "No image, video, map or immutable webpage artifacts were captured."
+  ]
+}

@@ -9,8 +9,10 @@ on:
       - "data/**"
       - "docs/**"
       - "maps/**"
+      - "queue/**"
       - "raw-manifests/**"
       - "reports/**"
+      - "review/**"
       - "schemas/**"
       - "scripts/**"
       - "tasks/**"
@@ -59,13 +61,13 @@ jobs:
       - name: Validate repository records and raw manifests
         run: python scripts/validate_data.py
 
-      - name: Validate queue, self-review, and trust boundary
+      - name: Validate queue and trust boundary
         run: python scripts/validate_worker_queue.py
 
-      - name: Validate autonomous runtime contract
+      - name: Validate autonomous runtime, self-review, and proposals
         run: python scripts/validate_autonomy.py
 
-      - name: Audit live work refs
+      - name: Audit live work refs without blocking on cleanup debt
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python scripts/audit_work_refs.py

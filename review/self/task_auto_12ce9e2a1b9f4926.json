@@ -1,0 +1,55 @@
+{
+  "task_id": "task_auto_12ce9e2a1b9f4926",
+  "pr_number": 78,
+  "rounds": [
+    {
+      "round": 1,
+      "reviewed_at": "2026-08-05T12:37:15Z",
+      "reviewer_run_id": "run_20260805T123502Z_12ce9e2a",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps"
+      ],
+      "findings": [
+        "The frozen discovery note contains three separable attributable propositions: criticism of delayed air-defence deliveries, a request for more air-defence support, and a request for additional sanctions.",
+        "The accepted Guardian article was retrieved after a later edit and the underlying social-media post was not separately registered.",
+        "The article shares the overnight Kyiv attack lineage and must not be treated as independent corroboration of casualty, interception, damage, weapon, or attribution claims.",
+        "Using a direct speaker source ID would imply a registered primary source item that is not present, so speaker_entity_id remains null and Guardian attribution is retained in each canonical statement."
+      ],
+      "repairs": [
+        "Split the composite discovery note into three atomic draft reaction observations.",
+        "Used only the source-item title and the short verification note preserved in the raw manifest as excerpts and locators.",
+        "Kept event_time null because the repository input does not establish a separate timestamp for the underlying statement."
+      ],
+      "outcome": "pass"
+    },
+    {
+      "round": 2,
+      "reviewed_at": "2026-08-05T12:38:56Z",
+      "reviewer_run_id": "run_20260805T123502Z_12ce9e2a",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps"
+      ],
+      "findings": [
+        "A second reread found each observation linked only to item_20260805_guardian_air_defence_criticism and phrased as an attributed report rather than an independently verified fact.",
+        "No casualty, interception, damage, targeting, reliability, truth-assessment, or report-narrative content was introduced.",
+        "The output path, proposal receipt, review receipt, and task-control update remain inside the declared task boundary.",
+        "Exact-head repository contract run 285 passed schema and graph validation, task/proposal reference validation, queue and trust-boundary checks, autonomy/proposal checks, and live-ref audit."
+      ],
+      "repairs": [],
+      "outcome": "pass"
+    }
+  ],
+  "exceptional_condition": false
+}

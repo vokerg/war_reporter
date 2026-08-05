@@ -1,0 +1,118 @@
+{
+  "task_id": "task_20260804_10_reactions_corrections",
+  "worker_run_id": "run_20260805T044202Z_b31d94e7",
+  "searched_at": "2026-08-05T04:45:57Z",
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
+  },
+  "scope": [
+    "public reactions to Russia-Ukraine war reporting and incidents",
+    "public criticism by attributable figures",
+    "formal corrections, clarifications, and retractions"
+  ],
+  "queries": [
+    "Ukraine war correction retraction August 4 2026",
+    "Ukraine Russia reaction criticism August 4 2026",
+    "site:reuters.com Ukraine reaction correction 2026-08-04",
+    "site:apnews.com Ukraine Russia August 4 2026 reaction",
+    "site:theguardian.com/world/2026/aug/04 Ukraine criticism reaction war",
+    "site:mfa.gov.tr 4 August 2026 Black Sea safety drone attack",
+    "site:president.gov.ua 4 August 2026 Kherson drone civilians",
+    "site:mfa.gov.ua 4 August 2026 Kherson Sybiha drone",
+    "site:fullfact.org/ukraine August 4 2026",
+    "site:ukrainefactcheck.org August 4 2026"
+  ],
+  "records": [
+    {
+      "source_item_id": "item_20260804_reuters_kherson_drone_reaction",
+      "canonical_url": "https://www.reuters.com/world/europe/ukraine-accuses-russia-war-crime-after-video-shows-drone-hunting-market-vendor-2026-08-04/",
+      "locator": "Headline and timestamp; paragraphs beginning 'Today, many were shocked', 'Reuters verified', and 'Sybiha said'.",
+      "short_excerpt": "Reuters verified the location but could not independently confirm the video's date.",
+      "discovery_notes": "Collects attributable reactions from President Volodymyr Zelenskyy and Foreign Minister Andrii Sybiha, records Russia's non-response to Reuters, and preserves Reuters' verification limitation. It also records a Ukrainian official's response to a separate Russian accusation without treating either statement as verified fact.",
+      "upstream_candidates": [
+        "Zelenskyy post on X referenced by Reuters",
+        "Sybiha Telegram post referenced by Reuters",
+        "Ukrainian police video referenced by Reuters",
+        "Kherson regional administration hospital interview referenced by Reuters"
+      ]
+    },
+    {
+      "source_item_id": "item_20260804_reuters_turkiye_black_sea_safety",
+      "canonical_url": "https://www.reuters.com/world/middle-east/turkey-calls-russia-ukraine-ensure-black-sea-safety-after-drone-attack-2026-08-04/",
+      "locator": "Headline and timestamp; paragraphs beginning 'ANKARA, Aug 4' and 'The Turkish Foreign Ministry said'.",
+      "short_excerpt": "Turkey called on both Russia and Ukraine to ensure navigational safety in the Black Sea.",
+      "discovery_notes": "Records an attributable Turkish government reaction after a drone attack on a Turkish-owned vessel. The underlying ministry statement was described by Reuters but an exact official statement URL was not resolved during this bounded scan.",
+      "upstream_candidates": [
+        "Republic of Türkiye Ministry of Foreign Affairs statement referenced by Reuters"
+      ]
+    },
+    {
+      "source_item_id": "item_20260804_ap_mutual_drone_attacks_reactions",
+      "canonical_url": "https://apnews.com/article/russia-ukraine-war-beach-drone-222d8755b524c231faa8fd6de10f38ef",
+      "locator": "Article opening; sections 'Russia says a Ukrainian drone killed 7 on Black Sea coast' and 'Russia hammers Ukrainian ports and shipping'.",
+      "short_excerpt": "AP reported that Ukraine had not commented on the Black Sea beach strike.",
+      "discovery_notes": "Collects multiple attributable official statements and non-response status across both sides, plus Türkiye's public appeal. AP displayed the publication date as August 4, 2026, but the retrieved page did not expose a precise publication time, so day precision is used.",
+      "upstream_candidates": [
+        "Krasnodar regional authorities update",
+        "Russian Defence Ministry statement",
+        "Turkish Foreign Ministry statement",
+        "Ukrainian regional administration statements"
+      ]
+    },
+    {
+      "source_item_id": "item_20260804_guardian_zaluzhnyi_nato_criticism",
+      "canonical_url": "https://www.theguardian.com/world/2026/aug/04/ukraine-war-briefing-militarys-former-top-commander-says-kyiv-has-no-chance-of-joining-nato",
+      "locator": "Headline, publication timestamp, and first bullet beginning 'Ukraine’s former top military commander'.",
+      "short_excerpt": "The briefing attributed criticism of NATO standards and membership promises to Valerii Zaluzhnyi.",
+      "discovery_notes": "Records public criticism by Ukraine's ambassador to the United Kingdom. The Guardian explicitly attributes the quotation to Evropeiska Pravda, so the item is a secondary publication and its upstream lineage remains unresolved in this shard.",
+      "upstream_candidates": [
+        "Evropeiska Pravda report quoted by The Guardian",
+        "Speech at a meeting of Ukrainian ambassadors"
+      ]
+    }
+  ],
+  "access_failures": [
+    {
+      "url": "https://www.thetimes.com/world/russia-ukraine-war/article/valerii-zaluzhny-ukraine-nato-russia-gv2ts6qgq",
+      "status": "paywalled",
+      "note": "Headline and deck were visible, but the article body and precise publication timestamp were inaccessible without a subscription; no source-item record was created."
+    }
+  ],
+  "excluded_results": [
+    {
+      "url": "https://www.reuters.com/world/europe/russian-forces-attack-ukrainian-capital-kyiv-with-ballistic-missiles-mayor-says-2026-08-04/",
+      "published_at": "2026-08-04T21:52:42Z",
+      "reason": "Published after the task window ended at 2026-08-04T18:00:00Z. The article contains a clarification that an initial apartment-fire report proved inaccurate, but it was not admitted into the bounded result set."
+    }
+  ],
+  "duplicate_or_lineage_notes": [
+    "The Reuters and AP Black Sea safety reports appear to derive the Turkish reaction from the same Foreign Ministry statement and are not independent evidence of that reaction.",
+    "The Guardian briefing is downstream of an Evropeiska Pravda report and should not be counted as an independent primary record of Zaluzhnyi's remarks.",
+    "The Reuters Kherson article aggregates several primary social-media and official-video items that require separate source registration before extraction."
+  ],
+  "coverage_gaps": [
+    "No clearly dated primary formal correction or retraction notice concerning Russia-Ukraine war reporting was found in the exact 24-hour window on the queried fact-check and corrections pages.",
+    "Search indexing did not resolve direct official URLs for the August 4 Turkish Foreign Ministry statement or the cited Ukrainian social-media posts.",
+    "Telegram, X, and other platform-native items were not directly collected where a stable public canonical URL and precise metadata could not be verified.",
+    "This was a bounded public-web scan, not an exhaustive search of all outlets, languages, or platforms."
+  ],
+  "follow_up_task_proposals": [
+    {
+      "task_type": "source_scan",
+      "summary": "Resolve and register the primary Turkish Foreign Ministry statement cited by Reuters and AP, then link both downstream reports to it."
+    },
+    {
+      "task_type": "source_scan",
+      "summary": "Resolve the Evropeiska Pravda report and original ambassador-meeting recording or transcript for Zaluzhnyi's remarks."
+    },
+    {
+      "task_type": "extract_observations",
+      "summary": "Extract atomic attributable observations from the four registered source items while preserving denials, non-response, and verification limitations."
+    }
+  ],
+  "artifact_policy": {
+    "downloaded_artifacts": 0,
+    "note": "No article text, images, videos, or binaries were downloaded or committed."
+  }
+}

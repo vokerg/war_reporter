@@ -33,6 +33,17 @@ Aliases are `continuous-loop`, `копай непрерывно`, and `непр�
 
 Daily discovery is automatic across ten configured source shards. Daily snapshots are automatic when their full window is complete. Weekly and monthly snapshots are on-demand.
 
+## Static publication site
+
+Approved report manifests and map snapshots can be projected into a dependency-light static site:
+
+```bash
+python scripts/build_site.py --strict --output _site
+python -m http.server 8000 --directory _site
+```
+
+The site provides latest-report, archive, report-reader, map, and methodology views. Its build step copies only approved reports and filters map geometry by record status, publication status, embargo time, and snapshot cutoff before any data reaches the browser. GitHub Pages deployment is intentionally a separate follow-up step.
+
 ## Start here
 
 1. [`AGENTS.md`](AGENTS.md) — all-the-way-down worker and supervisor contract.
@@ -40,7 +51,8 @@ Daily discovery is automatic across ten configured source shards. Daily snapshot
 3. [`config/autonomy.json`](config/autonomy.json) — machine-readable cadence, loop, and merge policy.
 4. [`docs/architecture/10-autonomous-runtime.md`](docs/architecture/10-autonomous-runtime.md) — atomic control-loop architecture.
 5. [`docs/architecture/11-continuous-loop.md`](docs/architecture/11-continuous-loop.md) — long-running supervisor architecture.
-6. [`METHODOLOGY.md`](METHODOLOGY.md) and [`SECURITY_AND_SAFETY.md`](SECURITY_AND_SAFETY.md).
+6. [`docs/architecture/12-static-publication-site.md`](docs/architecture/12-static-publication-site.md) — public-site build and publication boundary.
+7. [`METHODOLOGY.md`](METHODOLOGY.md) and [`SECURITY_AND_SAFETY.md`](SECURITY_AND_SAFETY.md).
 
 ## Validation
 
@@ -50,6 +62,7 @@ python -m unittest discover -s tests -v
 python scripts/validate_data.py
 python scripts/validate_worker_queue.py
 python scripts/validate_autonomy.py
+python scripts/build_site.py --strict --output _site
 python scripts/continuous_loop.py --open-worker-prs 0 --active-work-branches 0
 ```
 

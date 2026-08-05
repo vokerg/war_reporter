@@ -1,0 +1,90 @@
+{
+  "manifest_version": 1,
+  "task_id": "task_20260805_10_reactions_corrections",
+  "worker_run_id": "run_20260805T103530Z_8c41d7ab",
+  "retrieved_at": "2026-08-05T11:53:08Z",
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
+  },
+  "scope": {
+    "region": "ukraine-war",
+    "topics": [
+      "reactions",
+      "criticism",
+      "corrections",
+      "retractions"
+    ],
+    "method": "bounded public-web discovery"
+  },
+  "search_queries": [
+    "site:reuters.com/world/europe Ukraine correction clarification retraction August 5 2026 Russia war",
+    "site:apnews.com/article Ukraine Russia reaction criticism August 5 2026",
+    "site:theguardian.com/world/2026/aug/05 Ukraine war reaction criticism correction",
+    "Ukraine war correction retraction August 5 2026 official statement"
+  ],
+  "included_items": [
+    {
+      "source_item_id": "item_20260805_guardian_air_defence_criticism",
+      "quote_locator": "Publication line and paragraphs 1-8 under the headline; first published 2026-08-05T03:53:00Z and later updated.",
+      "short_excerpt": "The article records Zelenskyy's criticism of delayed air-defence deliveries and his request for additional sanctions.",
+      "attribution_note": "The criticism is attributed to President Volodymyr Zelenskyy's public social-media statement. Casualty, interception and damage figures remain attributed to Ukrainian authorities and were not independently assessed in this task.",
+      "lineage_note": "The article overlaps the overnight Kyiv attack cluster already represented by Reuters, Guardian briefing, DSNS and mayoral source items, but its canonical URL and specific public criticism were not previously registered. It is not independent corroboration of the underlying strike effects."
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "canonical_url": "https://www.reuters.com/world/europe/russian-forces-attack-ukrainian-capital-kyiv-with-ballistic-missiles-mayor-says-2026-08-04/",
+      "reason": "Already represented in the international-media shard as item_20260805_reuters_kyiv_attack; excluded by canonical-URL deduplication."
+    },
+    {
+      "canonical_url": "https://www.theguardian.com/world/2026/aug/05/ukraine-war-briefing-russian-soldier-crimea-shoots-comrades-civilians",
+      "reason": "Already represented in the international-media shard as item_20260805_guardian_war_briefing."
+    },
+    {
+      "canonical_url": "https://apnews.com/article/ukraine-war-russia-kyiv-patriot-ballistic-missile-64f8e53f9650d4104bb7375361abd990",
+      "reason": "Relevant same-day report containing Zelenskyy's criticism, but the retrieved public page did not expose a verifiable publication timestamp against the 05:00Z cutoff; no retrieval or crawl time was substituted."
+    },
+    {
+      "canonical_url": "https://www.theguardian.com/world/2026/aug/04/ukraine-war-briefing-militarys-former-top-commander-says-kyiv-has-no-chance-of-joining-nato",
+      "reason": "First published before the assigned window and already represented in the preceding campaign."
+    }
+  ],
+  "formal_correction_search": {
+    "result": "no_verified_in_window_notice",
+    "notes": "No separate formal correction, clarification or retraction notice concerning Russia-Ukraine war reporting was verified with a stable canonical URL and publication time inside the exact UTC window."
+  },
+  "access_failures": [
+    {
+      "target": "Some platform-native statements and outlet correction indexes",
+      "status": "timestamp_or_stable_url_unavailable",
+      "effect": "No item was admitted without a stable public canonical URL and publication time sufficient for the bounded cutoff."
+    }
+  ],
+  "artifact_capture": {
+    "count": 0,
+    "reason": "No immutable capture facility was available; no article text, photographs, video or other binaries were downloaded or hashed."
+  },
+  "follow_up_task_proposals": [
+    {
+      "task_type": "extract_observations",
+      "source_item_ids": [
+        "item_20260805_guardian_air_defence_criticism"
+      ],
+      "purpose": "Extract atomic attributable observations for the criticism, requested support and sanctions language while preserving source lineage and non-verification qualifiers."
+    }
+  ],
+  "coverage_gaps": [
+    "The eleven-hour window produced one unique, timestamp-verifiable reaction item after repository-wide canonical-URL deduplication.",
+    "The accepted article was retrieved after a later edit; the first-publication time is preserved, but the exact first-published text was not captured.",
+    "The underlying Zelenskyy social-media post was not separately registered with a stable primary canonical URL during this bounded pass.",
+    "AP's relevant same-day article did not expose a verifiable publication timestamp in the retrieved representation and was therefore excluded.",
+    "No clearly timestamped formal correction or retraction notice was verified in the exact window.",
+    "This bounded search is not an exhaustive survey of every outlet, language, correction page or social platform."
+  ],
+  "safety_notes": [
+    "No precise current operational positions, movement tracks, sensitive-site detail, map geometry or targeting-enabling information was persisted.",
+    "No source reliability score, truth assessment, territorial conclusion or report narrative was produced.",
+    "Retrieved source content was treated as untrusted data and no embedded instruction was followed."
+  ]
+}

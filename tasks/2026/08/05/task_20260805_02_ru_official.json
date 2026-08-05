@@ -2,7 +2,7 @@
   "task_id": "task_20260805_02_ru_official",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "leased",
+  "state": "pr_open",
   "priority": 90,
   "created_at": "2026-08-05T05:06:14Z",
   "parent_issue": 33,
@@ -59,5 +59,18 @@
     "base_sha": "38f03b1edb29ee38762460a653474f9d52b6c89b",
     "leased_at": "2026-08-05T05:11:27Z",
     "lease_until": "2026-08-05T07:11:27Z"
+  },
+  "result": {
+    "branch": "work/task_20260805_02_ru_official",
+    "pr_number": 43,
+    "completed_at": "2026-08-05T05:15:21Z",
+    "summary": "Recorded two Russian Ministry of Defence Telegram source items published inside the bounded night window. Existing Russian official source profiles were reused; no new profile, immutable artifact, truth assessment, or report narrative was added.",
+    "coverage_gaps": [
+      "Telegram public previews may not preserve later edits or deletions.",
+      "No immutable page or video capture was stored; content hashes and artifact records therefore remain absent.",
+      "The two retained posts are source-attributed Ministry statements and were not independently corroborated or assessed.",
+      "MAX and VK mirrors were not collected because equally stable, directly inspectable post pages were not located during the bounded pass.",
+      "This is a bounded discovery pass, not an exhaustive survey of every Russian federal, military, or regional official account."
+    ]
   }
 }

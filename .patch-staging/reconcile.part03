@@ -1,0 +1,131 @@
+               and parse(task["window"]["to"]) > start
+                and task.get("task_type") != "daily_report"
+            ]
+            if related and all(task.get("state") in COMPLETE_STATES for task in related):
+                merged_dependencies = sorted(task["task_id"] for task in related if task.get("state") == "merged")
+                if merged_dependencies:
+                    report_inputs = frozen_report_inputs(root, start, end)
+                    if report_inputs is not None:
+                        duties.append({
+                            "kind": "daily_snapshot",
+                            "day": day.isoformat(),
+                            "window": {"from": iso(start), "to": iso(end)},
+                            "region": region,
+                            "depends_on_task_ids": merged_dependencies,
+                            "report_inputs": report_inputs,
+                        })
+                    else:
+                        blockers.append(
+                            f"daily snapshot {day} deferred: no approved claims or assessments overlap the frozen UTC window"
+                        )
+                        if not report_inputs_task_exists:
+                            duties.append({
+                                "kind": "report_input_assessment",
+                                "day": day.isoformat(),
+                                "window": {"from": iso(start), "to": iso(end)},
+                                "region": region,
+                                "depends_on_task_ids": merged_dependencies,
+                            })
+                else:
+                    blockers.append(f"daily snapshot {day} skipped: no merged inputs")
+    return {
+        "generated_at": iso(now),
+        "target_day": day.isoformat(),
+        "duties": duties,
+        "blockers": blockers,
+    }
+
+
+def build_discovery_tasks(root: Path, duty: dict[str, Any], parent_issue: int | None, created_at: str) -> list[tuple[Path, dict[str, Any]]]:
+    day = date.fromisoformat(duty["day"])
+    start = parse(duty["window"]["from"])
+    end = parse(duty["window"]["to"])
+    region = duty["region"]
+    routes = routing(root)
+    result: list[tuple[Path, dict[str, Any]]] = []
+    for index, (slug, priority, topics) in enumerate(DISCOVERY_SHARDS, 1):
+        task_id = f"task_daily_{day:%Y%m%d}_{index:02d}_{slug.replace('-', '_')}"
+        task = {
+            "task_id": task_id,
+            "task_type": "open_web_discovery",
+            "role": routes.get("open_web_discovery", "open-web-discovery"),
+            "state": "ready",
+            "priority": priority,
+            "created_at": created_at,
+            "parent_issue": parent_issue,
+            "issue_number": None,
+            "depends_on_task_ids": [],
+            "window": {"from": iso(start), "to": iso(end)},
+            "scope": {
+                "source_ids": [],
+                "source_groups": [],
+                "regions": [region],
+                "topics": topics,
+                "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"],
+            },
+            "exclusions": [
+                "Items already represented by canonical URL, platform ID, or content hash",
+                "Access-control bypass, private material, and unsafe non-public geodata",
+                "Precise current operational positions or targeting-enabling detail",
+            ],
+            "allowed_output_paths": [
+                *discovery_data_paths(day, slug),
+                f"queue/proposals/{task_id}.json",
+                f"review/self/{task_id}.json",
+            ],
+            "definition_of_done": [
+                "The assigned public-web discovery shard and UTC window were searched",
+                "Primary publications were preferred and upstream lineage was recorded",
+                "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
+                "A queue proposal file was persisted, containing bounded downstream tasks or an explicit empty proposals list",
+                "Two separate self-review rounds passed and a receipt was persisted",
+                "No final truth assessment, territorial conclusion, or targeting-enabling detail was added",
+            ],
+            "idempotency_key": daily_key(day, slug, region),
+            "lease": None,
+        }
+        result.append((task_path(root, day, task_id), task))
+    return result
+
+
+def unique_strings(values: list[str]) -> list[str]:
+    """Preserve order while enforcing JSON Schema uniqueItems semantics."""
+    return list(dict.fromkeys(values))
+
+
+def task_from_proposal(root: Path, duty: dict[str, Any], created_at: str, tasks: dict[str, tuple[Path, dict[str, Any]]]) -> tuple[Path, dict[str, Any]]:
+    proposal = dict(duty["proposal"])
+    key = proposal["idempotency_key"]
+    task_id = proposal.get("task_id") or f"task_auto_{hashlib.sha256(key.encode()).hexdigest()[:16]}"
+    dependencies = list(proposal["depends_on_task_ids"])
+    state = "ready" if all(dep in tasks and tasks[dep][1].get("state") == "merged" for dep in dependencies) else "planned"
+    producer = tasks[duty["producer_task_id"]][1]
+    routes = routing(root)
+    task = {
+        "task_id": task_id,
+        "task_type": proposal["task_type"],
+        "role": routes.get(proposal["task_type"], ROLE_FALLBACK.get(proposal["task_type"], "dispatcher")),
+        "state": state,
+        "priority": proposal["priority"],
+        "created_at": created_at,
+        "parent_issue": producer.get("parent_issue"),
+        "issue_number": None,
+        "depends_on_task_ids": dependencies,
+        "window": proposal["window"],
+        "scope": normalized_scope(proposal["scope"]),
+        "exclusions": proposal["exclusions"],
+        "allowed_output_paths": unique_strings(list(proposal["allowed_output_paths"]) + [
+            f"queue/proposals/{task_id}.json",
+            f"review/self/{task_id}.json",
+        ]),
+        "definition_of_done": unique_strings(list(proposal["definition_of_done"]) + [
+            "Two separate self-review rounds passed and a receipt was persisted",
+        ]),
+        "idempotency_key": key,
+        "lease": None,
+    }
+    if proposal["task_type"] == "daily_report":
+        report_inputs = duty.get("report_inputs")
+        if not isinstance(report_inputs, dict):
+            raise ValueError(f"daily_report proposal {key} has no approved frozen report inputs")
+        task["report_inp

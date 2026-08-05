@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_investigate_claims",
   "task_type": "investigate_claim",
   "role": "corroborator",
-  "state": "review",
+  "state": "merged",
   "priority": 75,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -90,17 +90,11 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "backfill_claims:2026-08-04:ukraine-war:v1",
-  "lease": {
-    "worker_run_id": "run_20260805T192100Z_contloop",
-    "lease_branch": "work/task_backfill_20260804_investigate_claims",
-    "base_sha": "caed643349529c955083135de9b13be167a7348e",
-    "leased_at": "2026-08-05T19:22:00Z",
-    "lease_until": "2026-08-05T21:22:00Z"
-  },
+  "lease": null,
   "result": {
     "branch": "work/task_backfill_20260804_investigate_claims",
     "pr_number": 98,
-    "completed_at": "2026-08-05T19:32:00Z",
+    "completed_at": "2026-08-05T19:33:45Z",
     "summary": "Editorially approved 28 merged dependency observations, normalized 19 approved claims with lineage-aware outcomes, and produced seven approved editorial assessments without promoting source assertions beyond frozen evidence.",
     "coverage_gaps": [
       "No separate observation or claim was created from item_20260804_mod_66271 because the official dependency identified it as a summary repeating upstream Russian Ministry of Defence items rather than independent evidence.",
@@ -109,6 +103,8 @@
       "Russian and Ukrainian official unmanned-aircraft figures use unresolved and potentially incompatible reporting intervals, categories, and attribution; they were not combined or directly compared.",
       "Reuters and Rybar repetitions of Russian Ministry of Defence reporting, and overlapping Reuters, AP, and Rybar incident reporting, were treated as shared or unresolved upstream rather than independent corroboration.",
       "Precise operational positions, routes, map geometry, targeting-enabling detail, unsupported causality, and forecasts were withheld."
-    ]
+    ],
+    "merge_sha": "8477ce98ccd45555edebe9ba82659f1522e092e5",
+    "merged_at": "2026-08-05T19:33:45Z"
   }
 }

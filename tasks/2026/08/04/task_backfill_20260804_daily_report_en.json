@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_daily_report_en",
   "task_type": "daily_report",
   "role": "report-editor",
-  "state": "ready",
+  "state": "leased",
   "priority": 65,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -53,7 +53,13 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "backfill_daily_report:2026-08-04:ukraine-war:en:v1",
-  "lease": null,
+  "lease": {
+    "worker_run_id": "run_20260805T200900Z_report04",
+    "lease_branch": "work/task_backfill_20260804_daily_report_en",
+    "base_sha": "e53572f75bfcb47d11e7bbb3767faa9c65b46702",
+    "leased_at": "2026-08-05T20:09:00Z",
+    "lease_until": "2026-08-05T22:09:00Z"
+  },
   "report_inputs": {
     "assessment_ids": [
       "asm_20260804_air_defense_counts",

@@ -56,6 +56,27 @@
       "credential_or_security_boundary_change"
     ]
   },
+  "continuous_loop": {
+    "command": "continuous loop",
+    "aliases": [
+      "continuous-loop",
+      "копай непрерывно",
+      "непрерывный цикл"
+    ],
+    "atomic_cycle_command": "копай",
+    "reconcile_before_each_cycle": true,
+    "wait_for_task_merge": true,
+    "wait_for_post_merge_finalization": true,
+    "refresh_main_after_merge": true,
+    "spawned_tasks_are_in_scope": true,
+    "exit_only_on_quiescence": true,
+    "forced_interruption_is_not_quiescence": true,
+    "merge_poll_seconds": 30,
+    "idle_poll_seconds": 300,
+    "minimum_idle_sweeps": 12,
+    "minimum_idle_window_seconds": 3600,
+    "scheduled_duty_guard_seconds": 14400
+  },
   "branch_cleanup": {
     "owner": "merge_controller",
     "workers_must_not_attempt_connector_deletion": true,

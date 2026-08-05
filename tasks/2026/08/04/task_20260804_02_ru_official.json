@@ -2,17 +2,37 @@
   "task_id": "task_20260804_02_ru_official",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "ready",
+  "state": "leased",
   "priority": 90,
   "created_at": "2026-08-04T18:28:29Z",
   "parent_issue": 5,
-  "issue_number": null,
+  "issue_number": 9,
   "depends_on_task_ids": [],
-  "window": {"from": "2026-08-03T18:00:00Z", "to": "2026-08-04T18:00:00Z"},
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
+  },
   "scope": {
-    "source_ids": [], "source_groups": [], "regions": ["ukraine-war"],
-    "topics": ["russian-official-statements", "frontline", "strikes"],
-    "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"]
+    "source_ids": [],
+    "source_groups": [],
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "russian-official-statements",
+      "frontline",
+      "strikes"
+    ],
+    "content_types": [
+      "post",
+      "article",
+      "report",
+      "briefing",
+      "document",
+      "image",
+      "video",
+      "map"
+    ]
   },
   "exclusions": [
     "Items already represented by canonical URL, platform ID, or content hash",
@@ -33,5 +53,11 @@
     "No final truth assessment, territorial conclusion, or report narrative was added"
   ],
   "idempotency_key": "open_web_discovery:ru-official:20260803T1800Z:20260804T1800Z:ukraine-war",
-  "lease": null
+  "lease": {
+    "worker_run_id": "run_20260805T044015Z_8ecdaa09",
+    "lease_branch": "work/task_20260804_02_ru_official",
+    "base_sha": "7d8f3e13261f24e121ec4f8b63c6d200df4e2eb1",
+    "leased_at": "2026-08-05T04:40:52Z",
+    "lease_until": "2026-08-05T06:40:52Z"
+  }
 }

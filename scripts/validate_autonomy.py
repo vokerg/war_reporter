@@ -45,31 +45,55 @@ def schema_errors(value: Any, schema: Any, path: Path) -> list[str]:
 
 
 def validate_auto_merge_trust_boundary(root: Path) -> list[str]:
-    path = root / ".github/workflows/auto-merge-reviewed.yml"
+    auto_path = root / ".github/workflows/auto-merge-reviewed.yml"
+    finalizer_path = root / ".github/workflows/finalize-task-merge.yml"
     try:
-        text = path.read_text(encoding="utf-8")
+        auto_text = auto_path.read_text(encoding="utf-8")
     except OSError as exc:
         return [f"auto-merge workflow unavailable: {exc}"]
-    required_markers = (
+    try:
+        finalizer_text = finalizer_path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return [f"finalizer workflow unavailable: {exc}"]
+
+    auto_required_markers = (
         "ref: main",
         "path: trusted",
         "path: pr-head",
         "python trusted/scripts/validate_autonomy.py",
         "python trusted/scripts/validate_pr_scope.py",
         "validated_sha",
+        "actions: write",
+        "gh workflow run finalize-task-merge.yml",
+        "-f pr_number=",
+        "-f merge_sha=",
+        "-f merged_at=",
+        "-f head_ref=",
+    )
+    finalizer_required_markers = (
+        "workflow_dispatch:",
+        "FINALIZE_PR_NUMBER:",
+        "FINALIZE_MERGE_SHA:",
+        "FINALIZE_MERGED_AT:",
+        "FINALIZE_HEAD_REF:",
     )
     errors = [
-        f"{path}: missing trusted-controller marker: {marker}"
-        for marker in required_markers
-        if marker not in text
+        f"{auto_path}: missing trusted-controller marker: {marker}"
+        for marker in auto_required_markers
+        if marker not in auto_text
     ]
+    errors.extend(
+        f"{finalizer_path}: missing dispatch-finalizer marker: {marker}"
+        for marker in finalizer_required_markers
+        if marker not in finalizer_text
+    )
     unsafe_markers = (
         "python scripts/validate_autonomy.py",
         "python scripts/validate_pr_scope.py",
     )
     for marker in unsafe_markers:
-        if marker in text:
-            errors.append(f"{path}: write-capable controller may not execute validator from PR head: {marker}")
+        if marker in auto_text:
+            errors.append(f"{auto_path}: write-capable controller may not execute validator from PR head: {marker}")
     return errors
 
 

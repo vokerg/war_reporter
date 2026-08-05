@@ -1,0 +1,118 @@
+{
+  "task_id": "task_20260804_03_ua_analysis_media",
+  "worker_run_id": "run_20260805T044101Z_bf89d16c",
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
+  },
+  "searched_at": "2026-08-05T04:46:14Z",
+  "discovery_method": "Public-web search plus direct inspection of publisher pages and the publisher's dated index.",
+  "timestamp_normalization": {
+    "display_timezone": "Europe/Kyiv",
+    "offset_on_2026-08-04": "+03:00",
+    "method": "Publisher-displayed local minute timestamps were normalized to UTC. The raw displayed values are retained per item."
+  },
+  "source_coverage": [
+    {
+      "source_entity_id": "src_suspilne_media",
+      "access": "available",
+      "sections_checked": [
+        "national news index",
+        "texts",
+        "regional pages for Zaporizhzhia and Dnipro"
+      ],
+      "notes": "Four in-window items persisted. Articles were treated as attributable publications, not verified facts."
+    }
+  ],
+  "discovered_items": [
+    {
+      "source_item_id": "item_suspilne_1370662",
+      "displayed_published_at": "2026-08-04 10:04 Europe/Kyiv",
+      "normalized_published_at": "2026-08-04T07:04:00Z",
+      "short_excerpt": "56 тисяч людей — це трохи більше одного відсотка від загальної кількості мешканців столиці.",
+      "quote_locator": "Introductory section, paragraph beginning ‘56 тисяч людей’",
+      "source_basis": [
+        "original reporting",
+        "response from Kyiv city administration",
+        "interviews and linked public records"
+      ],
+      "upstream_status": "No standalone upstream item ingested in this shard."
+    },
+    {
+      "source_item_id": "item_suspilne_1370920",
+      "displayed_published_at": "2026-08-04 15:29 Europe/Kyiv",
+      "normalized_published_at": "2026-08-04T12:29:00Z",
+      "short_excerpt": "FPV — це малорозмірна ціль, її майже ніколи не видно на радарах.",
+      "quote_locator": "Body, quotation by the air-defence unit commander after the discussion of Molniya carriers",
+      "source_basis": [
+        "original interview with an identified Ukrainian air-defence unit commander"
+      ],
+      "upstream_status": "The interview is embedded in the publication; no separate upstream public item was identified."
+    },
+    {
+      "source_item_id": "item_suspilne_1371130",
+      "displayed_published_at": "2026-08-04 19:05 Europe/Kyiv",
+      "normalized_published_at": "2026-08-04T16:05:00Z",
+      "short_excerpt": "Де проходить межа між виконанням обов'язків та можливим перевищенням повноважень.",
+      "quote_locator": "Introductory section, second highlighted paragraph",
+      "source_basis": [
+        "original reporting",
+        "interviews with participants, lawyer and ombudsman representative",
+        "linked social-media videos treated as unverified source material"
+      ],
+      "upstream_status": "Linked social-media posts were not ingested because identity, completeness and duplication require separate review."
+    },
+    {
+      "source_item_id": "item_suspilne_1371598",
+      "displayed_published_at": "2026-08-04 19:38 Europe/Kyiv",
+      "normalized_published_at": "2026-08-04T16:38:00Z",
+      "short_excerpt": "Минулого місяця було зафіксовано 7922 бойових зіткнення.",
+      "quote_locator": "Body, first block quote attributed to the Ministry of Defence",
+      "source_basis": [
+        "media relay of a Ministry of Defence publication citing General Staff data"
+      ],
+      "upstream_urls": [
+        "https://mod.gov.ua/"
+      ],
+      "upstream_status": "The linked Ministry publication should be captured by the Ukrainian-official shard; it was not duplicated here."
+    }
+  ],
+  "artifacts": {
+    "captured": 0,
+    "reason": "No immutable files or binaries were downloaded. Exact byte hashes and sizes could not be established through the approved public-web connector."
+  },
+  "excluded_candidates": [
+    {
+      "title": "РФ штурмує малими групами та масово застосовує дрони — військові про Покровський напрямок",
+      "displayed_published_at": "2026-08-04 21:06 Europe/Kyiv",
+      "reason": "Outside the task window after UTC normalization."
+    },
+    {
+      "title": "На Костянтинівському напрямку РФ маскує міни дитячими речами та атакує логістику дронами",
+      "displayed_published_at": "2026-08-04 23:08 Europe/Kyiv",
+      "reason": "Outside the task window after UTC normalization."
+    },
+    {
+      "title": "СБУ заявила про ураження понад 100 стратегічних об'єктів РФ у рамках 40-денної операції",
+      "displayed_published_at": "2026-08-04 19:06 Europe/Kyiv",
+      "reason": "In-window but excluded to avoid overlap with the Ukrainian-official and strikes/infrastructure shards."
+    }
+  ],
+  "searches_without_persisted_items": [
+    {
+      "target": "Ukrainska Pravda, Militarynyi, Defense Express, LB.ua",
+      "result": "Search indexes did not return reliably dated 2026-08-04 items matching this shard during this run; no item was invented or backfilled from older dates."
+    }
+  ],
+  "coverage_gaps": [
+    "Discovery is not an exhaustive search of all Ukrainian media.",
+    "Search-engine freshness for several Ukrainian outlets lagged behind the task date.",
+    "No authenticated social-platform or archive API was available.",
+    "No artifact hashes were produced because immutable source bytes were not captured."
+  ],
+  "safety": {
+    "precise_current_positions_published": false,
+    "targeting_enabling_geodata_published": false,
+    "final_truth_assessments_added": false
+  }
+}

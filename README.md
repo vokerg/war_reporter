@@ -42,7 +42,9 @@ python scripts/build_site.py --strict --output _site
 python -m http.server 8000 --directory _site
 ```
 
-The site provides latest-report, archive, report-reader, map, and methodology views. Its build step copies only approved reports and filters map geometry by record status, publication status, embargo time, and snapshot cutoff before any data reaches the browser. GitHub Pages deployment is intentionally a separate follow-up step.
+The site provides latest-report, archive, report-reader, map, and methodology views. Its build step copies only approved reports and filters map geometry by record status, publication status, embargo time, and snapshot cutoff before any data reaches the browser.
+
+`.github/workflows/deploy-pages.yml` rebuilds and deploys `_site/` to the `github-pages` environment after relevant changes reach `main`, and it can also be run manually through `workflow_dispatch`.
 
 ## Start here
 

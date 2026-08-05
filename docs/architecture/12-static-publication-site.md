@@ -52,4 +52,15 @@ python -m http.server 8000 --directory _site
 
 Open `http://localhost:8000/`.
 
-`build-site.yml` validates the builder and generated entry points on pull requests and pushes to `main`. A separate deployment workflow will later publish `_site/` to GitHub Pages; deployment is intentionally not enabled by this change.
+## GitHub Pages deployment
+
+`.github/workflows/deploy-pages.yml` is the production publication path. On relevant pushes to `main`, or on manual dispatch, it:
+
+1. checks out the exact `main` revision;
+2. runs the site-builder tests;
+3. builds `_site/` in strict mode;
+4. verifies the generated catalog, map projection, entry page, and `.nojekyll` marker;
+5. uploads `_site/` as the `github-pages` artifact;
+6. deploys that artifact to the protected `github-pages` environment.
+
+The workflow grants only `contents: read`, `pages: write`, and `id-token: write`. The build workflow remains separate and validates publication generation on pull requests and pushes independently of deployment.

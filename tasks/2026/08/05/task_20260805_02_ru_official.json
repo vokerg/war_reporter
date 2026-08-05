@@ -1,0 +1,18 @@
+{
+  "task_id": "task_20260805_02_ru_official",
+  "task_type": "open_web_discovery",
+  "role": "open-web-discovery",
+  "state": "ready",
+  "priority": 90,
+  "created_at": "2026-08-05T05:06:14Z",
+  "parent_issue": 33,
+  "issue_number": null,
+  "depends_on_task_ids": [],
+  "window": {"from": "2026-08-04T18:00:00Z", "to": "2026-08-05T05:00:00Z"},
+  "scope": {"source_ids": [], "source_groups": [], "regions": ["ukraine-war"], "topics": ["russian-official-statements", "frontline", "strikes"], "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"]},
+  "exclusions": ["Items already represented by canonical URL, platform ID, or content hash", "Access-control bypass, private material, and unsafe non-public geodata", "Precise current operational positions or targeting-enabling detail"],
+  "allowed_output_paths": ["catalogs/sources/2026/08/05/ru-official.json", "data/source-items/2026/08/05/ru-official.ndjson", "data/artifacts/2026/08/05/ru-official.ndjson", "raw-manifests/2026/08/05/ru-official.json"],
+  "definition_of_done": ["The assigned public-web discovery shard and UTC window were searched", "Primary publications were preferred and upstream lineage was recorded", "Canonical URLs, timestamps, language, quote locators, and access failures were recorded", "Candidate source profiles and follow-up task proposals were persisted when justified", "No final truth assessment, territorial conclusion, or report narrative was added"],
+  "idempotency_key": "open_web_discovery:ru-official:20260804T1800Z:20260805T0500Z:ukraine-war",
+  "lease": null
+}

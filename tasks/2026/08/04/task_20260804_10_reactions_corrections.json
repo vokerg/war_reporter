@@ -2,7 +2,7 @@
   "task_id": "task_20260804_10_reactions_corrections",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "leased",
+  "state": "pr_open",
   "priority": 70,
   "created_at": "2026-08-04T18:28:29Z",
   "parent_issue": 5,
@@ -60,5 +60,17 @@
     "base_sha": "7d8f3e13261f24e121ec4f8b63c6d200df4e2eb1",
     "leased_at": "2026-08-05T04:42:22Z",
     "lease_until": "2026-08-05T06:42:22Z"
+  },
+  "result": {
+    "branch": "work/task_20260804_10_reactions_corrections",
+    "pr_number": 26,
+    "completed_at": "2026-08-05T04:48:24Z",
+    "summary": "Bounded public-web discovery registered three draft source profiles and four source items covering attributable reactions and criticism. Search provenance, upstream candidates, an out-of-window clarification, access failures, and follow-up proposals are recorded; no artifacts or truth assessments were added.",
+    "coverage_gaps": [
+      "No clearly dated primary formal correction or retraction notice was found in the exact task window on the queried fact-check and corrections pages.",
+      "Direct official URLs for the August 4 Turkish Foreign Ministry statement and cited Ukrainian platform posts were not resolved.",
+      "Platform-native Telegram and X items were not directly collected where stable public canonical URLs and precise metadata could not be verified.",
+      "The scan was bounded and is not exhaustive across all outlets, languages, or platforms."
+    ]
   }
 }

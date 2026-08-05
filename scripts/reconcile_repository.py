@@ -26,6 +26,13 @@ DISCOVERY_SHARDS = (
     ("diplomacy-support-sanctions", 70, ["diplomacy", "military-support", "sanctions"]),
     ("reactions-corrections", 70, ["reactions", "criticism", "corrections", "retractions"]),
 )
+DISCOVERY_DATA_ROOTS = (
+    "catalogs/sources/",
+    "data/source-items/",
+    "data/artifacts/",
+    "raw-manifests/",
+)
+INACTIVE_COVERAGE_STATES = {"rejected", "cancelled", "duplicate"}
 ROLE_FALLBACK = {
     "open_web_discovery": "open-web-discovery",
     "extract_observations": "extractor",
@@ -121,15 +128,124 @@ def nonterminal_count(tasks: dict[str, tuple[Path, dict[str, Any]]]) -> int:
     return sum(1 for _, task in tasks.values() if task.get("state") not in TERMINAL_STATES)
 
 
+def discovery_data_paths(day: date, slug: str) -> tuple[str, str, str, str]:
+    dated = f"{day:%Y/%m/%d}"
+    return (
+        f"catalogs/sources/{dated}/{slug}.json",
+        f"data/source-items/{dated}/{slug}.ndjson",
+        f"data/artifacts/{dated}/{slug}.ndjson",
+        f"raw-manifests/{dated}/{slug}.json",
+    )
+
+
+def discovery_shard_slug(task: dict[str, Any]) -> str | None:
+    if task.get("task_type") != "open_web_discovery":
+        return None
+    paths = task.get("allowed_output_paths", [])
+    if isinstance(paths, list):
+        for path in paths:
+            if not isinstance(path, str) or not path.startswith(DISCOVERY_DATA_ROOTS):
+                continue
+            stem = Path(path).stem
+            for slug, _, _ in DISCOVERY_SHARDS:
+                if stem == slug:
+                    return slug
+    key = task.get("idempotency_key")
+    key_parts = key.split(":") if isinstance(key, str) else []
+    for slug, _, _ in DISCOVERY_SHARDS:
+        if slug in key_parts:
+            return slug
+    task_id = task.get("task_id")
+    if isinstance(task_id, str):
+        for slug, _, _ in DISCOVERY_SHARDS:
+            if slug.replace("-", "_") in task_id:
+                return slug
+    return None
+
+
+def intervals_cover_window(intervals: list[tuple[datetime, datetime]], start: datetime, end: datetime) -> bool:
+    cursor = start
+    for lower, upper in sorted(intervals):
+        if upper <= cursor:
+            continue
+        if lower > cursor:
+            return False
+        cursor = max(cursor, upper)
+        if cursor >= end:
+            return True
+    return cursor >= end
+
+
+def discovery_coverage_for_day(
+    tasks: dict[str, tuple[Path, dict[str, Any]]], day: date, region: str
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, bool]]:
+    start, end = utc_day_window(day)
+    by_shard: dict[str, list[dict[str, Any]]] = {slug: [] for slug, _, _ in DISCOVERY_SHARDS}
+    intervals: dict[str, list[tuple[datetime, datetime]]] = {slug: [] for slug, _, _ in DISCOVERY_SHARDS}
+    for _, task in tasks.values():
+        if task.get("state") in INACTIVE_COVERAGE_STATES:
+            continue
+        slug = discovery_shard_slug(task)
+        if slug is None:
+            continue
+        scope = task.get("scope")
+        regions = scope.get("regions", []) if isinstance(scope, dict) else []
+        if isinstance(regions, list) and regions and region not in regions:
+            continue
+        window = task.get("window")
+        if not isinstance(window, dict):
+            continue
+        lower_value = window.get("from")
+        upper_value = window.get("to")
+        if not isinstance(lower_value, str) or not isinstance(upper_value, str):
+            continue
+        lower = max(parse(lower_value), start)
+        upper = min(parse(upper_value), end)
+        if lower >= upper:
+            continue
+        by_shard[slug].append(task)
+        intervals[slug].append((lower, upper))
+    covered = {
+        slug: intervals_cover_window(intervals[slug], start, end)
+        for slug, _, _ in DISCOVERY_SHARDS
+    }
+    return by_shard, covered
+
+
 def discovery_tasks_for_day(tasks: dict[str, tuple[Path, dict[str, Any]]], day: date, region: str) -> list[dict[str, Any]]:
-    prefix = f"daily_discovery:{day.isoformat()}:"
-    suffix = f":{region}"
-    return [
-        task for _, task in tasks.values()
-        if isinstance(task.get("idempotency_key"), str)
-        and task["idempotency_key"].startswith(prefix)
-        and task["idempotency_key"].endswith(suffix)
-    ]
+    by_shard, _ = discovery_coverage_for_day(tasks, day, region)
+    result: dict[str, dict[str, Any]] = {}
+    for shard_tasks in by_shard.values():
+        for task in shard_tasks:
+            result[str(task["task_id"])] = task
+    return [result[task_id] for task_id in sorted(result)]
+
+
+def discovery_output_collisions(
+    tasks: dict[str, tuple[Path, dict[str, Any]]], day: date
+) -> dict[str, list[str]]:
+    expected = {
+        path
+        for slug, _, _ in DISCOVERY_SHARDS
+        for path in discovery_data_paths(day, slug)
+    }
+    owners: dict[str, list[str]] = {}
+    for task_id, (_, task) in tasks.items():
+        paths = task.get("allowed_output_paths", [])
+        if not isinstance(paths, list):
+            continue
+        for path in paths:
+            if isinstance(path, str) and path in expected:
+                owners.setdefault(path, []).append(task_id)
+    return {path: sorted(task_ids) for path, task_ids in sorted(owners.items())}
+
+
+def summarize_output_collisions(collisions: dict[str, list[str]]) -> str:
+    entries = [f"{path} ({', '.join(task_ids)})" for path, task_ids in collisions.items()]
+    preview = "; ".join(entries[:4])
+    if len(entries) > 4:
+        preview += f"; +{len(entries) - 4} more"
+    return preview
 
 
 def pending_proposals(root: Path, tasks: dict[str, tuple[Path, dict[str, Any]]], config: dict[str, Any]) -> list[dict[str, Any]]:
@@ -191,29 +307,48 @@ def plan_duties(root: Path, now: datetime | None = None) -> dict[str, Any]:
     if promotable:
         duties.append({"kind": "promote_tasks", "task_ids": sorted(promotable)})
 
-    discovered = discovery_tasks_for_day(tasks, day, config["daily_cycle"]["region"])
+    region = config["daily_cycle"]["region"]
+    coverage_by_shard, covered_shards = discovery_coverage_for_day(tasks, day, region)
+    coverage_complete = all(covered_shards.values())
+    coverage_tasks: dict[str, dict[str, Any]] = {}
+    for shard_tasks in coverage_by_shard.values():
+        for task in shard_tasks:
+            coverage_tasks[str(task["task_id"])] = task
+
     cycle_activated = end > activation
-    if cycle_activated and local_now >= discovery_due and not discovered:
+    if cycle_activated and local_now >= discovery_due and not coverage_complete:
+        collisions = discovery_output_collisions(tasks, day)
+        covered_or_partial = sorted(slug for slug, shard_tasks in coverage_by_shard.items() if shard_tasks)
         backlog = nonterminal_count(tasks)
         limit = config["daily_cycle"]["maximum_nonterminal_backlog"]
-        if backlog >= limit:
+        if collisions:
+            blockers.append(
+                f"daily discovery {day} deferred: generated output paths already owned: "
+                f"{summarize_output_collisions(collisions)}"
+            )
+        elif covered_or_partial:
+            blockers.append(
+                f"daily discovery {day} deferred: partial legacy/incremental coverage exists for shards "
+                f"{', '.join(covered_or_partial)}; a full-day campaign would overlap existing work"
+            )
+        elif backlog >= limit:
             blockers.append(f"daily discovery {day} deferred: nonterminal backlog {backlog} >= {limit}")
         else:
             duties.append({
                 "kind": "discovery_campaign",
                 "day": day.isoformat(),
                 "window": {"from": iso(start), "to": iso(end)},
-                "region": config["daily_cycle"]["region"],
+                "region": region,
                 "shards": len(DISCOVERY_SHARDS),
             })
 
-    report_exists = any(task.get("idempotency_key") == daily_report_key(day, config["daily_cycle"]["region"]) for _, task in tasks.values())
+    report_exists = any(task.get("idempotency_key") == daily_report_key(day, region) for _, task in tasks.values())
     proposal_for_day = any(
         parse(duty["proposal"]["window"]["from"]) < end and parse(duty["proposal"]["window"]["to"]) > start
         for duty in proposal_duties
     )
-    if cycle_activated and local_now >= snapshot_due and discovered and not report_exists and not proposal_for_day:
-        if len(discovered) == len(DISCOVERY_SHARDS) and all(task.get("state") in COMPLETE_STATES for task in discovered):
+    if cycle_activated and local_now >= snapshot_due and coverage_complete and not report_exists and not proposal_for_day:
+        if coverage_tasks and all(task.get("state") in COMPLETE_STATES for task in coverage_tasks.values()):
             related = [
                 task for _, task in tasks.values()
                 if isinstance(task.get("window"), dict)
@@ -230,7 +365,7 @@ def plan_duties(root: Path, now: datetime | None = None) -> dict[str, Any]:
                         "kind": "daily_snapshot",
                         "day": day.isoformat(),
                         "window": {"from": iso(start), "to": iso(end)},
-                        "region": config["daily_cycle"]["region"],
+                        "region": region,
                         "depends_on_task_ids": merged_dependencies,
                     })
                 else:
@@ -276,10 +411,7 @@ def build_discovery_tasks(root: Path, duty: dict[str, Any], parent_issue: int | 
                 "Precise current operational positions or targeting-enabling detail",
             ],
             "allowed_output_paths": [
-                f"catalogs/sources/{day:%Y/%m/%d}/{slug}.json",
-                f"data/source-items/{day:%Y/%m/%d}/{slug}.ndjson",
-                f"data/artifacts/{day:%Y/%m/%d}/{slug}.ndjson",
-                f"raw-manifests/{day:%Y/%m/%d}/{slug}.json",
+                *discovery_data_paths(day, slug),
                 f"queue/proposals/{task_id}.json",
                 f"review/self/{task_id}.json",
             ],

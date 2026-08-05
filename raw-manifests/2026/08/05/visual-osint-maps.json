@@ -1,0 +1,102 @@
+{
+  "task_id": "task_20260805_08_visual_osint_maps",
+  "worker_run_id": "run_20260805T103412Z_250f50e1",
+  "retrieved_at": "2026-08-05T10:38:01Z",
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
+  },
+  "scope": {
+    "regions": ["ukraine-war"],
+    "topics": ["visual-osint", "geolocation", "maps"],
+    "languages": ["uk", "en"],
+    "access_method": "public_web"
+  },
+  "search_log": [
+    {
+      "source": "DeepState",
+      "status": "partial",
+      "notes": "The public Telegram channel exposed several map-update posts, post IDs, short text and clock times. The available representation did not expose a verifiable calendar date for those posts, so none was admitted as an in-window publication."
+    },
+    {
+      "source": "GeoConfirmed",
+      "status": "access_failed",
+      "notes": "The public Ukraine map shell was indexed, but the client-side dataset returned a loading error in the approved connector. No data export, visual evidence or geometry was copied."
+    },
+    {
+      "source": "War Mapper",
+      "status": "searched_no_admission",
+      "notes": "The project site and Substack were searched. No Ukraine map publication with a canonical page and publication timestamp verified inside the eleven-hour UTC window was found."
+    },
+    {
+      "source": "ISW / Critical Threats Project",
+      "status": "searched_no_admission",
+      "notes": "The analysis index and author indexes were searched for an August 4, 2026 assessment. Search indexing exposed older July entries but no page whose publication time could be verified inside the task window."
+    },
+    {
+      "source": "Liveuamap and general visual-OSINT search",
+      "status": "searched_no_admission",
+      "notes": "No additional primary visual-OSINT publication with a stable canonical URL and verifiable in-window timestamp was admitted. Secondary explanatory pages and operational news coverage were excluded from this shard."
+    }
+  ],
+  "candidate_items": [
+    {
+      "source_item_id": "item_20260805_deepstate_post_23714",
+      "quote_locator": "Public Telegram channel view; map-update entry and clock time",
+      "verification_excerpt": "Мапу оновлено",
+      "admission_status": "window_unconfirmed",
+      "lineage_note": "A first-party DeepState map-update notice. The page exposed post ID 23714 and clock time 19:15 but not a calendar date; no territorial proposition is normalized or assessed here."
+    },
+    {
+      "source_item_id": "item_20260805_deepstate_post_23715",
+      "quote_locator": "Public Telegram channel view; map-update entry and clock time",
+      "verification_excerpt": "Мапу оновлено",
+      "admission_status": "window_unconfirmed",
+      "lineage_note": "A first-party DeepState map-update notice. The page exposed post ID 23715 and clock time 14:39 but not a calendar date; no territorial proposition is normalized or assessed here."
+    },
+    {
+      "source_item_id": "item_20260805_deepstate_post_23718",
+      "quote_locator": "Public Telegram channel view; map-update entry and clock time",
+      "verification_excerpt": "Мапу оновлено",
+      "admission_status": "window_unconfirmed",
+      "lineage_note": "A first-party DeepState map-update notice. The page exposed post ID 23718 and clock time 20:23 but not a calendar date; no territorial proposition is normalized or assessed here."
+    }
+  ],
+  "qualifying_window_items": [],
+  "source_profile_changes": {
+    "count": 0,
+    "reason": "Canonical draft profiles for DeepState, GeoConfirmed, War Mapper and ISW already exist in the repository; no duplicate profile or reliability assessment was added."
+  },
+  "artifact_capture": {
+    "count": 0,
+    "reason": "No immutable snapshot or approved object-store capture was available. Map geometry, media and sensitive operational detail were intentionally not copied."
+  },
+  "excluded_candidates": [
+    {
+      "canonical_url": "https://www.online.ua/en/interactive-map-of-the-war-in-ukraine-879033/",
+      "reason": "Secondary explanatory article first published before the task window and not a primary visual-OSINT update."
+    },
+    {
+      "canonical_url": "https://warmapper.substack.com/p/ukraine-maps-are-back",
+      "reason": "Published in February 2026, outside the assigned window."
+    },
+    {
+      "canonical_url": "https://www.criticalthreats.org/analysis/russian-offensive-campaign-assessment-july-4-2026-6a4a4ea0cc90a",
+      "reason": "Published in July 2026, outside the assigned window."
+    }
+  ],
+  "safety": {
+    "precise_active_positions_recorded": false,
+    "map_geometry_copied": false,
+    "restricted_or_private_material_used": false,
+    "targeting_enabling_details_recorded": false
+  },
+  "coverage_gaps": [
+    "No visual-OSINT publication had a publication timestamp verifiable inside the exact 2026-08-04T18:00:00Z/2026-08-05T05:00:00Z window.",
+    "Telegram exposed clock times but not calendar dates for the candidate DeepState posts in the available connector representation.",
+    "GeoConfirmed client-side Ukraine data did not load in the approved connector.",
+    "Search indexing for daily ISW/CTP assessments appeared delayed relative to the task window.",
+    "No image, video, map geometry or immutable webpage artifact was captured."
+  ],
+  "follow_up_task_proposals": []
+}

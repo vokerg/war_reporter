@@ -2,7 +2,7 @@
   "task_id": "task_auto_5ba69fbdf442930f",
   "task_type": "source_profile_review",
   "role": "source-analyst",
-  "state": "ready",
+  "state": "leased",
   "priority": 55,
   "created_at": "2026-08-05T11:06:25.178473Z",
   "parent_issue": 33,
@@ -47,5 +47,11 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "source_profile_review:src_vitaliy_klitschko:20260805",
-  "lease": null
+  "lease": {
+    "worker_run_id": "run_20260805T122130Z_5ba69fbd",
+    "lease_branch": "work/task_auto_5ba69fbdf442930f",
+    "base_sha": "1d9f6e9c31a6a3ce511f8da005ad33d0996fc588",
+    "leased_at": "2026-08-05T12:21:30Z",
+    "lease_until": "2026-08-05T14:21:30Z"
+  }
 }

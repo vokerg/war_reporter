@@ -4,7 +4,7 @@ This document defines the operating protocol for parallel ordinary ChatGPT chats
 
 ## User interface
 
-The routine command is:
+The routine atomic command is:
 
 ```text
 копай
@@ -12,18 +12,27 @@ The routine command is:
 
 It means: reconcile due repository duties, ensure runnable work exists, acquire one task, complete it, perform two separate self-reviews, persist outputs and downstream proposals, and hand the exact reviewed PR head to the automatic merge controller.
 
-The user is not required to understand campaigns, roles, task layers, queue promotion, daily snapshots, PR finalization, or branch cleanup.
+The long-running supervisor command is:
+
+```text
+continuous loop
+```
+
+Configured aliases are `continuous-loop`, `копай непрерывно`, and `непрерывный цикл`. It repeatedly executes the full atomic protocol, waits for actual merge/finalization, refreshes `main`, and continues through all proposal-generated work.
+
+The user is not required to understand campaigns, roles, task layers, queue promotion, daily snapshots, PR finalization, branch cleanup, or loop quiescence.
 
 ## Sources of truth
 
 - `tasks/**/*.json` on `main`: canonical queue.
-- `config/autonomy.json`: cadence, review, merge, cleanup, and exception policy.
+- `config/autonomy.json`: cadence, loop, review, merge, cleanup, and exception policy.
 - `config/worker-routing.json`: task-type-to-role routing.
 - `.github/agents/*.agent.md`: role-specific constraints.
 - `work/<task_id>`: atomic task mutex.
 - `control/reconcile/<UTC-hour>`: repository-duty mutex.
 - `review/self/<task_id>.json`: two-round self-review attestation.
 - `queue/proposals/<task_id>.json`: machine-readable downstream task proposals.
+- `scripts/continuous_loop.py`: deterministic supervisor decision engine.
 
 Issue labels and Project memory are advisory. Successful deterministic branch creation decides ownership.
 
@@ -53,6 +62,23 @@ Issue labels and Project memory are advisory. Successful deterministic branch cr
 17. Do not approve, directly merge, or attempt connector branch deletion. The controller handles those operations.
 18. Return task, role, material result, coverage gap or exceptional blocker, and PR URL.
 
+## State machine for `continuous loop`
+
+1. Read the same current-`main` contract as `копай`, including `continuous_loop` configuration.
+2. Evaluate the repository with `scripts/continuous_loop.py` semantics.
+3. On `reconcile`, complete only the deterministic control-plane reconciliation, wait for its result on `main`, refresh, and evaluate again.
+4. On `claim`, execute one complete `копай` task lifecycle.
+5. After the task reaches a ready exact-head PR, do not report completion and do not claim another task.
+6. Poll until the controller has squash-merged the exact reviewed head and post-merge finalization is visible on `main`.
+7. Refresh `main`; allow post-merge reconciliation to materialize proposals; evaluate again.
+8. Treat every transitively spawned task as part of the same loop.
+9. On `wait`, keep the session in supervisor mode and recheck at the configured merge or idle cadence. Do not equate an unavailable task with an empty queue.
+10. On `human_gate`, stop automation and report the exact exceptional condition.
+11. On `quiescent`, return one final aggregate report covering all tasks completed in the loop.
+12. If runtime or tools force termination before `quiescent`, report `continuation_required`; do not claim that the loop completed.
+
+The supervisor resets its idle proof after any repository-state change.
+
 ## Automatic merge controller
 
 `.github/workflows/auto-merge-reviewed.yml` runs only after `Validate repository contracts` succeeds. It resolves the exact associated PR and verifies:
@@ -73,6 +99,8 @@ It then squash-merges the exact head. This is administrative automation, not ind
 
 Every merged PR also triggers `reconcile-queue.yml`, which promotes dependencies, materializes validated proposals, creates due campaigns/snapshots, and retries cleanup.
 
+For Continuous Loop, post-merge completion is a synchronization barrier. The next task may be claimed only after this state is visible on refreshed `main`.
+
 ## Daily, weekly, and monthly duties
 
 - **Daily discovery:** automatic for ten mutually exclusive source shards covering the previous UTC day after the configured Copenhagen local-hour threshold.
@@ -80,13 +108,26 @@ Every merged PR also triggers `reconcile-queue.yml`, which promotes dependencies
 - **Weekly snapshot:** on-demand.
 - **Monthly snapshot:** on-demand.
 
-The hourly workflow catches missed invocations. Every `копай` also checks the same duties, so one operator push is sufficient to restart or advance the system.
+The hourly workflow catches missed invocations. Every `копай` and every Continuous Loop iteration checks the same duties.
 
 ## Proposal-driven pipeline continuation
 
 A merged worker may propose bounded downstream tasks for extraction, claim investigation, source review, maps, report/translation, corrections, or validation. The reconciler accepts only configured task types, requires dependency linkage to the merged producer, rejects control-plane output paths, deduplicates by idempotency key, and creates tasks as `ready` or `planned` based on dependencies.
 
-This mechanism replaces the operator command “создай следующий слой” for routine work. Explicit control commands remain optional for custom windows or investigations.
+This mechanism replaces the operator command “создай следующий слой” for routine work. Continuous Loop follows this proposal closure transitively without returning control between layers. Explicit control commands remain optional for custom windows or investigations.
+
+## Quiescence and idle waiting
+
+A single empty scan cannot end Continuous Loop. The supervisor may voluntarily stop only after the configured number of unchanged idle sweeps and minimum elapsed idle window, with:
+
+- no due reconciliation duty;
+- no eligible or nonterminal task;
+- no open worker PR or active work branch;
+- no exceptional PR;
+- no temporary reconciliation blocker;
+- no scheduled daily boundary inside the configured guard.
+
+The reference decision engine returns `reconcile`, `claim`, `wait`, `human_gate`, or `quiescent`.
 
 ## Blocked and exceptional work
 

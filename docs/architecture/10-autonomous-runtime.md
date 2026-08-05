@@ -4,6 +4,8 @@
 
 A repository-authorized agent should be able to receive `копай` without any knowledge of internal roles or queue stages. The invocation checks duties, triggers control-plane work, claims one task, completes it, self-reviews twice, and hands it to an exact-head merge controller.
 
+`continuous loop` composes this atomic lifecycle into a long-running supervisor. Its detailed contract is defined in [`11-continuous-loop.md`](11-continuous-loop.md).
+
 ## Control loop
 
 ```text
@@ -20,6 +22,8 @@ operator invocation / hourly schedule / merged PR
   -> actual merge metadata finalization
   -> issue closure + reconciliation + cleanup retry
 ```
+
+In Continuous Loop mode, the supervisor refreshes `main` after the finalization barrier and starts the control loop again instead of reporting after one task.
 
 ## Queue reproduction
 
@@ -50,6 +54,12 @@ The write-capable controller executes validator code only from trusted `main`. T
 Worker permissions are taken from the base task manifest on `main`, not from the modified head manifest. Task-contract fields such as scope, dependencies, idempotency key, and `allowed_output_paths` are immutable inside the worker PR. Only lifecycle/result metadata may change.
 
 Hardening and other control-plane PRs are excluded from the worker auto-merge path.
+
+## Supervisor boundary
+
+Continuous Loop is a control-plane supervisor, not a wider worker permission set. It cannot combine several tasks in one work branch, bypass exact-head CI, merge directly, or continue past an exceptional human gate.
+
+The supervisor waits for both squash merge and finalization before selecting the next task. This makes proposal creation and dependency promotion visible before the next selection.
 
 ## Cleanup boundary
 

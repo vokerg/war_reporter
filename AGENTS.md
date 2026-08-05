@@ -1,12 +1,31 @@
 # Agent routing and autonomous repository contract
 
-This file applies to every human and AI contributor. `CHATGPT_PROJECT.md` is the executable operating protocol for ordinary ChatGPT Project workers.
+This file applies to every human and AI contributor. `CHATGPT_PROJECT.md` is the executable operating protocol for ordinary ChatGPT Project workers and Continuous Loop supervisors.
 
 ## Meaning of `копай`
 
 The command **`копай`** means: reconcile due repository duties, ensure runnable work exists, atomically acquire one eligible task, complete it, perform two separate self-review rounds, persist the result, and hand the exact reviewed head to the repository merge controller.
 
 The operator does not choose a campaign, task, role, next pipeline layer, or daily publication duty. GitHub state is authoritative; Project memory is context, not a lock.
+
+## Meaning of `continuous loop`
+
+The command **`continuous loop`** and its configured aliases mean: repeatedly execute the complete `копай` lifecycle without returning control after each task.
+
+A Continuous Loop supervisor:
+
+1. reconciles duties before every atomic cycle;
+2. claims exactly one deterministic `work/<task_id>` branch at a time;
+3. finishes that task all the way through two self-review rounds and controller handoff;
+4. waits until the exact reviewed head is squash-merged and post-merge finalization is visible on `main`;
+5. refreshes `main`, including proposal-generated tasks, and begins the next cycle;
+6. waits and rechecks while another worker or controller owns nonterminal work;
+7. treats every task spawned by work completed during the loop as part of the same loop;
+8. does not declare completion after a single empty scan;
+9. voluntarily exits only after the configured quiescence proof shows no due duties, eligible tasks, nonterminal tasks, worker PRs, work branches, or near-term scheduled duty;
+10. treats runtime/tool interruption as `continuation_required`, not as quiescence.
+
+The supervisor never directly merges a worker PR. The mandatory squash merge remains an administrative controller action. Waiting for that merge is part of the loop iteration.
 
 ## Required all-the-way-down sequence
 
@@ -35,6 +54,18 @@ The operator does not choose a campaign, task, role, next pipeline layer, or dai
 
 Incomplete work should be extraordinary. Ordinary completion includes persisted outputs, two passed review rounds, a valid proposal file, a ready PR, and controller handoff.
 
+## Continuous Loop quiescence
+
+`config/autonomy.json` defines merge polling, idle polling, the minimum number of idle sweeps, the minimum idle window, and the guard before the next scheduled daily boundary. `scripts/continuous_loop.py` evaluates the next supervisor action as one of:
+
+- `reconcile` — materialize or promote repository duties before claiming;
+- `claim` — acquire the returned eligible task;
+- `wait` — work exists, is in flight, is not yet claimable, or quiescence is not proven;
+- `human_gate` — an exceptional condition requires human review;
+- `quiescent` — the only normal voluntary exit.
+
+A loop must reset its idle proof whenever repository state changes, a duty appears, a task becomes claimable, or work enters/leaves an active state.
+
 ## Branch deletion
 
 The GitHub Connector used by ordinary workers may not expose delete-ref. Workers must not spend time attempting or retrying branch deletion through that connector. Branch cleanup belongs to the merge controller and hourly reconciliation workflow. Cleanup failure is non-blocking repository debt, not task failure.
@@ -44,7 +75,7 @@ The GitHub Connector used by ordinary workers may not expose delete-ref. Workers
 The queue reproduces through four mechanisms:
 
 1. hourly and post-merge reconciliation;
-2. the same duty check at the start of every `копай` invocation;
+2. the same duty check at the start of every `копай` invocation and every Continuous Loop iteration;
 3. dependency promotion from `planned` to `ready`;
 4. validated `queue/proposals/<producer_task_id>.json` files from merged tasks.
 

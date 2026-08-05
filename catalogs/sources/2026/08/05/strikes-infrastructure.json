@@ -3,7 +3,9 @@
     "source_entity_id": "src_vitaliy_klitschko",
     "display_name": "Vitali Klitschko official Telegram channel",
     "aliases": [
-      "Віталій Кличко"
+      "Віталій Кличко",
+      "Vitali Klitschko",
+      "Vitaliy Klitschko"
     ],
     "entity_type": "account",
     "languages": [
@@ -13,15 +15,46 @@
       "telegram": "vitaliy_klitschko"
     },
     "websites": [
-      "https://t.me/vitaliy_klitschko"
+      "https://t.me/vitaliy_klitschko",
+      "https://kyivcity.gov.ua/kyiv_ta_miska_vlada/kyivskyi_miskyi_holova/klychko_vitalii_volodymyrovych/"
     ],
     "topics": [
       "ukraine_war",
       "civil_defense",
       "kyiv_governance"
     ],
-    "assessments": [],
-    "record_status": "draft",
-    "updated_at": "2026-08-05T10:38:16Z"
+    "affiliations": [
+      {
+        "name": "Kyiv Mayor and Kyiv City State Administration",
+        "relationship": "Official Telegram communications channel of Vitali Klitschko, identified by Kyiv's official portal",
+        "valid_from": null,
+        "valid_to": null,
+        "evidence_urls": [
+          "https://kyivcity.gov.ua/kyiv_ta_miska_vlada/kyivskyi_miskyi_holova/klychko_vitalii_volodymyrovych/",
+          "https://kyivcity.gov.ua/news/vitaliy_klichko_zaklikav_kiyan_doviryati_tilki_informatsi_z_ofitsiynikh_dzherel/",
+          "https://t.me/vitaliy_klitschko"
+        ]
+      }
+    ],
+    "assessments": [
+      {
+        "topic": "source_identity",
+        "valid_from": "2026-08-05",
+        "valid_to": null,
+        "dimensions": {
+          "identity": "high",
+          "access": "high",
+          "historical_accuracy": "unknown",
+          "methodology_transparency": "unknown",
+          "correction_behavior": "unknown",
+          "independence": "unknown"
+        },
+        "rationale": "Kyiv's official portal identifies Vitali Klitschko as Kyiv mayor and head of the Kyiv City State Administration and explicitly lists @vitaliy_klitschko as his official Telegram channel. The public Telegram page presents the same verified name and handle. This review does not establish historical accuracy, methodology transparency, correction behavior, or independence, so those dimensions remain unknown.",
+        "reviewed_at": "2026-08-05T12:25:00Z",
+        "evidence_claim_ids": []
+      }
+    ],
+    "record_status": "approved",
+    "updated_at": "2026-08-05T12:25:00Z"
   }
 ]

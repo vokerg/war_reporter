@@ -2,7 +2,7 @@
   "task_id": "task_20260805_08_visual_osint_maps",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "leased",
+  "state": "pr_open",
   "priority": 75,
   "created_at": "2026-08-05T05:06:14Z",
   "parent_issue": 33,
@@ -44,5 +44,18 @@
     "base_sha": "71872a7d529614d3b4e7798e5284c8e9acc542fa",
     "leased_at": "2026-08-05T10:34:12Z",
     "lease_until": "2026-08-05T12:34:12Z"
+  },
+  "result": {
+    "branch": "work/task_20260805_08_visual_osint_maps",
+    "pr_number": 51,
+    "completed_at": "2026-08-05T10:38:01Z",
+    "summary": "Recorded three first-party DeepState map-update candidates without assigning calendar dates that the public connector did not expose; no item was admitted as inside the bounded window, no duplicate source profiles were added, and no map geometry, media or targeting-enabling detail was captured.",
+    "coverage_gaps": [
+      "No visual-OSINT publication had a publication timestamp verifiable inside the exact eleven-hour UTC window.",
+      "Telegram exposed clock times but not calendar dates for the candidate DeepState posts in the available connector representation.",
+      "GeoConfirmed client-side Ukraine data did not load in the approved connector.",
+      "Search indexing for daily ISW/CTP assessments appeared delayed relative to the task window.",
+      "No image, video, map geometry or immutable webpage artifact was captured."
+    ]
   }
 }

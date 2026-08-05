@@ -56,6 +56,7 @@ class AutonomyTests(unittest.TestCase):
         valid_auto = (
             "actions: write\nref: main\npath: trusted\npath: pr-head\n"
             "validated_sha\n"
+            "commits/$validated_sha/pulls\ncandidate_count\n"
             "python trusted/scripts/validate_autonomy.py\n"
             "python trusted/scripts/validate_pr_scope.py\n"
             "gh workflow run finalize-task-merge.yml\n"
@@ -71,6 +72,10 @@ class AutonomyTests(unittest.TestCase):
         workflow.write_text(valid_auto, encoding="utf-8")
         finalizer.write_text(valid_finalizer, encoding="utf-8")
         self.assertEqual(validate_auto_merge_trust_boundary(root), [])
+
+        workflow.write_text(valid_auto.replace("commits/$validated_sha/pulls\n", ""), encoding="utf-8")
+        errors = validate_auto_merge_trust_boundary(root)
+        self.assertTrue(any("commits/$validated_sha/pulls" in error for error in errors))
 
         workflow.write_text("python scripts/validate_autonomy.py\n", encoding="utf-8")
         errors = validate_auto_merge_trust_boundary(root)

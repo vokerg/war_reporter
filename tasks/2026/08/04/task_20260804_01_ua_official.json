@@ -2,11 +2,11 @@
   "task_id": "task_20260804_01_ua_official",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "ready",
+  "state": "merged",
   "priority": 90,
   "created_at": "2026-08-04T18:28:29Z",
   "parent_issue": 5,
-  "issue_number": null,
+  "issue_number": 7,
   "depends_on_task_ids": [],
   "window": {
     "from": "2026-08-03T18:00:00Z",
@@ -15,9 +15,24 @@
   "scope": {
     "source_ids": [],
     "source_groups": [],
-    "regions": ["ukraine-war"],
-    "topics": ["ukrainian-official-statements", "frontline", "strikes"],
-    "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"]
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "ukrainian-official-statements",
+      "frontline",
+      "strikes"
+    ],
+    "content_types": [
+      "post",
+      "article",
+      "report",
+      "briefing",
+      "document",
+      "image",
+      "video",
+      "map"
+    ]
   },
   "exclusions": [
     "Items already represented by canonical URL, platform ID, or content hash",
@@ -38,5 +53,17 @@
     "No final truth assessment, territorial conclusion, or report narrative was added"
   ],
   "idempotency_key": "open_web_discovery:ua-official:20260803T1800Z:20260804T1800Z:ukraine-war",
-  "lease": null
+  "lease": null,
+  "result": {
+    "branch": "work/task_20260804_01_ua_official",
+    "pr_number": 8,
+    "completed_at": "2026-08-05T04:54:00Z",
+    "summary": "Registered four draft Ukrainian official source profiles, three in-window General Staff source items, and a bounded discovery manifest with lineage, exclusions, safety notes, and follow-up proposals. No immutable artifacts or final assessments were created.",
+    "coverage_gaps": [
+      "Telegram public previews do not expose API-grade completeness, edit history, or stable content hashes.",
+      "The exact Air Force upstream item for the air-defense summary was not resolved.",
+      "No independently dated in-window DSNS item was recovered from the current preview.",
+      "The bounded scan was not exhaustive across every Ukrainian government and military account."
+    ]
+  }
 }

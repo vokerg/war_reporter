@@ -1,0 +1,66 @@
+{
+  "task_id": "task_backfill_20260804_daily_report_en",
+  "pr_number": 104,
+  "rounds": [
+    {
+      "round": 1,
+      "reviewed_at": "2026-08-05T20:17:00Z",
+      "reviewer_run_id": "run_20260805T200900Z_report04",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps",
+        "frozen_input_integrity",
+        "claim_strength",
+        "paragraph_references",
+        "manifest_consistency"
+      ],
+      "findings": [
+        "The diff is limited to the task manifest and the four declared output paths: report manifest, Markdown report, proposal receipt, and self-review receipt.",
+        "The report manifest and task repeat the exact frozen set of 19 approved claims, seven approved assessments, and claim-set SHA-256 7675dfa8238555c84a1bdbf8506778796b33896fab7c8510923c101f0f1cddcf.",
+        "Every factual prose paragraph ends with relevant frozen claim or assessment IDs; no source item, observation, or new evidence is promoted directly into report prose.",
+        "Confirmed language is restricted to publication, attributed quotation, attributable accusation, location verification, and attributed expert-assessment events; underlying strike, damage, territorial, count, policy, industry, and capacity propositions retain their approved unverified, plausible, probable, or mixed qualification.",
+        "The July engagement metric is explicitly identified as a July figure included through the approved reporting-window assessment and is not presented as an event of 4 August.",
+        "The report states that no prior approved daily baseline is available, identifies the absence of contested, misleading, or refuted outcomes, and represents unresolved questions, correction status, confidence levels, and coverage gaps.",
+        "No precise current operational position, targetable infrastructure detail, unsupported causality, or forecast is published.",
+        "Validate repository contracts run 31043198597 and Build static publication site run 31043199821 passed on the reviewed report head."
+      ],
+      "repairs": [],
+      "outcome": "pass"
+    },
+    {
+      "round": 2,
+      "reviewed_at": "2026-08-05T20:18:00Z",
+      "reviewer_run_id": "run_20260805T200900Z_report04",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps",
+        "fresh_complete_diff",
+        "frozen_input_integrity",
+        "manifest_content_alignment",
+        "definition_of_done"
+      ],
+      "findings": [
+        "A fresh pass over the complete diff found one approved English daily report manifest, one English Markdown report, one valid empty downstream proposal receipt, this two-round review receipt, and the task lifecycle update only.",
+        "The Markdown period, assessment time, report ID semantics, language, content path, editorial status, claim IDs, assessment IDs, and deterministic hash align with the report manifest and task contract.",
+        "Operational claims remain separated from confirmed publication or attribution events, overlapping publications with unresolved common upstream lineage are not counted as independent corroboration, and incompatible UAV figures are not combined or compared.",
+        "Material-change reporting fails closed rather than inventing a baseline: the report explicitly records that no prior approved daily report is present in the frozen contract.",
+        "The unresolved-question and coverage-gap sections account for independent strike and damage confirmation, territorial verification, UAV interval compatibility, primary port and vessel records, video date and perpetrator, primary legal and technical records, transcript lineage, shelter inventory, engagement-count methodology, and safety withholding.",
+        "No PR comments, review submissions, or unresolved review threads were present during review.",
+        "The task satisfies its bounded definition of done and has no exceptional condition."
+      ],
+      "repairs": [],
+      "outcome": "pass"
+    }
+  ],
+  "exceptional_condition": false
+}

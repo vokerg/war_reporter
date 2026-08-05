@@ -1,0 +1,61 @@
+{
+  "task_id": "task_backfill_20260804_extract_milbloggers",
+  "pr_number": 96,
+  "rounds": [
+    {
+      "round": 1,
+      "reviewed_at": "2026-08-05T19:12:00Z",
+      "reviewer_run_id": "run_20260805T190700Z_contloop",
+      "checks": [
+        "scope",
+        "provenance",
+        "atomicity",
+        "speaker_attribution",
+        "day_precision",
+        "upstream_lineage",
+        "translation_fidelity",
+        "safety_withholding",
+        "tests",
+        "coverage_gaps"
+      ],
+      "findings": [
+        "All changed paths were the task manifest or declared output paths.",
+        "All four assigned source items were reviewed against the frozen source-item records and raw manifest.",
+        "Each observation is atomic, remains attributed to Dva Majors or Rybar, and does not assert the channel claim as established fact.",
+        "The Rybar 82197 statement remains an attributed assessment and does not promote the unresolved Kotsnews upstream post to independent evidence.",
+        "Day-level publication bounds and preview times are preserved without inventing timezone-bearing publication timestamps.",
+        "The Rybar 82198 damage-assessment caveat is correctly recorded as a coverage gap because no original excerpt or artifact supports a separate observation.",
+        "No granular current positions, routes, map geometry, targeting instructions, reliability score, or final truth assessment were introduced.",
+        "GitHub Actions run 31038211033 passed validator tests, watchlist validation, record validation, task scope validation, trust-boundary checks, autonomy checks, and live-ref audit."
+      ],
+      "repairs": [],
+      "outcome": "pass"
+    },
+    {
+      "round": 2,
+      "reviewed_at": "2026-08-05T19:13:00Z",
+      "reviewer_run_id": "run_20260805T190700Z_contloop",
+      "checks": [
+        "fresh_complete_diff",
+        "assigned_item_coverage",
+        "claim_strength",
+        "duplicate_lineage",
+        "publication_precision",
+        "operational_safety",
+        "schema_conformance",
+        "definition_of_done"
+      ],
+      "findings": [
+        "A fresh pass over the complete diff found four source items represented by four atomic draft observations with no unsupported extra assertion.",
+        "Channel commentary, relayed official statements, and broad incident claims remain distinguishable by observation type and explicit attribution.",
+        "Named upstream Reuters, Kotsnews, Russian Ministry of Defence, Rutube, and Soloviev Live material is not counted as independent corroboration.",
+        "All records retain Russian excerpts, locators, day precision, and safe broad wording.",
+        "The proposal receipt is valid and intentionally empty because the downstream graph is pre-materialized.",
+        "The task satisfies its bounded definition of done and has no exceptional condition."
+      ],
+      "repairs": [],
+      "outcome": "pass"
+    }
+  ],
+  "exceptional_condition": false
+}

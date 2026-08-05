@@ -315,7 +315,7 @@ def plan_duties(root: Path, now: datetime | None = None) -> dict[str, Any]:
         for task in shard_tasks:
             coverage_tasks[str(task["task_id"])] = task
 
-    cycle_activated = end > activation
+    cycle_activated = start >= activation
     if cycle_activated and local_now >= discovery_due and not coverage_complete:
         collisions = discovery_output_collisions(tasks, day)
         covered_or_partial = sorted(slug for slug, shard_tasks in coverage_by_shard.items() if shard_tasks)

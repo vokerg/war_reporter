@@ -31,7 +31,7 @@ An empty proposal list is meaningful: it records that the worker considered down
 
 ## Daily obligations
 
-The reconciler runs hourly and after every merge. After the configured Copenhagen local hour, it creates ten source-sharded tasks for the previous UTC day if the autonomy activation boundary has passed and backlog limits allow. It creates a daily snapshot task only after all related tasks and materialized proposals for the day are complete and at least one input merged.
+The reconciler runs hourly and after every merge. After the configured Copenhagen local hour, it creates ten source-sharded tasks for the previous UTC day if the complete UTC day began at or after the autonomy activation boundary and backlog limits allow. A day that started before `activation_not_before` is not backfilled as an automatic daily cycle. The reconciler creates a daily snapshot task only after all related tasks and materialized proposals for the day are complete and at least one input merged.
 
 Weekly and monthly snapshots are intentionally on-demand.
 

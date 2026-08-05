@@ -31,7 +31,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 ACTIVE_STATES = {"leased", "collecting", "pr_open", "validating", "review"}
 TERMINAL_STATES = {"merged", "rejected", "cancelled", "duplicate"}
-HUMAN_GATE_STATES = {"blocked"}
+HUMAN_REVIEW_PREFIX = "HUMAN_REVIEW_REQUIRED:"
 
 
 def load(path: Path) -> Any:
@@ -91,6 +91,13 @@ def _task_payload(task: Any, root: Path) -> dict[str, Any]:
     }
 
 
+def _requires_human_gate(task: dict[str, Any]) -> bool:
+    return (
+        task.get("state") == "blocked"
+        and str(task.get("blocked_reason", "")).startswith(HUMAN_REVIEW_PREFIX)
+    )
+
+
 def evaluate_loop(
     root: Path,
     *,
@@ -113,9 +120,12 @@ def evaluate_loop(
     plan = plan_duties(root, now)
     tasks = task_index(root)
     state_counts: dict[str, int] = {}
-    for _, task in tasks.values():
+    human_gate_task_ids: list[str] = []
+    for task_id, (_, task) in tasks.items():
         state = str(task.get("state"))
         state_counts[state] = state_counts.get(state, 0) + 1
+        if _requires_human_gate(task):
+            human_gate_task_ids.append(task_id)
 
     nonterminal_tasks = sum(
         count for state, count in state_counts.items() if state not in TERMINAL_STATES
@@ -126,6 +136,7 @@ def evaluate_loop(
         "open_worker_prs": open_worker_prs,
         "active_work_branches": active_work_branches,
         "exceptional_prs": exceptional_prs,
+        "human_gate_task_ids": sorted(human_gate_task_ids),
         "states": dict(sorted(state_counts.items())),
     }
     common = {
@@ -135,8 +146,7 @@ def evaluate_loop(
         "queue": queue,
     }
 
-    human_gate_tasks = sum(state_counts.get(state, 0) for state in HUMAN_GATE_STATES)
-    if exceptional_prs or human_gate_tasks:
+    if exceptional_prs or human_gate_task_ids:
         return {
             **common,
             "action": "human_gate",

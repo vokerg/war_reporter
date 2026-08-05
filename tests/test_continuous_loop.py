@@ -36,8 +36,14 @@ class ContinuousLoopTests(unittest.TestCase):
         (root / "tasks").mkdir(parents=True)
         return root
 
-    def task(self, task_id: str, state: str = "ready") -> dict[str, object]:
-        return {
+    def task(
+        self,
+        task_id: str,
+        state: str = "ready",
+        *,
+        blocked_reason: str | None = None,
+    ) -> dict[str, object]:
+        task: dict[str, object] = {
             "task_id": task_id,
             "task_type": "open_web_discovery",
             "state": state,
@@ -45,6 +51,9 @@ class ContinuousLoopTests(unittest.TestCase):
             "created_at": "2026-08-05T10:00:00Z",
             "depends_on_task_ids": [],
         }
+        if blocked_reason is not None:
+            task["blocked_reason"] = blocked_reason
+        return task
 
     def test_ready_task_is_claimed(self) -> None:
         root = self.make_root()
@@ -96,11 +105,42 @@ class ContinuousLoopTests(unittest.TestCase):
         self.assertEqual(decision["action"], "wait")
         self.assertEqual(decision["reason"], "work_in_flight")
 
-    def test_blocked_task_requires_human_gate(self) -> None:
+    def test_operational_block_does_not_preempt_ready_work(self) -> None:
         root = self.make_root()
-        dump(root / "tasks/task_blocked.json", self.task("task_blocked", "blocked"))
+        dump(
+            root / "tasks/task_blocked.json",
+            self.task("task_blocked", "blocked", blocked_reason="HTTP 403 from a source"),
+        )
+        dump(root / "tasks/task_ready.json", self.task("task_ready"))
+        decision = evaluate_loop(root, now=datetime(2026, 8, 5, 12, tzinfo=UTC))
+        self.assertEqual(decision["action"], "claim")
+        self.assertEqual(decision["task"]["task_id"], "task_ready")
+        self.assertEqual(decision["queue"]["human_gate_task_ids"], [])
+
+    def test_operational_block_without_ready_work_waits(self) -> None:
+        root = self.make_root()
+        dump(
+            root / "tasks/task_blocked.json",
+            self.task("task_blocked", "blocked", blocked_reason="HTTP 403 from a source"),
+        )
+        decision = evaluate_loop(root, now=datetime(2026, 8, 5, 12, tzinfo=UTC))
+        self.assertEqual(decision["action"], "wait")
+        self.assertEqual(decision["reason"], "nonterminal_queue_not_claimable")
+
+    def test_explicit_human_review_block_requires_human_gate(self) -> None:
+        root = self.make_root()
+        dump(
+            root / "tasks/task_blocked.json",
+            self.task(
+                "task_blocked",
+                "blocked",
+                blocked_reason="HUMAN_REVIEW_REQUIRED: legal approval is required",
+            ),
+        )
+        dump(root / "tasks/task_ready.json", self.task("task_ready"))
         decision = evaluate_loop(root, now=datetime(2026, 8, 5, 12, tzinfo=UTC))
         self.assertEqual(decision["action"], "human_gate")
+        self.assertEqual(decision["queue"]["human_gate_task_ids"], ["task_blocked"])
 
     def test_quiescence_requires_sweeps_and_elapsed_window(self) -> None:
         root = self.make_root()

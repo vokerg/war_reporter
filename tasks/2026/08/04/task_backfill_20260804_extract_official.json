@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_extract_official",
   "task_type": "extract_observations",
   "role": "extractor",
-  "state": "ready",
+  "state": "leased",
   "priority": 90,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -26,9 +26,18 @@
       "item_20260804_generalstaff_strikes"
     ],
     "source_groups": [],
-    "regions": ["ukraine-war"],
-    "topics": ["backfill", "official-statements", "operations", "strikes"],
-    "content_types": ["post"]
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "backfill",
+      "official-statements",
+      "operations",
+      "strikes"
+    ],
+    "content_types": [
+      "post"
+    ]
   },
   "exclusions": [
     "Any source item outside the frozen UTC window",
@@ -50,5 +59,11 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "backfill_extract:2026-08-04:official:ukraine-war:v1",
-  "lease": null
+  "lease": {
+    "worker_run_id": "run_20260805T180500Z_contloop",
+    "lease_branch": "work/task_backfill_20260804_extract_official",
+    "base_sha": "6ed971c73fe0be149ee59dcd7dd6603dd6ebca1f",
+    "leased_at": "2026-08-05T18:05:00Z",
+    "lease_until": "2026-08-05T20:05:00Z"
+  }
 }

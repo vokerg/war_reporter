@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_extract_media",
   "task_type": "extract_observations",
   "role": "extractor",
-  "state": "ready",
+  "state": "collecting",
   "priority": 85,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -31,9 +31,20 @@
       "item_suspilne_1371598"
     ],
     "source_groups": [],
-    "regions": ["ukraine-war"],
-    "topics": ["backfill", "media", "diplomacy", "strikes", "infrastructure", "reactions"],
-    "content_types": ["article"]
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "backfill",
+      "media",
+      "diplomacy",
+      "strikes",
+      "infrastructure",
+      "reactions"
+    ],
+    "content_types": [
+      "article"
+    ]
   },
   "exclusions": [
     "Any source item outside the frozen UTC window",
@@ -55,5 +66,11 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "backfill_extract:2026-08-04:media:ukraine-war:v1",
-  "lease": null
+  "lease": {
+    "worker_run_id": "run_20260805T185100Z_contloop",
+    "lease_branch": "work/task_backfill_20260804_extract_media",
+    "base_sha": "d474a19131e8621de6b4162510ac0c491c0f40f5",
+    "leased_at": "2026-08-05T18:52:00Z",
+    "lease_until": "2026-08-05T20:52:00Z"
+  }
 }

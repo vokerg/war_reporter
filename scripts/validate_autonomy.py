@@ -12,6 +12,7 @@ from typing import Any
 from jsonschema import Draft202012Validator, FormatChecker
 
 ROOT = Path(__file__).resolve().parents[1]
+PROPOSAL_OUTPUT_PREFIXES = ("catalogs/", "data/", "maps/", "raw-manifests/", "reports/")
 REQUIRED_RUNTIME_FILES = (
     "config/autonomy.json",
     "schemas/autonomy.schema.json",
@@ -149,6 +150,10 @@ def validate_receipt(
     return errors
 
 
+def proposal_output_allowed(path: str) -> bool:
+    return any(path.startswith(prefix) for prefix in PROPOSAL_OUTPUT_PREFIXES)
+
+
 def validate_proposals(root: Path) -> list[str]:
     errors: list[str] = []
     try:
@@ -172,8 +177,8 @@ def validate_proposals(root: Path) -> list[str]:
             if task_type not in allowed_types:
                 errors.append(f"{path}: proposed task_type {task_type} is not autonomously allowed")
             for output in proposal.get("allowed_output_paths", []):
-                if str(output).startswith((".github/", "config/", "schemas/", "scripts/")):
-                    errors.append(f"{path}: proposal may not grant control-plane output path {output}")
+                if not proposal_output_allowed(str(output)):
+                    errors.append(f"{path}: proposal output must remain in a data-plane root: {output}")
     return errors
 
 

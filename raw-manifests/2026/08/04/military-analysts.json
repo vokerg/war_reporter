@@ -1,0 +1,136 @@
+{
+  "scan_id": "scan_task_20260804_06_military_analysts_run_20260805T044000Z_6b18e2d9",
+  "task_id": "task_20260804_06_military_analysts",
+  "worker_run_id": "run_20260805T044000Z_6b18e2d9",
+  "retrieved_at": "2026-08-05T04:45:51Z",
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
+  },
+  "scope": {
+    "region": "ukraine-war",
+    "topics": [
+      "military-analysis",
+      "capabilities",
+      "logistics"
+    ],
+    "access_classification": "public_web_only"
+  },
+  "search_strategy": {
+    "methods": [
+      "Exact-title and exact-date web search",
+      "Site-restricted search of analyst institutions and specialist outlets",
+      "Search of public secondary indexes for canonical primary URLs",
+      "Date and scope screening against the bounded UTC window"
+    ],
+    "queries": [
+      "Russian Offensive Campaign Assessment August 3 2026",
+      "Russian Offensive Campaign Assessment August 4 2026",
+      "site:understandingwar.org Ukraine August 3 2026",
+      "site:criticalthreats.org Ukraine August 4 2026",
+      "site:rusi.org Ukraine military analysis logistics August 2026",
+      "site:warontherocks.com Ukraine military analysis logistics August 2026",
+      "site:drone-warfare.com Ukraine assessment August 4 2026"
+    ]
+  },
+  "source_checks": [
+    {
+      "source_entity_id": "src_institute_for_study_of_war",
+      "website": "https://understandingwar.org/",
+      "outcome": "candidate_found_time_uncertain_primary_inaccessible",
+      "notes": "A public secondary index exposed the canonical URL and title for the August 3 assessment. The primary page returned HTTP 403 to the approved connector. The title supplies day-level dating only, so the exact publication time cannot be proven to fall after the window start at 18:00Z.",
+      "candidate_item_ids": [
+        "item_isw_rocaa_20260803"
+      ]
+    },
+    {
+      "source_entity_id": "src_royal_united_services_institute",
+      "website": "https://www.rusi.org/",
+      "outcome": "no_verified_in_window_item",
+      "notes": "Relevant search results surfaced publications dated July 7, July 21, and July 28, all outside the assigned window. No August 3-4 item was verifiably surfaced."
+    },
+    {
+      "source_entity_id": "src_war_on_the_rocks",
+      "website": "https://warontherocks.com/",
+      "outcome": "no_verified_in_window_item",
+      "notes": "Relevant search results surfaced publications dated July 14 and July 21, outside the assigned window. No August 3-4 item was verifiably surfaced."
+    },
+    {
+      "source_entity_id": "src_drone_warfare_dwim",
+      "website": "https://drone-warfare.com/",
+      "outcome": "no_verified_in_window_item",
+      "notes": "The July 15 midpoint assessment projected resolution around August 4, but a corresponding final assessment was not surfaced by the approved connector."
+    }
+  ],
+  "discovered_items": [
+    {
+      "source_item_id": "item_isw_rocaa_20260803",
+      "canonical_url": "https://understandingwar.org/research/russia-ukraine/russian-offensive-campaign-assessment-august-3-2026/",
+      "title": "Russian Offensive Campaign Assessment, August 3, 2026",
+      "language": "en",
+      "publication_time_status": "day_known_exact_time_unknown",
+      "window_status": "ambiguous",
+      "primary_access": "http_403",
+      "quote_locator": null,
+      "discovery_evidence_urls": [
+        "https://www.reddit.com/r/ukraine/comments/1vf0eeq/russian_offensive_campaign_assessment_the/"
+      ],
+      "notes": "Persisted as an inaccessible candidate source item, not as a verified in-window publication and not as evidence for any claim."
+    }
+  ],
+  "verified_in_window_item_ids": [],
+  "time_uncertain_item_ids": [
+    "item_isw_rocaa_20260803"
+  ],
+  "out_of_window_leads": [
+    {
+      "source_entity_id": "src_royal_united_services_institute",
+      "title": "Ukraine’s Logistics Targeting Raises Questions for Russia’s Rear Defences",
+      "published_at": "2026-07-07",
+      "canonical_url": "https://www.rusi.org/explore-our-research/publications/commentary/ukraines-logistics-targeting-raises-questions-russias-rear-defences",
+      "exclusion_reason": "Published before the task window"
+    },
+    {
+      "source_entity_id": "src_war_on_the_rocks",
+      "title": "A Return to Mass: Russian Force Expansion in the War with Ukraine",
+      "published_at": "2026-07-14",
+      "canonical_url": "https://warontherocks.com/a-return-to-mass-russian-force-expansion-in-the-war-with-ukraine/",
+      "exclusion_reason": "Published before the task window"
+    },
+    {
+      "source_entity_id": "src_drone_warfare_dwim",
+      "title": "Ukraine 40-Day Operation: Day 20 Mid-Point Assessment",
+      "published_at": "2026-07-15",
+      "canonical_url": "https://drone-warfare.com/2026/07/15/ukraine-40-day-operation-midpoint-assessment/",
+      "exclusion_reason": "Published before the task window; retained only as a lead because it forecast a resolution point around August 4"
+    }
+  ],
+  "access_failures": [
+    {
+      "url": "https://understandingwar.org/research/russia-ukraine/russian-offensive-campaign-assessment-august-3-2026/",
+      "failure": "HTTP 403 from approved connector",
+      "effect": "No full-text capture, exact publication timestamp, author list, excerpt, or quote locator could be verified"
+    }
+  ],
+  "coverage_gaps": [
+    "Search-engine and connector indexes lagged the live analyst sites and surfaced institutional archives only through late July in several cases.",
+    "The exact publication time of the ISW August 3 assessment could not be verified, so its fit within the UTC window remains ambiguous.",
+    "No site-native RSS/API or authenticated archive access was available; no access controls were bypassed.",
+    "Public social-media search did not provide stable, exact-timestamp primary records suitable for persistence.",
+    "A zero-item verified result means only that the documented sources and queries were checked, not that the open internet was exhaustively searched."
+  ],
+  "follow_up_task_proposals": [
+    {
+      "task_type": "open_web_discovery",
+      "proposal": "Recheck the ISW/CTP archives and RSS/indexes for August 3-4 assessments after indexing catches up; capture exact publication timestamps and quote locators if public access succeeds."
+    },
+    {
+      "task_type": "open_web_discovery",
+      "proposal": "Recheck Drone Warfare / DWIM for the promised day-40 assessment or correction resolving the July 15 forecasts."
+    }
+  ],
+  "safety_notes": [
+    "No precise current positions, movement tracks, targeting-enabling details, or non-public geodata were stored.",
+    "No reliability score, truth assessment, territorial conclusion, or report narrative was produced."
+  ]
+}

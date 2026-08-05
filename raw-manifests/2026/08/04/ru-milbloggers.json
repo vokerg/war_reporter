@@ -1,0 +1,158 @@
+{
+  "task_id": "task_20260804_04_ru_milbloggers",
+  "worker_run_id": "run_20260805T044026Z_5c91d2a4",
+  "retrieved_at": "2026-08-05T04:46:26Z",
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
+  },
+  "scope": {
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "russian-milbloggers",
+      "operations",
+      "claims"
+    ],
+    "access_method": "public Telegram web previews and indexed public-web search"
+  },
+  "search_log": [
+    {
+      "source_entity_id": "src_dva_majors",
+      "channel_url": "https://t.me/s/dva_majors",
+      "status": "searched",
+      "notes": "The public preview exposed posts spanning late 4 August and early 5 August 2026. One in-window, non-geospatial post was registered."
+    },
+    {
+      "source_entity_id": "src_rybar",
+      "channel_url": "https://t.me/s/rybar",
+      "status": "searched",
+      "notes": "The public preview exposed multiple 4 August posts. Three in-window posts relevant to operations or attributed claims were registered."
+    },
+    {
+      "channel_url": "https://t.me/s/RVvoenkor",
+      "status": "partial",
+      "notes": "The retrievable preview began with late-evening posts after the task cutoff; earlier in-window pagination was not reliably exposed by the connector."
+    },
+    {
+      "channel_url": "https://t.me/s/boris_rozhin",
+      "status": "partial",
+      "notes": "The retrievable preview primarily exposed 5 August posts; exact in-window 4 August posts were not reliably recovered."
+    }
+  ],
+  "records": [
+    {
+      "source_item_id": "item_ru_milbloggers_dva_97048",
+      "canonical_url": "https://t.me/dva_majors/97048",
+      "preview_time": "17:08",
+      "publication_date_basis": "The post text explicitly says '4 августа'; the Telegram preview did not expose a timezone-bearing datetime, so the canonical record uses day precision.",
+      "quote_locator": "Telegram post body, opening paragraph",
+      "excerpt_original": "4 августа Министр аграрной политики Украины пожаловался в интервью агентству Reuters",
+      "summary": "The channel framed statements attributed to Ukraine's agriculture minister about export losses and disrupted Black Sea shipping.",
+      "upstream_lineage": [
+        {
+          "description": "Reuters interview and a meeting with the Spanish ambassador are named as upstream material.",
+          "status": "named_but_not_registered_in_this_shard"
+        }
+      ],
+      "safety_note": "No coordinates, active-unit positions, or targeting-enabling detail retained."
+    },
+    {
+      "source_item_id": "item_ru_milbloggers_rybar_82197",
+      "canonical_url": "https://t.me/rybar/82197",
+      "preview_time": "13:04",
+      "publication_date_basis": "The linked upstream text says 'Сегодня, 4 августа'; the connector omitted a timezone-bearing datetime, so day precision is used.",
+      "quote_locator": "Telegram post body, paragraphs 1-3",
+      "excerpt_original": "И так называемая «40-дневная операция по принуждению к миру» не стала исключением.",
+      "summary": "The channel assessed a Ukrainian influence campaign and cited attacks on Russian commercial and energy infrastructure as examples.",
+      "upstream_lineage": [
+        {
+          "description": "Forward-linked Kotsnews post titled '40 дней операции Зеленского. Итоги'.",
+          "status": "external_upstream_not_registered"
+        }
+      ],
+      "safety_note": "Only broad narrative claims were retained; no operational coordinates or current movement details."
+    },
+    {
+      "source_item_id": "item_ru_milbloggers_rybar_82198",
+      "canonical_url": "https://t.me/rybar/82198",
+      "preview_time": "14:04",
+      "publication_date_basis": "The post discusses events on the evening of 3 August and appears in the channel's explicit 4 August sequence; timezone-bearing metadata was unavailable, so day precision is used.",
+      "quote_locator": "Telegram post body, paragraph under 'Что там по ударам?'",
+      "excerpt_original": "Согласно заявлениям Минобороны России, удары наносились как в порту Николаева",
+      "summary": "The channel relayed Russian Ministry of Defence claims about attacks on shipping and port infrastructure, while stating that actual damage still required assessment.",
+      "upstream_lineage": [
+        {
+          "description": "Russian Ministry of Defence statements are explicitly cited, but no direct canonical ministry URL was exposed in the preview.",
+          "status": "named_upstream_without_resolved_url"
+        }
+      ],
+      "safety_note": "Registered as historical claim metadata only; no live coordinates, routes, or targeting instructions retained."
+    },
+    {
+      "source_item_id": "item_ru_milbloggers_rybar_82204",
+      "canonical_url": "https://t.me/rybar/82204",
+      "preview_time": "17:59",
+      "publication_date_basis": "The post title explicitly states 'Итоги 4 августа'; timezone-bearing metadata was unavailable, so day precision is used.",
+      "quote_locator": "Telegram post body, opening two paragraphs",
+      "excerpt_original": "Украинские формирования продолжают налеты на российские регионы.",
+      "summary": "A daily video-summary post grouped cross-border drone attacks, Russian attacks on Black Sea ports, and military-support diplomacy.",
+      "upstream_lineage": [
+        {
+          "description": "The post links to a Rutube video presented by Rybar project head Mikhail Zvinchuk for Soloviev Live.",
+          "status": "linked_external_media_not_archived"
+        }
+      ],
+      "safety_note": "No detailed frontline section or map geometry was registered."
+    }
+  ],
+  "artifact_policy": {
+    "artifacts_created": 0,
+    "reason": "The task used public HTML previews only. No media was downloaded, hashed, or stored, so the artifact manifest is intentionally empty."
+  },
+  "coverage_gaps": [
+    "Telegram public previews did not expose timezone-bearing publication datetimes; records therefore use day precision and preserve preview times separately.",
+    "RVvoenkor and Colonelcassad in-window coverage was incomplete because reliable backward pagination was unavailable through the approved connector.",
+    "Upstream Reuters, Kotsnews, Russian Ministry of Defence, Rutube, and Soloviev Live materials were named but not registered because this shard was limited to Russian milblogger discovery.",
+    "The open internet was not exhaustively searched; this is a bounded discovery sample, not a completeness claim."
+  ],
+  "excluded_results": [
+    {
+      "reason": "outside_window",
+      "description": "Late-evening RVvoenkor posts and Rybar's 19:26 daily chronicle were excluded because the connector's displayed times could fall after the 18:00Z cutoff."
+    },
+    {
+      "reason": "operational_safety",
+      "description": "Posts centered on granular active-frontline positions, map geometry, unit movements, or targeting-relevant details were not registered."
+    },
+    {
+      "reason": "date_mismatch",
+      "description": "Search results for 4 August 2025 and older years were excluded."
+    }
+  ],
+  "follow_up_task_proposals": [
+    {
+      "task_type": "source_profile_review",
+      "source_entity_ids": [
+        "src_dva_majors",
+        "src_rybar"
+      ],
+      "reason": "Identity, ownership, historical accuracy, correction behavior, independence, and topic-specific methodology require separate evidence-backed review."
+    },
+    {
+      "task_type": "extract_observations",
+      "source_item_ids": [
+        "item_ru_milbloggers_dva_97048",
+        "item_ru_milbloggers_rybar_82197",
+        "item_ru_milbloggers_rybar_82198",
+        "item_ru_milbloggers_rybar_82204"
+      ],
+      "reason": "Atomic attributed observations should be extracted before any normalized claim or assessment is created."
+    },
+    {
+      "task_type": "source_scan",
+      "reason": "A connector with reliable Telegram history or API access should backfill RVvoenkor and Colonelcassad for the same UTC window."
+    }
+  ]
+}

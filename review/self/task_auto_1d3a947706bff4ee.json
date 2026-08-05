@@ -1,0 +1,57 @@
+{
+  "task_id": "task_auto_1d3a947706bff4ee",
+  "pr_number": 70,
+  "rounds": [
+    {
+      "round": 1,
+      "reviewed_at": "2026-08-05T12:17:00Z",
+      "reviewer_run_id": "run_20260805T121100Z_1d3a9477",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps"
+      ],
+      "findings": [
+        "The first controller attempt exposed a trusted-runtime mismatch because main advanced after the task was claimed; the task data itself was not rejected.",
+        "Repair: the unchanged four-file task result was rebased onto current main so the reviewed head includes the controller hardening markers required by trusted validation.",
+        "The rebased diff remains limited to the task manifest, the declared observation output, and the required proposal and self-review paths.",
+        "Exactly the two accepted source items named by the immutable task contract are represented, with frozen excerpts and locators preserved.",
+        "Both observations remain draft, explicitly attributed official statements; neither is presented as a verified fact or independent corroboration.",
+        "Event time remains null rather than inferred, and no precise sensitive-site, target-direction, weapon-effect, or operational movement detail is retained.",
+        "The English-only frozen excerpts, absence of immutable captures, and lack of independent verification remain disclosed as coverage gaps."
+      ],
+      "repairs": [
+        "Rebased the task-only changes onto main commit 194b5dd68a465590468649887f9630eeb6e4e949 without altering the immutable task contract or research output."
+      ],
+      "outcome": "pass"
+    },
+    {
+      "round": 2,
+      "reviewed_at": "2026-08-05T12:17:30Z",
+      "reviewer_run_id": "run_20260805T121100Z_1d3a9477",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps"
+      ],
+      "findings": [
+        "A fresh post-repair review of the immutable base task, frozen raw manifest, source-item lineage, rebased four-file diff, and controller requirements found no remaining defect.",
+        "Observation identifiers, source-item links, speaker identifier, excerpts, quote locators, statement modality, language fields, null event times, and draft statuses are internally consistent.",
+        "The hospital figure is phrased as reported by the mayoral account, and the later update remains within the same incident lineage rather than being counted as corroboration.",
+        "No external evidence, claim assessment, report narrative, artifact, geolocation, casualty verification, attribution conclusion, or sensitive operational detail was introduced.",
+        "The empty proposal file is appropriate because this extraction does not justify another bounded downstream task beyond those already present in the canonical queue."
+      ],
+      "repairs": [],
+      "outcome": "pass"
+    }
+  ],
+  "exceptional_condition": false
+}

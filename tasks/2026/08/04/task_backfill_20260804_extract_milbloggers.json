@@ -1,0 +1,49 @@
+{
+  "task_id": "task_backfill_20260804_extract_milbloggers",
+  "task_type": "extract_observations",
+  "role": "extractor",
+  "state": "ready",
+  "priority": 80,
+  "created_at": "2026-08-05T17:22:00Z",
+  "parent_issue": 81,
+  "issue_number": null,
+  "depends_on_task_ids": [],
+  "window": {
+    "from": "2026-08-04T00:00:00Z",
+    "to": "2026-08-05T00:00:00Z"
+  },
+  "scope": {
+    "source_ids": [],
+    "source_item_ids": [
+      "item_ru_milbloggers_dva_97048",
+      "item_ru_milbloggers_rybar_82197",
+      "item_ru_milbloggers_rybar_82198",
+      "item_ru_milbloggers_rybar_82204"
+    ],
+    "source_groups": [],
+    "regions": ["ukraine-war"],
+    "topics": ["backfill", "russian-milbloggers", "claims", "operations"],
+    "content_types": ["post"]
+  },
+  "exclusions": [
+    "Any source item outside the frozen UTC window",
+    "External web research or introduction of evidence not already stored in the repository",
+    "Final truth assessment, source reliability scoring, report narrative, or targeting-enabling detail",
+    "Treating commentary, repetition, or shared upstream material as independent evidence"
+  ],
+  "allowed_output_paths": [
+    "data/observations/2026/08/04/backfill-milbloggers.ndjson",
+    "queue/proposals/task_backfill_20260804_extract_milbloggers.json",
+    "review/self/task_backfill_20260804_extract_milbloggers.json"
+  ],
+  "definition_of_done": [
+    "Every assigned source item was reviewed against its stored source-item record and raw manifest",
+    "Each material attributable assertion supportable from frozen repository evidence was represented as an atomic draft observation, or the omission reason was recorded as a coverage gap",
+    "Speaker attribution, qualifiers, day-level publication precision, upstream lineage, excerpts, and locators were preserved",
+    "No observation was promoted beyond draft and no claim or assessment was created",
+    "A queue proposal receipt was persisted; an empty proposals array is acceptable because the downstream graph is pre-materialized",
+    "Two separate self-review rounds passed and a receipt was persisted"
+  ],
+  "idempotency_key": "backfill_extract:2026-08-04:milbloggers:ukraine-war:v1",
+  "lease": null
+}

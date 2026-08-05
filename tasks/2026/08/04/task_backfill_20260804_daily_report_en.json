@@ -1,0 +1,47 @@
+{
+  "task_id": "task_backfill_20260804_daily_report_en",
+  "task_type": "daily_report",
+  "role": "report-editor",
+  "state": "planned",
+  "priority": 65,
+  "created_at": "2026-08-05T17:22:00Z",
+  "parent_issue": 81,
+  "issue_number": null,
+  "depends_on_task_ids": ["task_backfill_20260804_investigate_claims"],
+  "window": {
+    "from": "2026-08-04T00:00:00Z",
+    "to": "2026-08-05T00:00:00Z"
+  },
+  "scope": {
+    "source_ids": [],
+    "source_item_ids": [],
+    "source_groups": [],
+    "regions": ["ukraine-war"],
+    "topics": ["daily-snapshot", "backfill", "publication"],
+    "content_types": ["report"]
+  },
+  "exclusions": [
+    "Unmerged, draft, rejected, superseded, withdrawn, or out-of-window claims and assessments",
+    "New web browsing or introduction of evidence during report editing",
+    "The 2026-08-03 ISW record and the four visual-index records without a verified 2026-08-04 publication time",
+    "Precise current operational locations, targeting-enabling detail, unsupported causality, or unsupported forecasts"
+  ],
+  "allowed_output_paths": [
+    "data/reports/2026/08/04/daily.json",
+    "reports/daily/2026-08-04.md",
+    "queue/proposals/task_backfill_20260804_daily_report_en.json",
+    "review/self/task_backfill_20260804_daily_report_en.json"
+  ],
+  "definition_of_done": [
+    "The exact report_id is rpt_daily_20260804_en and the language is en",
+    "Only approved claims and approved assessments from the merged claim task and frozen UTC window were used",
+    "The report manifest contains non-empty claim_ids and assessment_ids and a deterministic SHA-256 over the sorted canonical frozen claim and assessment records",
+    "Every factual paragraph references claim or assessment IDs",
+    "Material changes, contested claims, confidence levels, corrections, unresolved questions, and coverage gaps were represented without chronological filler",
+    "The manifest and Markdown content were written to the declared paths with record_status approved",
+    "A queue proposal receipt was persisted; an empty proposals array is acceptable because the downstream graph is pre-materialized",
+    "Two separate self-review rounds passed and a receipt was persisted"
+  ],
+  "idempotency_key": "backfill_daily_report:2026-08-04:ukraine-war:en:v1",
+  "lease": null
+}

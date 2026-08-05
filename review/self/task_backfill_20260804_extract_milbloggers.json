@@ -10,13 +10,14 @@
         "scope",
         "provenance",
         "atomicity",
-        "speaker_attribution",
-        "day_precision",
-        "upstream_lineage",
-        "translation_fidelity",
-        "safety_withholding",
+        "deduplication",
+        "temporal_precision",
+        "safety",
         "tests",
-        "coverage_gaps"
+        "coverage_gaps",
+        "speaker_attribution",
+        "upstream_lineage",
+        "translation_fidelity"
       ],
       "findings": [
         "All changed paths were the task manifest or declared output paths.",
@@ -28,30 +29,39 @@
         "No granular current positions, routes, map geometry, targeting instructions, reliability score, or final truth assessment were introduced.",
         "GitHub Actions run 31038211033 passed validator tests, watchlist validation, record validation, task scope validation, trust-boundary checks, autonomy checks, and live-ref audit."
       ],
-      "repairs": [],
+      "repairs": [
+        "Expanded the receipt check labels to the validator-required canonical names deduplication, temporal_precision, and safety without changing the reviewed task content."
+      ],
       "outcome": "pass"
     },
     {
       "round": 2,
-      "reviewed_at": "2026-08-05T19:13:00Z",
+      "reviewed_at": "2026-08-05T19:15:00Z",
       "reviewer_run_id": "run_20260805T190700Z_contloop",
       "checks": [
+        "scope",
+        "provenance",
+        "atomicity",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps",
         "fresh_complete_diff",
         "assigned_item_coverage",
         "claim_strength",
-        "duplicate_lineage",
-        "publication_precision",
-        "operational_safety",
+        "upstream_lineage",
         "schema_conformance",
         "definition_of_done"
       ],
       "findings": [
-        "A fresh pass over the complete diff found four source items represented by four atomic draft observations with no unsupported extra assertion.",
+        "A fresh pass over the complete repaired diff found four source items represented by four atomic draft observations with no unsupported extra assertion.",
         "Channel commentary, relayed official statements, and broad incident claims remain distinguishable by observation type and explicit attribution.",
         "Named upstream Reuters, Kotsnews, Russian Ministry of Defence, Rutube, and Soloviev Live material is not counted as independent corroboration.",
         "All records retain Russian excerpts, locators, day precision, and safe broad wording.",
         "The proposal receipt is valid and intentionally empty because the downstream graph is pre-materialized.",
-        "The task satisfies its bounded definition of done and has no exceptional condition."
+        "The task satisfies its bounded definition of done and has no exceptional condition.",
+        "The only repaired defect was self-review check-label completeness; task outputs and claim strength were unchanged."
       ],
       "repairs": [],
       "outcome": "pass"

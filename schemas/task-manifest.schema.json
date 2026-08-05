@@ -32,6 +32,7 @@
       "required": ["source_ids", "regions", "topics", "content_types"],
       "properties": {
         "source_ids": {"type": "array", "items": {"type": "string", "pattern": "^src_[a-z0-9][a-z0-9_-]*$"}, "uniqueItems": true},
+        "source_item_ids": {"type": "array", "items": {"type": "string", "pattern": "^item_[a-z0-9][a-z0-9_-]*$"}, "uniqueItems": true, "default": []},
         "source_groups": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true, "default": []},
         "regions": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
         "topics": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},

@@ -1,35 +1,11 @@
 {
-  "task_id": "task_20260805_04_ru_milbloggers",
-  "task_type": "open_web_discovery",
-  "role": "open-web-discovery",
-  "state": "merged",
-  "priority": 85,
-  "created_at": "2026-08-05T05:06:14Z",
-  "parent_issue": 33,
-  "issue_number": 41,
-  "depends_on_task_ids": [],
-  "window": {
-    "from": "2026-08-04T18:00:00Z",
-    "to": "2026-08-05T05:00:00Z"
-  },
-  "scope": {
-    "source_ids": [],
-    "source_groups": [],
-    "regions": ["ukraine-war"],
-    "topics": ["russian-milbloggers", "operations", "claims"],
-    "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"]
-  },
-  "exclusions": [
-    "Items already represented by canonical URL, platform ID, or content hash",
-    "Access-control bypass, private material, and unsafe non-public geodata",
-    "Precise current operational positions or targeting-enabling detail"
-  ],
   "allowed_output_paths": [
     "catalogs/sources/2026/08/05/ru-milbloggers.json",
     "data/source-items/2026/08/05/ru-milbloggers.ndjson",
     "data/artifacts/2026/08/05/ru-milbloggers.ndjson",
     "raw-manifests/2026/08/05/ru-milbloggers.json"
   ],
+  "created_at": "2026-08-05T05:06:14Z",
   "definition_of_done": [
     "The assigned public-web discovery shard and UTC window were searched",
     "Primary publications were preferred and upstream lineage was recorded",
@@ -37,24 +13,59 @@
     "Candidate source profiles and follow-up task proposals were persisted when justified",
     "No final truth assessment, territorial conclusion, or report narrative was added"
   ],
+  "depends_on_task_ids": [],
+  "exclusions": [
+    "Items already represented by canonical URL, platform ID, or content hash",
+    "Access-control bypass, private material, and unsafe non-public geodata",
+    "Precise current operational positions or targeting-enabling detail"
+  ],
   "idempotency_key": "open_web_discovery:ru-milbloggers:20260804T1800Z:20260805T0500Z:ukraine-war",
-  "lease": {
-    "worker_run_id": "run_20260805T051000Z_a7c4d2e9",
-    "lease_branch": "work/task_20260805_04_ru_milbloggers",
-    "base_sha": "38f03b1edb29ee38762460a653474f9d52b6c89b",
-    "leased_at": "2026-08-05T05:11:41Z",
-    "lease_until": "2026-08-05T07:11:41Z"
-  },
+  "issue_number": 41,
+  "lease": null,
+  "parent_issue": 33,
+  "priority": 85,
   "result": {
     "branch": "work/task_20260805_04_ru_milbloggers",
-    "pr_number": 44,
-    "completed_at": "2026-08-05T05:15:00Z",
-    "summary": "Completed the bounded Russian-milblogger public-web scan. Added two draft source candidates and four Telegram source-item candidates dated to 4-5 August 2026, preserved preview times and lineage notes, and explicitly left exact UTC-window inclusion unresolved because timezone-bearing publication metadata was unavailable.",
+    "completed_at": "2026-08-05T05:28:17Z",
     "coverage_gaps": [
       "Telegram public previews displayed minute-level times but did not expose timezone-bearing datetimes, so all four candidates use day precision and exact UTC-window inclusion remains uncertain.",
       "Rolling public previews did not guarantee exhaustive overnight coverage.",
       "Named official and local upstream sources were not always exposed as stable canonical URLs.",
       "Visual media, strike geometry, and granular operational details were excluded for safety."
+    ],
+    "merge_sha": "aaf0965ebabc6a7ee05ca0c7cdff47b89e4f3b18",
+    "merged_at": "2026-08-05T05:28:17Z",
+    "pr_number": 44,
+    "summary": "Completed the bounded Russian-milblogger public-web scan. Added two draft source candidates and four Telegram source-item candidates dated to 4-5 August 2026, preserved preview times and lineage notes, and explicitly left exact UTC-window inclusion unresolved because timezone-bearing publication metadata was unavailable."
+  },
+  "role": "open-web-discovery",
+  "scope": {
+    "content_types": [
+      "post",
+      "article",
+      "report",
+      "briefing",
+      "document",
+      "image",
+      "video",
+      "map"
+    ],
+    "regions": [
+      "ukraine-war"
+    ],
+    "source_groups": [],
+    "source_ids": [],
+    "topics": [
+      "russian-milbloggers",
+      "operations",
+      "claims"
     ]
+  },
+  "state": "merged",
+  "task_id": "task_20260805_04_ru_milbloggers",
+  "task_type": "open_web_discovery",
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
   }
 }

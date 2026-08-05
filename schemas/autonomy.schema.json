@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://war-reporter.invalid/schemas/autonomy.schema.json",
+  "title": "Autonomous runtime configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "mode", "activation_not_before", "timezone", "daily_cycle", "queue", "self_review", "merge_controller", "branch_cleanup", "reports"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schema_version": {"const": 1},
+    "mode": {"const": "operator_triggered_self_sustaining"},
+    "activation_not_before": {"type": "string", "format": "date-time"},
+    "timezone": {"type": "string", "minLength": 1},
+    "daily_cycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["discovery_due_local_hour", "snapshot_due_local_hour", "window_timezone", "window_hours", "shard_count", "region", "maximum_nonterminal_backlog"],
+      "properties": {
+        "discovery_due_local_hour": {"type": "integer", "minimum": 0, "maximum": 23},
+        "snapshot_due_local_hour": {"type": "integer", "minimum": 0, "maximum": 23},
+        "window_timezone": {"const": "UTC"},
+        "window_hours": {"const": 24},
+        "shard_count": {"const": 10},
+        "region": {"type": "string", "minLength": 1},
+        "maximum_nonterminal_backlog": {"type": "integer", "minimum": 10}
+      }
+    },
+    "queue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["proposal_root", "allowed_proposal_task_types"],
+      "properties": {
+        "proposal_root": {"const": "queue/proposals"},
+        "allowed_proposal_task_types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "self_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_rounds", "rounds_must_be_separate", "receipt_root", "required_checks"],
+      "properties": {
+        "required_rounds": {"const": 2},
+        "rounds_must_be_separate": {"const": true},
+        "receipt_root": {"const": "review/self"},
+        "required_checks": {
+          "type": "array",
+          "minItems": 5,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "merge_controller": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "strategy", "implementation", "validation_workflow", "eligible_head_prefix", "worker_direct_merge_allowed", "administrative_same_repository_controller_allowed", "human_review_required_for"],
+      "properties": {
+        "enabled": {"const": true},
+        "strategy": {"const": "squash"},
+        "implementation": {"const": "github_actions"},
+        "validation_workflow": {"type": "string", "minLength": 1},
+        "eligible_head_prefix": {"const": "work/task_"},
+        "worker_direct_merge_allowed": {"const": false},
+        "administrative_same_repository_controller_allowed": {"const": true},
+        "human_review_required_for": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "branch_cleanup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "workers_must_not_attempt_connector_deletion", "failure_is_non_blocking", "retry_on_reconciliation"],
+      "properties": {
+        "owner": {"const": "merge_controller"},
+        "workers_must_not_attempt_connector_deletion": {"const": true},
+        "failure_is_non_blocking": {"const": true},
+        "retry_on_reconciliation": {"const": true}
+      }
+    },
+    "reports": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["daily", "weekly", "monthly"],
+      "properties": {
+        "daily": {"const": "automatic"},
+        "weekly": {"const": "on_demand"},
+        "monthly": {"const": "on_demand"}
+      }
+    }
+  }
+}

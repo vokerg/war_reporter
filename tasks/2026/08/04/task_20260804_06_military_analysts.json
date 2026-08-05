@@ -1,28 +1,44 @@
 {
-  "task_id": "task_20260804_06_military_analysts",
-  "task_type": "open_web_discovery",
-  "role": "open-web-discovery",
-  "state": "merged",
-  "priority": 80,
+  "allowed_output_paths": [
+    "catalogs/sources/2026/08/04/military-analysts.json",
+    "data/source-items/2026/08/04/military-analysts.ndjson",
+    "data/artifacts/2026/08/04/military-analysts.ndjson",
+    "raw-manifests/2026/08/04/military-analysts.json"
+  ],
   "created_at": "2026-08-04T18:28:29Z",
-  "parent_issue": 5,
-  "issue_number": 14,
+  "definition_of_done": [
+    "The assigned public-web discovery shard and UTC window were searched",
+    "Primary publications were preferred and upstream lineage was recorded",
+    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
+    "Candidate source profiles and follow-up task proposals were persisted when justified",
+    "No final truth assessment, territorial conclusion, or report narrative was added"
+  ],
   "depends_on_task_ids": [],
-  "window": {
-    "from": "2026-08-03T18:00:00Z",
-    "to": "2026-08-04T18:00:00Z"
+  "exclusions": [
+    "Items already represented by canonical URL, platform ID, or content hash",
+    "Access-control bypass, private material, and unsafe non-public geodata",
+    "Precise current operational positions or targeting-enabling detail"
+  ],
+  "idempotency_key": "open_web_discovery:military-analysts:20260803T1800Z:20260804T1800Z:ukraine-war",
+  "issue_number": 14,
+  "lease": null,
+  "parent_issue": 5,
+  "priority": 80,
+  "result": {
+    "branch": "work/task_20260804_06_military_analysts",
+    "completed_at": "2026-08-05T04:57:17Z",
+    "coverage_gaps": [
+      "Search and connector indexes lagged several live analyst sites and did not expose complete August 3-4 archives.",
+      "The exact publication timestamp and full text of the ISW August 3 candidate were unavailable because the primary page returned HTTP 403.",
+      "No site-native RSS/API or authenticated archive access was available; the open internet was not exhaustively searched."
+    ],
+    "merge_sha": "67fbc97376f99c26c2a7f1321e25b9099ab9faf7",
+    "merged_at": "2026-08-05T04:57:17Z",
+    "pr_number": 17,
+    "summary": "Completed the bounded public-web military-analyst scan. Added four draft source candidates, recorded one inaccessible ISW August 3 candidate with day-level time uncertainty, found no publication verifiably inside the exact UTC window, and persisted out-of-window leads, access failures, and follow-up proposals."
   },
+  "role": "open-web-discovery",
   "scope": {
-    "source_ids": [],
-    "source_groups": [],
-    "regions": [
-      "ukraine-war"
-    ],
-    "topics": [
-      "military-analysis",
-      "capabilities",
-      "logistics"
-    ],
     "content_types": [
       "post",
       "article",
@@ -32,43 +48,23 @@
       "image",
       "video",
       "map"
+    ],
+    "regions": [
+      "ukraine-war"
+    ],
+    "source_groups": [],
+    "source_ids": [],
+    "topics": [
+      "military-analysis",
+      "capabilities",
+      "logistics"
     ]
   },
-  "exclusions": [
-    "Items already represented by canonical URL, platform ID, or content hash",
-    "Access-control bypass, private material, and unsafe non-public geodata",
-    "Precise current operational positions or targeting-enabling detail"
-  ],
-  "allowed_output_paths": [
-    "catalogs/sources/2026/08/04/military-analysts.json",
-    "data/source-items/2026/08/04/military-analysts.ndjson",
-    "data/artifacts/2026/08/04/military-analysts.ndjson",
-    "raw-manifests/2026/08/04/military-analysts.json"
-  ],
-  "definition_of_done": [
-    "The assigned public-web discovery shard and UTC window were searched",
-    "Primary publications were preferred and upstream lineage was recorded",
-    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
-    "Candidate source profiles and follow-up task proposals were persisted when justified",
-    "No final truth assessment, territorial conclusion, or report narrative was added"
-  ],
-  "idempotency_key": "open_web_discovery:military-analysts:20260803T1800Z:20260804T1800Z:ukraine-war",
-  "lease": {
-    "worker_run_id": "run_20260805T044000Z_6b18e2d9",
-    "lease_branch": "work/task_20260804_06_military_analysts",
-    "base_sha": "7d8f3e13261f24e121ec4f8b63c6d200df4e2eb1",
-    "leased_at": "2026-08-05T04:41:21Z",
-    "lease_until": "2026-08-05T06:41:21Z"
-  },
-  "result": {
-    "branch": "work/task_20260804_06_military_analysts",
-    "pr_number": 17,
-    "completed_at": "2026-08-05T04:47:27Z",
-    "summary": "Completed the bounded public-web military-analyst scan. Added four draft source candidates, recorded one inaccessible ISW August 3 candidate with day-level time uncertainty, found no publication verifiably inside the exact UTC window, and persisted out-of-window leads, access failures, and follow-up proposals.",
-    "coverage_gaps": [
-      "Search and connector indexes lagged several live analyst sites and did not expose complete August 3-4 archives.",
-      "The exact publication timestamp and full text of the ISW August 3 candidate were unavailable because the primary page returned HTTP 403.",
-      "No site-native RSS/API or authenticated archive access was available; the open internet was not exhaustively searched."
-    ]
+  "state": "merged",
+  "task_id": "task_20260804_06_military_analysts",
+  "task_type": "open_web_discovery",
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
   }
 }

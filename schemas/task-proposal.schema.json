@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://war-reporter.invalid/schemas/task-proposal.schema.json",
+  "title": "Worker-produced downstream task proposals",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["producer_task_id", "generated_at", "proposals"],
+  "properties": {
+    "producer_task_id": {"type": "string", "pattern": "^task_[a-z0-9][a-z0-9_-]*$"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "proposals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["task_type", "priority", "depends_on_task_ids", "window", "scope", "exclusions", "allowed_output_paths", "definition_of_done", "idempotency_key"],
+        "properties": {
+          "task_id": {"type": "string", "pattern": "^task_[a-z0-9][a-z0-9_-]*$"},
+          "task_type": {"type": "string", "minLength": 1},
+          "priority": {"type": "integer", "minimum": 0, "maximum": 100},
+          "depends_on_task_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^task_[a-z0-9][a-z0-9_-]*$"}},
+          "window": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to"],
+            "properties": {
+              "from": {"type": "string", "format": "date-time"},
+              "to": {"type": "string", "format": "date-time"}
+            }
+          },
+          "scope": {"type": "object"},
+          "exclusions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "allowed_output_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "definition_of_done": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "idempotency_key": {"type": "string", "minLength": 8}
+        }
+      }
+    }
+  }
+}

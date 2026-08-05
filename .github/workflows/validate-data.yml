@@ -9,7 +9,10 @@ on:
       - "data/**"
       - "docs/**"
       - "maps/**"
+      - "queue/**"
+      - "raw-manifests/**"
       - "reports/**"
+      - "review/**"
       - "schemas/**"
       - "scripts/**"
       - "tasks/**"
@@ -25,6 +28,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
   group: validate-${{ github.workflow }}-${{ github.ref }}
@@ -41,6 +45,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -53,8 +58,16 @@ jobs:
       - name: Run validator tests
         run: python -m unittest discover -s tests -v
 
-      - name: Validate repository records
+      - name: Validate repository records and raw manifests
         run: python scripts/validate_data.py
 
-      - name: Validate ChatGPT Project queue
+      - name: Validate queue and trust boundary
         run: python scripts/validate_worker_queue.py
+
+      - name: Validate autonomous runtime, self-review, and proposals
+        run: python scripts/validate_autonomy.py
+
+      - name: Audit live work refs without blocking on cleanup debt
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/audit_work_refs.py

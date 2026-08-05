@@ -1,72 +1,8 @@
 {
-  "manifest_version": 1,
-  "task_id": "task_20260804_07_strikes_infrastructure",
-  "worker_run_id": "run_20260805T044124Z_9c7e31d4",
-  "window": {
-    "from": "2026-08-03T18:00:00Z",
-    "to": "2026-08-04T18:00:00Z"
-  },
-  "retrieved_at": "2026-08-05T04:45:38Z",
-  "scope": {
-    "region": "ukraine-war",
-    "topics": [
-      "strikes",
-      "air-defense",
-      "infrastructure"
-    ],
-    "method": "bounded public-web discovery"
-  },
-  "search_queries": [
-    "Reuters August 4 2026 Ukraine warehouses drone strikes infrastructure",
-    "Reuters August 4 2026 Ukraine grain export routes ports attacks",
-    "AP August 4 2026 Russia Ukraine drone strikes ports infrastructure",
-    "official Ukraine regional administration August 4 2026 infrastructure attack",
-    "official air-defense reporting August 4 2026 Ukraine"
-  ],
-  "discovered_items": [
-    {
-      "source_item_id": "item_20260804_reuters_warehouses",
-      "quote_locator": "Reuters article, headline and paragraphs beginning ‘MOSCOW, Aug 4’, especially the paragraphs describing the three warehouse incidents.",
-      "short_excerpt": "Ukrainian drones hit three warehouses in Russia in overnight attacks.",
-      "attribution_note": "Reuters attributes casualty and damage details to local officials, regional authorities and Wildberries; this record does not endorse those statements.",
-      "lineage_note": "Overlaps the AP and Financial Times items on Wildberries warehouse incidents. Direct upstream posts and company statements were not separately registered in this shard."
-    },
-    {
-      "source_item_id": "item_20260804_ft_wildberries",
-      "quote_locator": "Public headline and publication metadata only; article body required a subscription.",
-      "short_excerpt": null,
-      "attribution_note": "No substantive claim extraction performed because the full article was not publicly accessible.",
-      "lineage_note": "Likely overlaps the Reuters and AP Wildberries incident cluster; common upstream sources were not resolved from paywalled metadata."
-    },
-    {
-      "source_item_id": "item_20260804_ap_drone_strikes",
-      "quote_locator": "AP article sections ‘Ukrainian drones attack near Moscow and St. Petersburg’ and ‘Russia hammers Ukrainian ports and shipping’.",
-      "short_excerpt": "Ukrainian drones attack near Moscow and St. Petersburg.",
-      "attribution_note": "AP attributes individual statements to Russian and Ukrainian officials, Wildberries and the Turkish Foreign Ministry; this discovery record makes no truth assessment.",
-      "lineage_note": "Overlaps Reuters coverage of warehouse incidents and port disruption. The reports appear to rely partly on the same official and company statements, so repetition is not treated as independent corroboration."
-    },
-    {
-      "source_item_id": "item_20260804_reuters_ports",
-      "quote_locator": "Reuters article, paragraphs beginning ‘KYIV, Aug 4’, including the port-attack counts and alternative-route discussion.",
-      "short_excerpt": "No vessels entered for almost two weeks.",
-      "attribution_note": "Reuters attributes attack counts and export estimates to Ukraine’s infrastructure ministry and Agriculture Minister Taras Vysotskyi.",
-      "lineage_note": "Background figures cover July and are not asserted to have occurred solely inside the task window; the item itself was published inside the window."
-    }
-  ],
   "access_failures": [
     {
-      "url": "https://www.ft.com/content/4d9d5f1a-df3e-490e-9567-f7f7f968f3a4",
-      "reason": "Subscription paywall blocked full-text review; only public metadata was retained and no bypass was attempted."
-    }
-  ],
-  "excluded_candidates": [
-    {
-      "url": "https://t.me/kpszsu/39870",
-      "reason": "The matching Air Force post concerns August 4, 2025, not the 2026 task window."
-    },
-    {
-      "url": "https://www.reuters.com/world/europe/russian-forces-attack-ukrainian-capital-kyiv-with-ballistic-missiles-mayor-says-2026-08-04/",
-      "reason": "Published at 2026-08-04T21:52:00Z, after the task window closed at 18:00Z."
+      "reason": "Subscription paywall blocked full-text review; only public metadata was retained and no bypass was attempted.",
+      "url": "https://www.ft.com/content/4d9d5f1a-df3e-490e-9567-f7f7f968f3a4"
     }
   ],
   "coverage_gaps": [
@@ -75,14 +11,78 @@
     "No binaries, photographs, videos or full-text artifacts were downloaded or hashed.",
     "This shard records discovery and provenance only; it does not verify casualties, damage, military use, targeting intent or attribution."
   ],
-  "follow_up_task_proposals": [
+  "discovered_items": [
     {
-      "task_type": "source_scan",
-      "purpose": "Collect the direct regional-government, company and ministry statements cited in the warehouse and Black Sea shipping reports, preserving platform IDs and timestamps."
+      "attribution_note": "Reuters attributes casualty and damage details to local officials, regional authorities and Wildberries; this record does not endorse those statements.",
+      "lineage_note": "Overlaps the AP and Financial Times items on Wildberries warehouse incidents. Direct upstream posts and company statements were not separately registered in this shard.",
+      "quote_locator": "Reuters article, headline and paragraphs beginning ‘MOSCOW, Aug 4’, especially the paragraphs describing the three warehouse incidents.",
+      "short_excerpt": "Ukrainian drones hit three warehouses in Russia in overnight attacks.",
+      "source_item_id": "item_20260804_reuters_warehouses"
     },
     {
-      "task_type": "extract_observations",
-      "purpose": "After source-item review, extract atomic attributed observations from the accepted records without converting allegations into facts."
+      "attribution_note": "No substantive claim extraction performed because the full article was not publicly accessible.",
+      "lineage_note": "Likely overlaps the Reuters and AP Wildberries incident cluster; common upstream sources were not resolved from paywalled metadata.",
+      "quote_locator": "Public headline and publication metadata only; article body required a subscription.",
+      "short_excerpt": null,
+      "source_item_id": "item_20260804_ft_wildberries"
+    },
+    {
+      "attribution_note": "AP attributes individual statements to Russian and Ukrainian officials, Wildberries and the Turkish Foreign Ministry; this discovery record makes no truth assessment.",
+      "lineage_note": "Overlaps Reuters coverage of warehouse incidents and port disruption. The reports appear to rely partly on the same official and company statements, so repetition is not treated as independent corroboration.",
+      "quote_locator": "AP article sections ‘Ukrainian drones attack near Moscow and St. Petersburg’ and ‘Russia hammers Ukrainian ports and shipping’.",
+      "short_excerpt": "Ukrainian drones attack near Moscow and St. Petersburg.",
+      "source_item_id": "item_20260804_ap_drone_strikes"
+    },
+    {
+      "attribution_note": "Reuters attributes attack counts and export estimates to Ukraine’s infrastructure ministry and Agriculture Minister Taras Vysotskyi.",
+      "lineage_note": "Background figures cover July and are not asserted to have occurred solely inside the task window; the item itself was published inside the window.",
+      "quote_locator": "Reuters article, paragraphs beginning ‘KYIV, Aug 4’, including the port-attack counts and alternative-route discussion.",
+      "short_excerpt": "No vessels entered for almost two weeks.",
+      "source_item_id": "item_20260804_reuters_grain_routes"
     }
-  ]
+  ],
+  "excluded_candidates": [
+    {
+      "reason": "The matching Air Force post concerns August 4, 2025, not the 2026 task window.",
+      "url": "https://t.me/kpszsu/39870"
+    },
+    {
+      "reason": "Published at 2026-08-04T21:52:00Z, after the task window closed at 18:00Z.",
+      "url": "https://www.reuters.com/world/europe/russian-forces-attack-ukrainian-capital-kyiv-with-ballistic-missiles-mayor-says-2026-08-04/"
+    }
+  ],
+  "follow_up_task_proposals": [
+    {
+      "purpose": "Collect the direct regional-government, company and ministry statements cited in the warehouse and Black Sea shipping reports, preserving platform IDs and timestamps.",
+      "task_type": "source_scan"
+    },
+    {
+      "purpose": "After source-item review, extract atomic attributed observations from the accepted records without converting allegations into facts.",
+      "task_type": "extract_observations"
+    }
+  ],
+  "manifest_version": 1,
+  "retrieved_at": "2026-08-05T04:45:38Z",
+  "scope": {
+    "method": "bounded public-web discovery",
+    "region": "ukraine-war",
+    "topics": [
+      "strikes",
+      "air-defense",
+      "infrastructure"
+    ]
+  },
+  "search_queries": [
+    "Reuters August 4 2026 Ukraine warehouses drone strikes infrastructure",
+    "Reuters August 4 2026 Ukraine grain export routes ports attacks",
+    "AP August 4 2026 Russia Ukraine drone strikes ports infrastructure",
+    "official Ukraine regional administration August 4 2026 infrastructure attack",
+    "official air-defense reporting August 4 2026 Ukraine"
+  ],
+  "task_id": "task_20260804_07_strikes_infrastructure",
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
+  },
+  "worker_run_id": "run_20260805T044124Z_9c7e31d4"
 }

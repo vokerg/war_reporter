@@ -1,0 +1,126 @@
+name: Reconcile self-sustaining queue
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: repository-duty-reconciliation
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Install validation dependency
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Plan repository duties
+        id: plan
+        run: |
+          python scripts/reconcile_repository.py plan > /tmp/duty-plan.json
+          cat /tmp/duty-plan.json
+          count="$(python -c 'import json; print(len(json.load(open("/tmp/duty-plan.json"))["duties"]))')"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+
+      - name: Retry stale branch cleanup
+        run: |
+          python scripts/audit_work_refs.py --delete-stale || \
+            echo "::warning::Some stale branches remain; queue reconciliation continues."
+
+      - name: Materialize duties on deterministic control branch
+        if: steps.plan.outputs.count != '0'
+        id: materialize
+        run: |
+          stamp="$(date -u +%Y%m%dT%H00Z)"
+          branch="control/reconcile/$stamp"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            echo "A reconciliation controller already owns $branch."
+            echo "created=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git push origin "HEAD:$branch"
+          git switch -c "$branch"
+          parent_issue=""
+          if python -c 'import json; raise SystemExit(0 if any(d["kind"]=="discovery_campaign" for d in json.load(open("/tmp/duty-plan.json"))["duties"]) else 1)'; then
+            window="$(python -c 'import json; d=next(x for x in json.load(open("/tmp/duty-plan.json"))["duties"] if x["kind"]=="discovery_campaign"); print(d["window"]["from"]+" to "+d["window"]["to"])')"
+            issue_url="$(gh issue create --title "[campaign] Automated discovery $window" --body "Created by repository reconciliation. The operator does not need to decompose, route, or manually advance this campaign.")"
+            parent_issue="${issue_url##*/}"
+          fi
+          if [ -n "$parent_issue" ]; then
+            python scripts/reconcile_repository.py apply --plan-file /tmp/duty-plan.json --parent-issue "$parent_issue"
+          else
+            python scripts/reconcile_repository.py apply --plan-file /tmp/duty-plan.json
+          fi
+          if git diff --quiet; then
+            echo "created=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "war-reporter-queue[bot]"
+          git config user.email "war-reporter-queue[bot]@users.noreply.github.com"
+          git add tasks
+          git commit -m "[queue] Reconcile due repository duties"
+          head_sha="$(git rev-parse HEAD)"
+          git push origin "HEAD:$branch"
+          pr_url="$(gh pr create --base main --head "$branch" --title "[queue] Reconcile due repository duties" --body "Automated control-plane PR. It creates or promotes task manifests only and contains no research findings.")"
+          echo "created=true" >> "$GITHUB_OUTPUT"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
+          echo "pr_number=${pr_url##*/}" >> "$GITHUB_OUTPUT"
+
+      - name: Control-plane self-review round 1
+        if: steps.materialize.outputs.created == 'true'
+        run: |
+          git diff --check main...HEAD
+          python -m unittest discover -s tests -v
+          python scripts/validate_data.py
+          python scripts/validate_worker_queue.py
+          python scripts/validate_autonomy.py
+
+      - name: Control-plane self-review round 2
+        if: steps.materialize.outputs.created == 'true'
+        run: |
+          git diff --check main...HEAD
+          python scripts/reconcile_repository.py plan > /tmp/second-pass-plan.json
+          python scripts/validate_data.py
+          python scripts/validate_worker_queue.py
+          python scripts/validate_autonomy.py
+
+      - name: Squash-merge control-plane PR
+        if: steps.materialize.outputs.created == 'true'
+        env:
+          PR_NUMBER: ${{ steps.materialize.outputs.pr_number }}
+          HEAD_SHA: ${{ steps.materialize.outputs.head_sha }}
+          BRANCH: ${{ steps.materialize.outputs.branch }}
+        run: |
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/merge" \
+            -f merge_method=squash \
+            -f sha="$HEAD_SHA" \
+            -f commit_title="[queue] Reconcile due repository duties" | jq -e '.merged == true'
+          gh api --method DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$BRANCH" || \
+            echo "::warning::Control branch cleanup deferred."

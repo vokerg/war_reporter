@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate ChatGPT Project queue semantics beyond individual JSON Schemas."""
+"""Validate queue lifecycle, bootstrap backpressure, and configured trust boundaries."""
 
 from __future__ import annotations
 
@@ -8,13 +8,17 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, FormatChecker
 
 try:
-    from .worker_queue import ACTIVE_STATES, REPOSITORY_ROOT, deterministic_branch, index_tasks, load_routing
+    from .worker_queue import ACTIVE_STATES, REPOSITORY_ROOT, TERMINAL_STATES, deterministic_branch, index_tasks, load_routing
 except ImportError:
-    from worker_queue import ACTIVE_STATES, REPOSITORY_ROOT, deterministic_branch, index_tasks, load_routing
+    from worker_queue import ACTIVE_STATES, REPOSITORY_ROOT, TERMINAL_STATES, deterministic_branch, index_tasks, load_routing
+
+NO_LEASE_STATES = TERMINAL_STATES | {"planned", "ready", "blocked", "lease_expired"}
+RESULT_STATES = {"pr_open", "validating", "review", "merged"}
 
 
 def parse_datetime(value: str) -> datetime:
@@ -50,19 +54,47 @@ def find_cycle(edges: dict[str, list[str]]) -> list[str] | None:
     return None
 
 
+def validate_trust_boundary(root: Path) -> list[str]:
+    errors: list[str] = []
+    path = root / "config" / "trust-boundary.json"
+    schema_path = root / "schemas" / "trust-boundary.schema.json"
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return [f"trust boundary configuration unavailable: {exc}"]
+    validator = Draft202012Validator(schema, format_checker=FormatChecker())
+    for error in validator.iter_errors(value):
+        field = ".".join(str(part) for part in error.absolute_path) or "<root>"
+        errors.append(f"{path}: {field}: {error.message}")
+    mode = value.get("review_mode")
+    worker = value.get("worker_identity")
+    controller = value.get("merge_controller_identity")
+    distinct = worker != controller
+    if mode == "independent" and not distinct:
+        errors.append(f"{path}: independent review requires distinct authenticated identities")
+    if mode == "independent" and value.get("require_distinct_identities") is not True:
+        errors.append(f"{path}: independent review must require distinct identities")
+    if mode == "administrative" and value.get("require_distinct_identities") is True and not distinct:
+        errors.append(f"{path}: cannot require distinct identities while configuring the same identity")
+    return errors
+
+
 def validate_queue(tasks_root: Path, routing_path: Path) -> list[str]:
     errors: list[str] = []
+    root = routing_path.resolve().parents[1]
     try:
         tasks = index_tasks(tasks_root)
         routing_document = json.loads(routing_path.read_text(encoding="utf-8"))
-        routing_schema_path = REPOSITORY_ROOT / "schemas" / "worker-routing.schema.json"
+        routing_schema_path = root / "schemas" / "worker-routing.schema.json"
         routing_schema = json.loads(routing_schema_path.read_text(encoding="utf-8"))
         Draft202012Validator.check_schema(routing_schema)
-        routing_errors = list(Draft202012Validator(routing_schema).iter_errors(routing_document))
+        routing_validator = Draft202012Validator(routing_schema)
+        routing_errors = list(routing_validator.iter_errors(routing_document))
         if routing_errors:
             return [f"{routing_path}: {'.'.join(str(part) for part in error.absolute_path) or '<root>'}: {error.message}" for error in routing_errors]
         routing = load_routing(routing_path)
-        task_schema_path = REPOSITORY_ROOT / "schemas" / "task-manifest.schema.json"
+        task_schema_path = root / "schemas" / "task-manifest.schema.json"
         task_schema = json.loads(task_schema_path.read_text(encoding="utf-8"))
         schema_task_types = set(task_schema["properties"]["task_type"]["enum"])
         routing_task_types = set(routing)
@@ -75,14 +107,13 @@ def validate_queue(tasks_root: Path, routing_path: Path) -> list[str]:
             relative_path = agent_files.get(role)
             if not isinstance(relative_path, str):
                 errors.append(f"{routing_path}: no agent file configured for role {role}")
-            elif not (REPOSITORY_ROOT / relative_path).is_file():
+            elif not (root / relative_path).is_file():
                 errors.append(f"{routing_path}: agent file does not exist for role {role}: {relative_path}")
     except (OSError, json.JSONDecodeError, ValueError, KeyError, TypeError) as exc:
         return [str(exc)]
 
     idempotency: dict[str, str] = {}
     edges: dict[str, list[str]] = {}
-
     for task_id, task in tasks.items():
         value = task.value
         location = str(task.path)
@@ -110,7 +141,6 @@ def validate_queue(tasks_root: Path, routing_path: Path) -> list[str]:
                 errors.append(f"{location}: task cannot depend on itself")
             elif dependency not in tasks:
                 errors.append(f"{location}: unknown dependency {dependency}")
-
         if value.get("state") == "ready":
             unmet = [dependency for dependency in dependencies if dependency in tasks and tasks[dependency].value.get("state") != "merged"]
             if unmet:
@@ -120,14 +150,13 @@ def validate_queue(tasks_root: Path, routing_path: Path) -> list[str]:
         state = value.get("state")
         if state in ACTIVE_STATES and not isinstance(lease, dict):
             errors.append(f"{location}: state {state} requires lease metadata")
-        if state in {"planned", "ready"} and lease is not None:
+        if state in NO_LEASE_STATES and lease is not None:
             errors.append(f"{location}: state {state} must not have a lease")
         if isinstance(lease, dict):
             expected_branch = deterministic_branch(task_id)
             if lease.get("lease_branch") != expected_branch:
                 errors.append(f"{location}: lease_branch must be {expected_branch}")
-            leased_at = lease.get("leased_at")
-            lease_until = lease.get("lease_until")
+            leased_at, lease_until = lease.get("leased_at"), lease.get("lease_until")
             if isinstance(leased_at, str) and isinstance(lease_until, str):
                 try:
                     if parse_datetime(lease_until) <= parse_datetime(leased_at):
@@ -136,16 +165,27 @@ def validate_queue(tasks_root: Path, routing_path: Path) -> list[str]:
                     pass
 
         result = value.get("result")
-        if state in {"pr_open", "validating", "review", "merged"} and not isinstance(result, dict):
+        if state in RESULT_STATES and not isinstance(result, dict):
             errors.append(f"{location}: state {state} requires result metadata")
-        if isinstance(result, dict) and result.get("branch") != deterministic_branch(task_id):
-            errors.append(f"{location}: result.branch must be {deterministic_branch(task_id)}")
+        if isinstance(result, dict):
+            if result.get("branch") != deterministic_branch(task_id):
+                errors.append(f"{location}: result.branch must be {deterministic_branch(task_id)}")
+            if state == "merged":
+                merge_sha = result.get("merge_sha")
+                merged_at = result.get("merged_at")
+                if not isinstance(merge_sha, str) or len(merge_sha) != 40:
+                    errors.append(f"{location}: merged task requires actual result.merge_sha")
+                if not isinstance(merged_at, str):
+                    errors.append(f"{location}: merged task requires result.merged_at")
+                if result.get("completed_at") != merged_at:
+                    errors.append(f"{location}: merged task completed_at must equal merged_at")
         if state == "blocked" and not value.get("blocked_reason"):
             errors.append(f"{location}: blocked task requires blocked_reason")
 
     cycle = find_cycle(edges)
     if cycle:
         errors.append(f"task dependency cycle: {' -> '.join(cycle)}")
+    errors.extend(validate_trust_boundary(root))
     return errors
 
 

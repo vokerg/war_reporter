@@ -1,0 +1,111 @@
+name: Auto-merge reviewed worker task
+
+on:
+  workflow_run:
+    workflows: ["Validate repository contracts"]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: auto-merge-${{ github.event.workflow_run.id }}
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Resolve eligible pull request
+        id: pr
+        shell: bash
+        run: |
+          set -euo pipefail
+          pr_number="$(jq -r '.workflow_run.pull_requests[0].number // empty' "$GITHUB_EVENT_PATH")"
+          if [ -z "$pr_number" ]; then
+            echo "eligible=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$pr_number" > /tmp/pr.json
+          head_ref="$(jq -r '.head.ref' /tmp/pr.json)"
+          head_sha="$(jq -r '.head.sha' /tmp/pr.json)"
+          base_sha="$(jq -r '.base.sha' /tmp/pr.json)"
+          title="$(jq -r '.title' /tmp/pr.json)"
+          eligible=true
+          [ "$(jq -r '.state' /tmp/pr.json)" = open ] || eligible=false
+          [ "$(jq -r '.draft' /tmp/pr.json)" = false ] || eligible=false
+          [ "$(jq -r '.base.ref' /tmp/pr.json)" = main ] || eligible=false
+          [ "$(jq -r '.head.repo.full_name' /tmp/pr.json)" = "$GITHUB_REPOSITORY" ] || eligible=false
+          [[ "$head_ref" == work/task_* ]] || eligible=false
+          [[ "$title" != \[hardening\]* ]] || eligible=false
+          echo "eligible=$eligible" >> "$GITHUB_OUTPUT"
+          echo "number=$pr_number" >> "$GITHUB_OUTPUT"
+          echo "head_ref=$head_ref" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$head_sha" >> "$GITHUB_OUTPUT"
+          echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
+          echo "task_id=${head_ref#work/}" >> "$GITHUB_OUTPUT"
+
+      - name: Check out validated head
+        if: steps.pr.outputs.eligible == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.pr.outputs.head_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        if: steps.pr.outputs.eligible == 'true'
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Install validation dependency
+        if: steps.pr.outputs.eligible == 'true'
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Verify two-round self-review and exact scope
+        if: steps.pr.outputs.eligible == 'true'
+        env:
+          TASK_ID: ${{ steps.pr.outputs.task_id }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          BASE_SHA: ${{ steps.pr.outputs.base_sha }}
+          HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
+        run: |
+          git fetch origin "$BASE_SHA" "$HEAD_SHA"
+          python scripts/validate_autonomy.py \
+            --receipt "review/self/$TASK_ID.json" \
+            --task-id "$TASK_ID" \
+            --pr-number "$PR_NUMBER" \
+            --require-automerge-eligible
+          python scripts/validate_pr_scope.py \
+            --task-id "$TASK_ID" \
+            --pr-number "$PR_NUMBER" \
+            --base "$BASE_SHA" \
+            --head "$HEAD_SHA"
+
+      - name: Squash-merge exact reviewed head
+        if: steps.pr.outputs.eligible == 'true'
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
+          TASK_ID: ${{ steps.pr.outputs.task_id }}
+        run: |
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/merge" \
+            -f merge_method=squash \
+            -f sha="$HEAD_SHA" \
+            -f commit_title="[task] $TASK_ID" > /tmp/merge.json
+          jq -e '.merged == true' /tmp/merge.json
+
+      - name: Best-effort branch cleanup
+        if: steps.pr.outputs.eligible == 'true'
+        env:
+          HEAD_REF: ${{ steps.pr.outputs.head_ref }}
+        run: |
+          gh api --method DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$HEAD_REF" || \
+            echo "::warning::Branch cleanup deferred to repository reconciliation."

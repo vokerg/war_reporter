@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_extract_official",
   "task_type": "extract_observations",
   "role": "extractor",
-  "state": "ready",
+  "state": "review",
   "priority": 90,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -26,9 +26,18 @@
       "item_20260804_generalstaff_strikes"
     ],
     "source_groups": [],
-    "regions": ["ukraine-war"],
-    "topics": ["backfill", "official-statements", "operations", "strikes"],
-    "content_types": ["post"]
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "backfill",
+      "official-statements",
+      "operations",
+      "strikes"
+    ],
+    "content_types": [
+      "post"
+    ]
   },
   "exclusions": [
     "Any source item outside the frozen UTC window",
@@ -50,5 +59,22 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "backfill_extract:2026-08-04:official:ukraine-war:v1",
-  "lease": null
+  "lease": {
+    "worker_run_id": "run_20260805T180500Z_contloop",
+    "lease_branch": "work/task_backfill_20260804_extract_official",
+    "base_sha": "6ed971c73fe0be149ee59dcd7dd6603dd6ebca1f",
+    "leased_at": "2026-08-05T18:05:00Z",
+    "lease_until": "2026-08-05T20:05:00Z"
+  },
+  "result": {
+    "branch": "work/task_backfill_20260804_extract_official",
+    "pr_number": 92,
+    "completed_at": "2026-08-05T18:11:30Z",
+    "summary": "Created eight atomic draft observations from the assigned Ukrainian and Russian official source items while preserving attribution, modality, original-language excerpts, and stored locators.",
+    "coverage_gaps": [
+      "Russian MoD summary item_20260804_mod_66271 was reviewed but not emitted as a separate observation because its stored upstream_item_ids repeat earlier assigned posts and it is not independent evidence.",
+      "The stored source items and raw manifests contain short locator excerpts rather than complete immutable captures, so no additional assertions beyond those directly supported by the stored records were extracted.",
+      "The exact upstream Ukrainian Air Force item behind item_20260804_generalstaff_air_defense remains unresolved as recorded in the source raw manifest."
+    ]
+  }
 }

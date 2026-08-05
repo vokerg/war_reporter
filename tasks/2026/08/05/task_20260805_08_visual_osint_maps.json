@@ -2,17 +2,60 @@
   "task_id": "task_20260805_08_visual_osint_maps",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "ready",
+  "state": "review",
   "priority": 75,
   "created_at": "2026-08-05T05:06:14Z",
   "parent_issue": 33,
-  "issue_number": null,
+  "issue_number": 50,
   "depends_on_task_ids": [],
-  "window": {"from": "2026-08-04T18:00:00Z", "to": "2026-08-05T05:00:00Z"},
-  "scope": {"source_ids": [], "source_groups": [], "regions": ["ukraine-war"], "topics": ["visual-osint", "geolocation", "maps"], "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"]},
-  "exclusions": ["Items already represented by canonical URL, platform ID, or content hash", "Access-control bypass, private material, and unsafe non-public geodata", "Precise current operational positions or targeting-enabling detail"],
-  "allowed_output_paths": ["catalogs/sources/2026/08/05/visual-osint-maps.json", "data/source-items/2026/08/05/visual-osint-maps.ndjson", "data/artifacts/2026/08/05/visual-osint-maps.ndjson", "raw-manifests/2026/08/05/visual-osint-maps.json"],
-  "definition_of_done": ["The assigned public-web discovery shard and UTC window were searched", "Primary publications were preferred and upstream lineage was recorded", "Canonical URLs, timestamps, language, quote locators, and access failures were recorded", "Candidate source profiles and follow-up task proposals were persisted when justified", "No final truth assessment, territorial conclusion, or report narrative was added"],
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
+  },
+  "scope": {
+    "source_ids": [],
+    "source_groups": [],
+    "regions": ["ukraine-war"],
+    "topics": ["visual-osint", "geolocation", "maps"],
+    "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"]
+  },
+  "exclusions": [
+    "Items already represented by canonical URL, platform ID, or content hash",
+    "Access-control bypass, private material, and unsafe non-public geodata",
+    "Precise current operational positions or targeting-enabling detail"
+  ],
+  "allowed_output_paths": [
+    "catalogs/sources/2026/08/05/visual-osint-maps.json",
+    "data/source-items/2026/08/05/visual-osint-maps.ndjson",
+    "data/artifacts/2026/08/05/visual-osint-maps.ndjson",
+    "raw-manifests/2026/08/05/visual-osint-maps.json"
+  ],
+  "definition_of_done": [
+    "The assigned public-web discovery shard and UTC window were searched",
+    "Primary publications were preferred and upstream lineage was recorded",
+    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
+    "Candidate source profiles and follow-up task proposals were persisted when justified",
+    "No final truth assessment, territorial conclusion, or report narrative was added"
+  ],
   "idempotency_key": "open_web_discovery:visual-osint-maps:20260804T1800Z:20260805T0500Z:ukraine-war",
-  "lease": null
+  "lease": {
+    "worker_run_id": "run_20260805T103412Z_250f50e1",
+    "lease_branch": "work/task_20260805_08_visual_osint_maps",
+    "base_sha": "71872a7d529614d3b4e7798e5284c8e9acc542fa",
+    "leased_at": "2026-08-05T10:34:12Z",
+    "lease_until": "2026-08-05T12:34:12Z"
+  },
+  "result": {
+    "branch": "work/task_20260805_08_visual_osint_maps",
+    "pr_number": 51,
+    "completed_at": "2026-08-05T10:38:01Z",
+    "summary": "Recorded three first-party DeepState map-update candidates without assigning calendar dates that the public connector did not expose; no item was admitted as inside the bounded window, no duplicate source profiles were added, and no map geometry, media or targeting-enabling detail was captured.",
+    "coverage_gaps": [
+      "No visual-OSINT publication had a publication timestamp verifiable inside the exact eleven-hour UTC window.",
+      "Telegram exposed clock times but not calendar dates for the candidate DeepState posts in the available connector representation.",
+      "GeoConfirmed client-side Ukraine data did not load in the approved connector.",
+      "Search indexing for daily ISW/CTP assessments appeared delayed relative to the task window.",
+      "No image, video, map geometry or immutable webpage artifact was captured."
+    ]
+  }
 }

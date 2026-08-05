@@ -59,8 +59,11 @@ jobs:
       - name: Validate repository records and raw manifests
         run: python scripts/validate_data.py
 
-      - name: Validate ChatGPT Project queue and trust boundary
+      - name: Validate queue, self-review, and trust boundary
         run: python scripts/validate_worker_queue.py
+
+      - name: Validate autonomous runtime contract
+        run: python scripts/validate_autonomy.py
 
       - name: Audit live work refs
         env:

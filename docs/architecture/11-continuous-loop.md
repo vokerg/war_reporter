@@ -4,7 +4,7 @@
 
 `continuous loop` is a supervisor command above the atomic `копай` worker protocol. It minimizes operator involvement by executing complete task lifecycles sequentially until the repository reaches proven quiescence.
 
-The supervisor does not weaken atomic ownership, review, scope, or merge controls. It composes them.
+The supervisor does not weaken atomic ownership, review, scope, safety, or merge controls. It composes them and handles uncertain material through automatic withholding rather than a human-review stop.
 
 ## Supervisor state machine
 
@@ -14,10 +14,12 @@ START
   -> evaluate repository duties
      -> duties due: reconcile, merge control-plane result, refresh main
   -> select eligible task
-     -> task available: atomically create work/<task_id>
+     -> ready task available: atomically create work/<task_id>
+     -> retired HUMAN_REVIEW_REQUIRED task available: claim as blocked -> leased
      -> no task but nonterminal/in-flight work exists: WAIT
      -> no work visible: QUIESCENCE SWEEP
   -> execute exactly one bounded task
+  -> withhold unsafe or unresolved material and record the limitation
   -> tests and validators
   -> self-review round 1 -> repairs
   -> self-review round 2 -> repairs
@@ -29,6 +31,8 @@ START
   -> consume materialized proposals
   -> repeat
 ```
+
+`scripts/continuous_loop.py` returns only `reconcile`, `claim`, `wait`, or `quiescent`. `human_gate` is retired.
 
 ## Iteration boundary
 
@@ -42,27 +46,54 @@ A loop iteration is complete only when all of the following are true:
 6. reconciliation has had an opportunity to materialize downstream proposals;
 7. the supervisor has refreshed `main`.
 
-A pre-materialized `planned` daily report may omit `report_inputs` while its dependencies are unfinished. Reconciliation must freeze an approved claim/assessment set and persist its deterministic hash in the task before promotion to `ready`; without such inputs the task remains planned.
+Opening or readying a PR is not the iteration boundary. Claiming another task before finalization could hide spawned work and violates the supervisor contract.
 
-Opening or readying a PR is not the iteration boundary. Claiming another task before finalization could hide spawned work and would violate the supervisor contract.
+## Pickable task set
+
+The normal pickable state is `ready` with all dependencies merged and any canonicalization prerequisite satisfied.
+
+For backward compatibility, a task is also pickable when:
+
+- `state` is `blocked`;
+- `blocked_reason` begins with `HUMAN_REVIEW_REQUIRED:`;
+- its dependencies are merged;
+- downstream canonicalization requirements are satisfied.
+
+The decision payload marks such a task with `retired_human_gate: true` and `claim_transition: blocked_to_leased`. The claimant clears `blocked_reason` while writing lease metadata and preserves the substance of the old blocker as a coverage gap or automatic-withhold note.
+
+## Non-worker and exceptional PR telemetry
+
+Architecture, hardening, and other non-worker PRs are outside the task loop. The compatibility `exceptional_prs` counter remains accepted by the CLI so existing runners do not break, but it is telemetry only. It cannot cause `wait`, prevent `claim`, or block quiescence.
+
+This specifically prevents an unrelated architecture PR from freezing the research queue.
+
+## Automatic withholding
+
+Conditions listed in `merge_controller.automatic_withhold_for` are resolved without operator action. Workers fail closed on the affected material:
+
+- omit ambiguous source attribution;
+- omit rights-uncertain copied material;
+- withhold, delay, or coarsen sensitive geodata;
+- preserve correction history rather than silently replacing released content;
+- exclude credential or security-boundary changes from research tasks.
+
+The worker records the limitation, completes the safe bounded remainder, and proceeds through normal self-review. Withholding does not authorize invention, access-control bypass, or unsafe publication.
 
 ## Concurrency
 
-`continuous loop` uses no global worker monopoly. It relies on the existing deterministic task mutex:
+`continuous loop` uses no global worker monopoly. It relies on the deterministic task mutex:
 
 ```text
 work/<task_id>
 ```
 
-Multiple ordinary `копай` workers and one or more Continuous Loop supervisors can coexist. Branch creation conflict means another worker owns that task; the supervisor must refresh and select another eligible task or wait.
+Multiple ordinary `копай` workers and one or more Continuous Loop supervisors can coexist. Branch creation conflict means another worker owns that task; the supervisor refreshes and selects another eligible task or waits.
 
 A supervisor processes one task at a time. Parallelism remains available through separate chats using `копай`.
 
 ## Spawn closure
 
-Every valid proposal written by a task completed during the loop belongs to the same supervisor scope after the producer merges. The supervisor must not stop between producer merge and proposal reconciliation.
-
-The closure is transitive: a spawned task may itself spawn more tasks, and those tasks remain in scope until no valid downstream work is materialized.
+Every valid proposal written by a task completed during the loop belongs to the same supervisor scope after the producer merges. The closure is transitive: a spawned task may itself spawn more tasks, and those tasks remain in scope until no valid downstream work is materialized.
 
 ## Waiting behavior
 
@@ -84,37 +115,23 @@ The supervisor refreshes state at `merge_poll_seconds` while work is in flight a
 A single empty queue scan is insufficient. Normal voluntary exit requires all of the following across the configured idle window:
 
 - no due reconciliation duties;
-- no eligible task;
+- no eligible task, including no retired-gate candidate;
 - no nonterminal task manifest;
 - no open worker PR;
 - no active deterministic work branch;
-- no exceptional PR;
 - no reconciliation blocker that can still clear;
 - no scheduled daily boundary inside `scheduled_duty_guard_seconds`;
 - at least `minimum_idle_sweeps` consecutive unchanged idle observations;
 - at least `minimum_idle_window_seconds` elapsed since the first idle observation.
 
-Any state change resets the idle proof.
+Non-worker PRs do not participate in this proof. Any relevant repository-state change resets the idle proof.
 
-`scripts/continuous_loop.py` is the reference decision engine and returns `reconcile`, `claim`, `wait`, `human_gate`, or `quiescent`.
+## Forced termination
 
-## Exceptional and forced termination
+A platform runtime limit, connector failure, revoked credential, or tool interruption is not quiescence. The supervisor classifies it as `continuation_required` and preserves the last observed task/merge state in its final report.
 
-`human_gate` remains mandatory for the configured safety and governance exceptions. Continuous mode does not convert exceptional work into self-approved work.
-
-A platform runtime limit, connector failure, revoked credential, or tool interruption is not quiescence. The supervisor must classify it as `continuation_required` and preserve the last observed task/merge state in its final report. A truly unattended daemon still requires an external runner capable of starting or resuming agent sessions; this repository change defines the deterministic contract that such a runner must follow.
+A truly unattended daemon still requires an external runner capable of starting or resuming agent sessions; this repository defines the deterministic contract that such a runner follows.
 
 ## Configuration
 
-`config/autonomy.json` defines:
-
-- command and aliases;
-- the atomic child command;
-- mandatory wait for merge and finalization;
-- refresh and spawn-closure behavior;
-- merge and idle polling;
-- idle sweep and elapsed-time thresholds;
-- the near-term scheduled-duty guard;
-- the rule that forced interruption is not quiescence.
-
-The schema makes the safety-critical properties constants so a configuration change cannot silently weaken the supervisor contract.
+`config/autonomy.json` defines command aliases, atomic child command, mandatory wait for merge/finalization, refresh and spawn-closure behavior, merge and idle polling, idle proof thresholds, scheduled-duty guard, and automatic-withhold classes.

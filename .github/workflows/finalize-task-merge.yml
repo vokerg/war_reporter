@@ -29,7 +29,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: finalize-task-${{ github.event_name == 'workflow_dispatch' && inputs.pr_number || github.event.pull_request.number }}
+  group: finalize-merged-worker-task-main
   cancel-in-progress: false
 
 jobs:
@@ -108,27 +108,23 @@ jobs:
           python scripts/validate_worker_queue.py
           python scripts/validate_autonomy.py
 
-      - name: Create and squash-merge finalization PR
+      - name: Commit and push trusted finalization to main
         if: steps.changed.outputs.value == 'true'
         env:
           TASK_ID: ${{ steps.finalize.outputs.task_id }}
         run: |
-          short="${FINALIZE_MERGE_SHA:0:12}"
-          branch="control/finalize/$TASK_ID/$short"
-          git switch -c "$branch"
+          set -euo pipefail
           git config user.name "war-reporter-finalizer[bot]"
           git config user.email "war-reporter-finalizer[bot]@users.noreply.github.com"
           git add tasks
           git commit -m "[finalize] $TASK_ID"
-          head_sha="$(git rev-parse HEAD)"
-          git push origin "HEAD:$branch"
-          pr_url="$(gh pr create --base main --head "$branch" --title "[finalize] $TASK_ID" --body "Automated control-plane finalization with actual merge SHA and timestamp. Two deterministic self-review rounds passed; no research content is introduced.")"
-          pr_number="${pr_url##*/}"
-          gh api --method PUT "repos/$GITHUB_REPOSITORY/pulls/$pr_number/merge" \
-            -f merge_method=squash \
-            -f sha="$head_sha" \
-            -f commit_title="[finalize] $TASK_ID" | jq -e '.merged == true'
-          gh api --method DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$branch" || true
+          git fetch origin main
+          git rebase origin/main
+          python -m unittest discover -s tests -v
+          python scripts/validate_data.py
+          python scripts/validate_worker_queue.py
+          python scripts/validate_autonomy.py
+          git push origin HEAD:main
 
       - name: Close task issue
         if: steps.finalize.outputs.issue_number != ''

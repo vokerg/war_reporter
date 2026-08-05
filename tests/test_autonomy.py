@@ -26,7 +26,7 @@ def dump(path: Path, value: object) -> None:
 class AutonomyTests(unittest.TestCase):
     def make_root(self) -> Path:
         root = Path(tempfile.mkdtemp())
-        self.addCleanup(shutil.rmtree, root)
+        self.addCleanup(shutil.rmtree, root, ignore_errors=True)
         for relative in ("config/autonomy.json", "schemas/self-review.schema.json"):
             source = REPO_ROOT / relative
             target = root / relative
@@ -80,6 +80,14 @@ class AutonomyTests(unittest.TestCase):
         finalizer.write_text("pull_request:\n", encoding="utf-8")
         errors = validate_auto_merge_trust_boundary(root)
         self.assertTrue(any("dispatch-finalizer" in error for error in errors))
+
+    def test_finalizer_uses_serialized_trusted_main_push(self) -> None:
+        text = (REPO_ROOT / ".github/workflows/finalize-task-merge.yml").read_text(encoding="utf-8")
+        self.assertIn("group: finalize-merged-worker-task-main", text)
+        self.assertIn("git fetch origin main", text)
+        self.assertIn("git rebase origin/main", text)
+        self.assertIn("git push origin HEAD:main", text)
+        self.assertNotIn("gh pr create", text)
 
     def test_two_review_rounds_are_ordered_and_complete(self) -> None:
         root = self.make_root()

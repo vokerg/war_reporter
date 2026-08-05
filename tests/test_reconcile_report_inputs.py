@@ -143,6 +143,69 @@ class ReconcileReportInputTests(unittest.TestCase):
         self.assertNotIn("daily_snapshot", [duty["kind"] for duty in plan["duties"]])
         self.assertIn("report_input_assessment", [duty["kind"] for duty in plan["duties"]])
 
+    def planned_report(self, root: Path) -> Path:
+        dependency_id = "task_backfill_claims"
+        dump(
+            root / "tasks/2026/08/05/task_backfill_claims.json",
+            {
+                "task_id": dependency_id,
+                "task_type": "investigate_claim",
+                "state": "merged",
+                "depends_on_task_ids": [],
+                "window": {"from": "2026-08-05T00:00:00Z", "to": "2026-08-06T00:00:00Z"},
+                "idempotency_key": "backfill_claims:2026-08-05",
+            },
+        )
+        path = root / "tasks/2026/08/05/task_backfill_report.json"
+        dump(
+            path,
+            {
+                "task_id": "task_backfill_report",
+                "task_type": "daily_report",
+                "state": "planned",
+                "depends_on_task_ids": [dependency_id],
+                "window": {"from": "2026-08-05T00:00:00Z", "to": "2026-08-06T00:00:00Z"},
+                "idempotency_key": reconcile.daily_report_key(self.day, "ukraine-war"),
+                "lease": None,
+            },
+        )
+        return path
+
+    def test_planned_report_waits_until_approved_inputs_exist(self) -> None:
+        root = self.make_root()
+        report_path = self.planned_report(root)
+
+        plan = reconcile.plan_duties(root, self.now)
+        promoted = [
+            task_id
+            for duty in plan["duties"]
+            if duty["kind"] == "promote_tasks"
+            for task_id in duty["task_ids"]
+        ]
+        self.assertNotIn("task_backfill_report", promoted)
+        self.assertTrue(any("task_backfill_report remains planned" in value for value in plan["blockers"]))
+        self.assertEqual(json.loads(report_path.read_text(encoding="utf-8"))["state"], "planned")
+
+    def test_planned_report_freezes_inputs_during_promotion(self) -> None:
+        root = self.make_root()
+        report_path = self.planned_report(root)
+        dump(root / "data/claims/2026/08/05/claim.json", self.approved_claim())
+
+        plan = reconcile.plan_duties(root, self.now)
+        promotion = next(
+            duty
+            for duty in plan["duties"]
+            if duty["kind"] == "promote_tasks" and "task_backfill_report" in duty["task_ids"]
+        )
+        frozen = promotion["report_inputs_by_task"]["task_backfill_report"]
+        self.assertEqual(frozen["claim_ids"], ["clm_reportable"])
+
+        result = reconcile.apply_plan(root, plan)
+        self.assertIn("task_backfill_report", result["promoted_task_ids"])
+        task = json.loads(report_path.read_text(encoding="utf-8"))
+        self.assertEqual(task["state"], "ready")
+        self.assertEqual(task["report_inputs"], frozen)
+
     def test_hash_is_deterministic_across_file_order(self) -> None:
         root = self.make_root()
         first = self.approved_claim("clm_alpha")

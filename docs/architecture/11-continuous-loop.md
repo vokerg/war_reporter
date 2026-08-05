@@ -42,6 +42,8 @@ A loop iteration is complete only when all of the following are true:
 6. reconciliation has had an opportunity to materialize downstream proposals;
 7. the supervisor has refreshed `main`.
 
+A pre-materialized `planned` daily report may omit `report_inputs` while its dependencies are unfinished. Reconciliation must freeze an approved claim/assessment set and persist its deterministic hash in the task before promotion to `ready`; without such inputs the task remains planned.
+
 Opening or readying a PR is not the iteration boundary. Claiming another task before finalization could hide spawned work and would violate the supervisor contract.
 
 ## Concurrency

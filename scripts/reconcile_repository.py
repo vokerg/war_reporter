@@ -421,16 +421,48 @@ def plan_duties(root: Path, now: datetime | None = None) -> dict[str, Any]:
     proposal_duties = pending_proposals(root, tasks, config)
     duties.extend(proposal_duties)
 
-    promotable = []
+    promotable: list[str] = []
+    report_inputs_by_task: dict[str, dict[str, Any]] = {}
     for task_id, (_, task) in tasks.items():
         dependencies = task.get("depends_on_task_ids", [])
-        if task.get("state") == "planned" and dependencies and all(
-            dependency in tasks and tasks[dependency][1].get("state") == "merged"
-            for dependency in dependencies
+        if not (
+            task.get("state") == "planned"
+            and dependencies
+            and all(
+                dependency in tasks and tasks[dependency][1].get("state") == "merged"
+                for dependency in dependencies
+            )
         ):
-            promotable.append(task_id)
+            continue
+        if task.get("task_type") == "daily_report":
+            report_inputs = task.get("report_inputs")
+            if not isinstance(report_inputs, dict):
+                window = task.get("window")
+                lower = window.get("from") if isinstance(window, dict) else None
+                upper = window.get("to") if isinstance(window, dict) else None
+                if not isinstance(lower, str) or not isinstance(upper, str):
+                    blockers.append(f"daily report task {task_id} remains planned: invalid frozen UTC window")
+                    continue
+                report_inputs = frozen_report_inputs(root, parse(lower), parse(upper))
+            if report_inputs is None:
+                blockers.append(
+                    f"daily report task {task_id} remains planned: no approved claims or assessments "
+                    "overlap the frozen UTC window"
+                )
+                continue
+            report_inputs_by_task[task_id] = report_inputs
+        promotable.append(task_id)
     if promotable:
-        duties.append({"kind": "promote_tasks", "task_ids": sorted(promotable)})
+        promotion_duty: dict[str, Any] = {
+            "kind": "promote_tasks",
+            "task_ids": sorted(promotable),
+        }
+        if report_inputs_by_task:
+            promotion_duty["report_inputs_by_task"] = {
+                task_id: report_inputs_by_task[task_id]
+                for task_id in sorted(report_inputs_by_task)
+            }
+        duties.append(promotion_duty)
 
     region = config["daily_cycle"]["region"]
     coverage_by_shard, covered_shards = discovery_coverage_for_day(tasks, day, region)
@@ -726,8 +758,22 @@ def apply_plan(root: Path, plan: dict[str, Any], parent_issue: int | None = None
     for duty in plan.get("duties", []):
         kind = duty["kind"]
         if kind == "promote_tasks":
+            report_inputs_by_task = duty.get("report_inputs_by_task", {})
             for task_id in duty["task_ids"]:
                 path, task = tasks[task_id]
+                if task.get("task_type") == "daily_report":
+                    report_inputs = task.get("report_inputs")
+                    if not isinstance(report_inputs, dict):
+                        report_inputs = (
+                            report_inputs_by_task.get(task_id)
+                            if isinstance(report_inputs_by_task, dict)
+                            else None
+                        )
+                    if not isinstance(report_inputs, dict):
+                        raise ValueError(
+                            f"daily_report task {task_id} cannot be promoted without approved frozen report inputs"
+                        )
+                    task["report_inputs"] = report_inputs
                 task["state"] = "ready"
                 task["lease"] = None
                 dump(path, task)

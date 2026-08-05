@@ -2,17 +2,76 @@
   "task_id": "task_20260805_10_reactions_corrections",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "ready",
+  "state": "review",
   "priority": 70,
   "created_at": "2026-08-05T05:06:14Z",
   "parent_issue": 33,
-  "issue_number": null,
+  "issue_number": 53,
   "depends_on_task_ids": [],
-  "window": {"from": "2026-08-04T18:00:00Z", "to": "2026-08-05T05:00:00Z"},
-  "scope": {"source_ids": [], "source_groups": [], "regions": ["ukraine-war"], "topics": ["reactions", "criticism", "corrections", "retractions"], "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"]},
-  "exclusions": ["Items already represented by canonical URL, platform ID, or content hash", "Access-control bypass, private material, and unsafe non-public geodata", "Precise current operational positions or targeting-enabling detail"],
-  "allowed_output_paths": ["catalogs/sources/2026/08/05/reactions-corrections.json", "data/source-items/2026/08/05/reactions-corrections.ndjson", "data/artifacts/2026/08/05/reactions-corrections.ndjson", "raw-manifests/2026/08/05/reactions-corrections.json"],
-  "definition_of_done": ["The assigned public-web discovery shard and UTC window were searched", "Primary publications were preferred and upstream lineage was recorded", "Canonical URLs, timestamps, language, quote locators, and access failures were recorded", "Candidate source profiles and follow-up task proposals were persisted when justified", "No final truth assessment, territorial conclusion, or report narrative was added"],
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
+  },
+  "scope": {
+    "source_ids": [],
+    "source_groups": [],
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "reactions",
+      "criticism",
+      "corrections",
+      "retractions"
+    ],
+    "content_types": [
+      "post",
+      "article",
+      "report",
+      "briefing",
+      "document",
+      "image",
+      "video",
+      "map"
+    ]
+  },
+  "exclusions": [
+    "Items already represented by canonical URL, platform ID, or content hash",
+    "Access-control bypass, private material, and unsafe non-public geodata",
+    "Precise current operational positions or targeting-enabling detail"
+  ],
+  "allowed_output_paths": [
+    "catalogs/sources/2026/08/05/reactions-corrections.json",
+    "data/source-items/2026/08/05/reactions-corrections.ndjson",
+    "data/artifacts/2026/08/05/reactions-corrections.ndjson",
+    "raw-manifests/2026/08/05/reactions-corrections.json"
+  ],
+  "definition_of_done": [
+    "The assigned public-web discovery shard and UTC window were searched",
+    "Primary publications were preferred and upstream lineage was recorded",
+    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
+    "Candidate source profiles and follow-up task proposals were persisted when justified",
+    "No final truth assessment, territorial conclusion, or report narrative was added"
+  ],
   "idempotency_key": "open_web_discovery:reactions-corrections:20260804T1800Z:20260805T0500Z:ukraine-war",
-  "lease": null
+  "lease": {
+    "worker_run_id": "run_20260805T103530Z_8c41d7ab",
+    "lease_branch": "work/task_20260805_10_reactions_corrections",
+    "base_sha": "93d3f7b500def6af2006ef36e5de427522557938",
+    "leased_at": "2026-08-05T10:35:30Z",
+    "lease_until": "2026-08-05T12:35:30Z"
+  },
+  "result": {
+    "branch": "work/task_20260805_10_reactions_corrections",
+    "pr_number": 54,
+    "completed_at": "2026-08-05T12:00:00Z",
+    "summary": "Completed the bounded reactions, criticism, corrections and retractions scan. Registered one unique Guardian article first published at 03:53Z that records attributable criticism of delayed air-defence deliveries and a request for additional sanctions. Existing Kyiv-attack publications were deduplicated, a same-day AP item without a verifiable cutoff timestamp was excluded, and no formal correction or retraction notice was verified in the exact window.",
+    "coverage_gaps": [
+      "The accepted article was retrieved after a later edit; the exact first-published text was not captured.",
+      "The underlying Zelenskyy social-media post was not separately registered with a stable primary canonical URL during this bounded pass.",
+      "AP's relevant same-day article did not expose a verifiable publication timestamp in the retrieved representation.",
+      "No clearly timestamped formal correction or retraction notice was verified in the exact window.",
+      "This bounded search is not an exhaustive survey of every outlet, language, correction page or social platform."
+    ]
+  }
 }

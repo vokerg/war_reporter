@@ -2,7 +2,7 @@
   "task_id": "task_20260804_04_ru_milbloggers",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "leased",
+  "state": "pr_open",
   "priority": 85,
   "created_at": "2026-08-04T18:28:29Z",
   "parent_issue": 5,
@@ -59,5 +59,17 @@
     "base_sha": "7d8f3e13261f24e121ec4f8b63c6d200df4e2eb1",
     "leased_at": "2026-08-05T04:40:26Z",
     "lease_until": "2026-08-05T06:40:26Z"
+  },
+  "result": {
+    "branch": "work/task_20260804_04_ru_milbloggers",
+    "pr_number": 15,
+    "completed_at": "2026-08-05T04:49:11Z",
+    "summary": "Registered two draft source profiles and four public Telegram source items from the bounded Russian-milblogger discovery window, with quote locators, named upstream lineage, exclusions, access failures, and follow-up proposals. No truth assessment, media artifact, map geometry, or targeting-enabling detail was added.",
+    "coverage_gaps": [
+      "Telegram public previews did not expose timezone-bearing publication datetimes, so source items use day precision and preserve preview times in the raw manifest.",
+      "Reliable in-window backward pagination was unavailable for RVvoenkor and Colonelcassad.",
+      "Named upstream Reuters, Kotsnews, Russian Ministry of Defence, Rutube, and Soloviev Live materials were not registered in this milblogger-only shard.",
+      "The bounded public-web search is not an exhaustive scan of the open internet."
+    ]
   }
 }

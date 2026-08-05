@@ -1,0 +1,90 @@
+{
+  "$schema": "../schemas/source-watchlist.schema.json",
+  "version": "1.0.0",
+  "updated_at": "2026-08-05T17:12:00Z",
+  "effective_from": "2026-08-06T00:00:00Z",
+  "description": "Canonical mandatory and extended source watchlist for bounded Russia-Ukraine discovery tasks.",
+  "anchor_source_ids": [
+    "src_michael_kofman",
+    "src_rob_lee",
+    "src_dara_massicot",
+    "src_russia_contingency",
+    "src_cit",
+    "src_deepstateua",
+    "src_geoconfirmed",
+    "src_bellingcat",
+    "src_cir_eyes_on_russia",
+    "src_black_bird_group",
+    "src_frontelligence_insight",
+    "src_oryx",
+    "src_isw",
+    "src_deep_cuts_commission"
+  ],
+  "assignment_policy": {
+    "include_priority_tiers": [
+      "core",
+      "extended"
+    ],
+    "assign_all_active_sources": true,
+    "require_per_source_outcome": true,
+    "allow_unassigned_open_web_discovery": false
+  },
+  "coverage_policy": {
+    "ua-official": {
+      "min_active_sources": 15,
+      "min_core_sources": 5
+    },
+    "ru-official": {
+      "min_active_sources": 10,
+      "min_core_sources": 3
+    },
+    "ua-analysis-media": {
+      "min_active_sources": 12,
+      "min_core_sources": 5
+    },
+    "ru-milbloggers": {
+      "min_active_sources": 12,
+      "min_core_sources": 4
+    },
+    "international-media": {
+      "min_active_sources": 15,
+      "min_core_sources": 8
+    },
+    "military-analysts": {
+      "min_active_sources": 20,
+      "min_core_sources": 12
+    },
+    "strikes-infrastructure": {
+      "min_active_sources": 25,
+      "min_core_sources": 8
+    },
+    "visual-osint-maps": {
+      "min_active_sources": 12,
+      "min_core_sources": 8
+    },
+    "diplomacy-support-sanctions": {
+      "min_active_sources": 20,
+      "min_core_sources": 10
+    },
+    "reactions-corrections": {
+      "min_active_sources": 8,
+      "min_core_sources": 5
+    }
+  },
+  "source_files": [
+    "source-watchlist/sources-01.json",
+    "source-watchlist/sources-02.json",
+    "source-watchlist/sources-03.json",
+    "source-watchlist/sources-04.json",
+    "source-watchlist/sources-05.json",
+    "source-watchlist/sources-06.json",
+    "source-watchlist/sources-07.json",
+    "source-watchlist/sources-08.json",
+    "source-watchlist/sources-09.json",
+    "source-watchlist/sources-10.json",
+    "source-watchlist/sources-11.json",
+    "source-watchlist/sources-12.json",
+    "source-watchlist/sources-13.json",
+    "source-watchlist/sources-14.json"
+  ]
+}

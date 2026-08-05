@@ -58,6 +58,12 @@ jobs:
       - name: Run validator tests
         run: python -m unittest discover -s tests -v
 
+      - name: Validate canonical source watchlist
+        run: |
+          python scripts/validate_source_watchlist.py
+          python scripts/assign_source_watchlist.py --check
+          python scripts/validate_source_scan_coverage.py
+
       - name: Validate repository records and raw manifests
         run: python scripts/validate_data.py
 

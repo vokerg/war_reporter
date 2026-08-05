@@ -1,0 +1,120 @@
+{
+  "task_id": "task_20260805_05_international_media",
+  "worker_run_id": "run_20260805T051110Z_8f3c2a91",
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
+  },
+  "retrieved_at": "2026-08-05T05:13:52Z",
+  "scope": {
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "international-media",
+      "operations",
+      "external-support"
+    ],
+    "languages": [
+      "en"
+    ],
+    "access_method": "public_web"
+  },
+  "search_log": [
+    {
+      "outlet": "Reuters",
+      "status": "searched",
+      "notes": "Admitted two articles with minute-precision publication timestamps verified inside the UTC window."
+    },
+    {
+      "outlet": "The Guardian",
+      "status": "searched",
+      "notes": "Admitted one briefing first published inside the window and updated before the window closed; repeated Reuters lineage was linked explicitly."
+    },
+    {
+      "outlet": "Associated Press",
+      "status": "partial",
+      "notes": "A relevant article was retrieved, but the page representation exposed no verifiable publication timestamp, so it was not admitted against the bounded cutoff."
+    },
+    {
+      "outlet": "BBC",
+      "status": "access_failed",
+      "notes": "Candidate pages were unavailable through the approved research connector because of robots/access restrictions. No bypass was attempted."
+    },
+    {
+      "outlet": "CNN, DW, France 24",
+      "status": "searched_no_admission",
+      "notes": "No additional candidate with a canonical page and publication timestamp verified inside the narrow UTC window was admitted during the bounded scan."
+    }
+  ],
+  "included_items": [
+    {
+      "source_item_id": "item_20260805_reuters_kyiv_attack",
+      "quote_locator": "Headline, timestamp and article body paragraphs 1-10",
+      "verification_excerpt": "Reuters could not independently verify all the reports.",
+      "lineage_note": "The report attributes casualty and damage information to Kyiv city and regional authorities, Mayor Vitali Klitschko and Reuters witnesses; it does not assert independent verification of all reports."
+    },
+    {
+      "source_item_id": "item_20260805_reuters_north_korean_missile_unit",
+      "quote_locator": "Headline, summary bullets and article body paragraphs 1-12",
+      "verification_excerpt": "Reuters could not independently verify Cherniak's assertions.",
+      "lineage_note": "The central deployment assertions are attributed to Andrii Cherniak of Ukraine's military intelligence; Reuters records non-verification and unsuccessful requests for Russian and North Korean comment."
+    },
+    {
+      "source_item_id": "item_20260805_guardian_war_briefing",
+      "quote_locator": "Headline, publication line and briefing bullet points 1-7",
+      "verification_excerpt": "Soldier arrested after shooting; Kyiv comes under ballistic missile attack; more Wildberries hit.",
+      "lineage_note": "The page is a staff-and-agencies aggregation. It was first published at 2026-08-05T01:27:00Z and updated at 2026-08-05T04:29:00Z; its Kyiv and North Korean missile-unit entries repeat Reuters reporting represented by the linked upstream source items."
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "canonical_url": "https://apnews.com/article/russia-ukraine-war-beach-drone-222d8755b524c231faa8fd6de10f38ef",
+      "reason": "Relevant Associated Press article, but the retrieved page representation exposed no exact publication timestamp; admission relative to the 2026-08-04T18:00:00Z opening and 2026-08-05T05:00:00Z cutoff could not be verified."
+    },
+    {
+      "canonical_url": "https://www.reuters.com/world/europe/ukraine-accuses-russia-war-crime-after-video-shows-drone-hunting-market-vendor-2026-08-04/",
+      "reason": "Published at 2026-08-04T10:30:00Z, before the task window opened."
+    },
+    {
+      "canonical_url": "https://www.reuters.com/world/europe/ukraine-strikes-three-warehouses-across-russia-killing-five-local-officials-say-2026-08-04/",
+      "reason": "Published at 2026-08-04T06:58:00Z, before the task window opened."
+    },
+    {
+      "canonical_url": "https://www.theguardian.com/world/2026/aug/04/ukraine-war-briefing-militarys-former-top-commander-says-kyiv-has-no-chance-of-joining-nato",
+      "reason": "First published at 2026-08-04T01:24:00Z, before the task window opened."
+    }
+  ],
+  "source_profile_changes": {
+    "count": 0,
+    "reason": "Reuters and The Guardian already have canonical repository source profiles; no duplicate profile or reliability assessment was added."
+  },
+  "artifact_capture": {
+    "count": 0,
+    "reason": "No permitted immutable snapshot or object-store capture was available in this worker environment. Source pages are represented by canonical URLs and retrieval metadata only."
+  },
+  "follow_up_task_proposals": [
+    {
+      "task_type": "extract_observations",
+      "subject": "Reuters reporting on the overnight Kyiv attack",
+      "reason": "Separate statements by the mayor, city military administration, regional authorities and Reuters witnesses while preserving attribution and non-verification qualifiers."
+    },
+    {
+      "task_type": "investigate_claim",
+      "subject": "Claimed deployment of a North Korean missile unit to western Russia",
+      "reason": "Seek Russian, North Korean, satellite, procurement and independent analyst evidence without treating the Ukrainian intelligence assertion as established fact."
+    },
+    {
+      "task_type": "source_scan",
+      "subject": "Guardian briefing upstream agency lineage",
+      "reason": "Resolve the primary statements and agency dispatches underlying the Crimea shooting, strike casualty and warehouse-attack entries."
+    }
+  ],
+  "coverage_gaps": [
+    "Only three items from two outlets had publication timestamps verified inside the narrow eleven-hour UTC window.",
+    "The Associated Press candidate was excluded because an exact publication timestamp could not be verified against the task bounds.",
+    "BBC candidate pages were not retrievable through the approved connector because of robots/access restrictions.",
+    "No paywall, access-control or robots restriction was bypassed.",
+    "No image, video, map or immutable webpage artifacts were captured."
+  ]
+}

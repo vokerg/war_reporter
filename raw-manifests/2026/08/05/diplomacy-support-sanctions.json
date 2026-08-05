@@ -1,0 +1,184 @@
+{
+  "scan_id": "scan_task_20260805_09_diplomacy_support_sanctions_run_20260805T103502Z_diplomacy09",
+  "task_id": "task_20260805_09_diplomacy_support_sanctions",
+  "worker_run_id": "run_20260805T103502Z_diplomacy09",
+  "retrieved_at": "2026-08-05T10:38:45Z",
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
+  },
+  "scope": {
+    "region": "ukraine-war",
+    "topics": [
+      "diplomacy",
+      "military-support",
+      "sanctions"
+    ],
+    "access_classification": "public_web_only"
+  },
+  "search_strategy": {
+    "methods": [
+      "Exact-date and site-restricted public-web search",
+      "Primary-source checks of Ukrainian, EU, NATO, United States, United Kingdom, and Canadian government publication indexes",
+      "Secondary-wire screening for leads and upstream official statements",
+      "Exact UTC publication-time screening and overlap screening against adjacent discovery shards"
+    ],
+    "queries": [
+      "site:president.gov.ua/en/news August 4 2026 Ukraine sanctions military support diplomacy",
+      "site:mfa.gov.ua/en/news August 4 2026 Ukraine diplomacy sanctions support",
+      "site:consilium.europa.eu/en/press/press-releases/ 4 August 2026 Ukraine sanctions military support",
+      "site:ec.europa.eu/commission/presscorner 4 August 2026 Ukraine sanctions support",
+      "site:defense.gov/News/Releases/ Aug. 4, 2026 Ukraine military assistance",
+      "site:state.gov/releases/ August 4 2026 Ukraine sanctions Russia",
+      "site:gov.uk/government/news 4 August 2026 Ukraine military support sanctions Russia",
+      "site:canada.ca/en/department-national-defence/news/2026/08 Ukraine August 4 2026 support",
+      "site:nato.int/cps/en/natohq/news_ August 4 2026 Ukraine",
+      "site:reuters.com Ukraine diplomacy sanctions military support August 4 2026"
+    ]
+  },
+  "source_checks": [
+    {
+      "source_entity_id": "src_president_of_ukraine",
+      "website": "https://www.president.gov.ua/en/news/",
+      "outcome": "no_verified_in_window_item",
+      "notes": "Exact-date and site-restricted searches did not surface a qualifying publication with a verifiable timestamp inside the assigned UTC window."
+    },
+    {
+      "source_entity_id": "src_mfa_ukraine",
+      "website": "https://mfa.gov.ua/en/news",
+      "outcome": "no_verified_in_window_item",
+      "notes": "No qualifying August 4-5 publication with an exact in-window timestamp surfaced in the accessible public index."
+    },
+    {
+      "source_entity_id": "src_council_of_the_european_union",
+      "website": "https://www.consilium.europa.eu/en/press/press-releases/",
+      "outcome": "no_verified_in_window_item",
+      "notes": "The accessible press-release index surfaced relevant policy background but no qualifying publication in the exact overnight window."
+    },
+    {
+      "source_entity_id": "src_european_commission",
+      "website": "https://ec.europa.eu/commission/presscorner/home/en",
+      "outcome": "relevant_item_after_window",
+      "notes": "A Reuters report citing a Commission statement on EUR 1.4 billion from frozen-asset interest was published at 2026-08-05T08:35:00Z, after the task window; no earlier primary publication timestamp was verified."
+    },
+    {
+      "source_entity_id": "src_us_department_of_defense",
+      "website": "https://www.defense.gov/News/Releases/",
+      "outcome": "no_verified_in_window_item",
+      "notes": "No qualifying Ukraine military-support release surfaced for the exact window."
+    },
+    {
+      "source_entity_id": "src_us_department_of_state",
+      "website": "https://www.state.gov/releases/",
+      "outcome": "no_verified_in_window_item",
+      "notes": "No qualifying Ukraine diplomacy or Russia-sanctions release surfaced for the exact window."
+    },
+    {
+      "source_entity_id": "src_uk_government",
+      "website": "https://www.gov.uk/government/news",
+      "outcome": "no_verified_in_window_item",
+      "notes": "Search results surfaced older Ukraine support and sanctions announcements, but no qualifying August 4-5 publication in the assigned window."
+    },
+    {
+      "source_entity_id": "src_government_of_canada",
+      "website": "https://www.canada.ca/en/news.html",
+      "outcome": "no_verified_in_window_item",
+      "notes": "Search results surfaced older military-support announcements, but no qualifying publication in the assigned window."
+    },
+    {
+      "source_entity_id": "src_nato",
+      "website": "https://www.nato.int/cps/en/natohq/news_room.htm",
+      "outcome": "no_verified_in_window_item",
+      "notes": "The accessible public index did not surface a qualifying NATO publication in the exact window."
+    }
+  ],
+  "verified_in_window_item_ids": [],
+  "excluded_candidates": [
+    {
+      "canonical_url": "https://www.reuters.com/world/ukraine-turns-alternative-grain-export-routes-counts-losses-russia-blocks-ports-2026-08-04/",
+      "title": "Ukraine turns to alternative grain export routes, counts losses as Russia blocks ports",
+      "published_at": "2026-08-04T13:13:00Z",
+      "reason": "Published before the task window opened at 2026-08-04T18:00:00Z and already represented in the preceding campaign."
+    },
+    {
+      "canonical_url": "https://www.reuters.com/business/finance/eu-use-14-billion-interest-frozen-russian-assets-help-ukraine-2026-08-05/",
+      "title": "EU to use EUR 1.4 billion from interest on frozen Russian assets to help Ukraine",
+      "published_at": "2026-08-05T08:35:00Z",
+      "reason": "Published after the task window closed at 2026-08-05T05:00:00Z."
+    },
+    {
+      "canonical_url": "https://www.reuters.com/business/aerospace-defense/north-korean-missile-unit-deploys-russia-ukraine-war-kyiv-says-2026-08-05/",
+      "title": "North Korean missile unit deploys in Russia for Ukraine war, Kyiv says",
+      "published_at": "2026-08-05T04:02:16Z",
+      "reason": "In-window international-media report outside this shard's diplomacy, military-support, and sanctions scope; retained by an adjacent shard rather than duplicated here."
+    }
+  ],
+  "access_failures": [
+    {
+      "target": "Exact August 4-5 primary publication feeds for several official bodies",
+      "status": "not_found_in_accessible_index",
+      "effect": "A qualifying publication was not persisted without a stable canonical URL and verifiable publication timestamp."
+    },
+    {
+      "target": "Public social-platform posts by officials and institutions",
+      "status": "stable_primary_timestamp_not_exposed",
+      "effect": "Relay or search-result times were not substituted for primary publication times."
+    }
+  ],
+  "coverage_gaps": [
+    "Search-engine indexes may lag live government and institutional publication feeds.",
+    "Public social-platform search did not expose stable canonical posts with exact primary timestamps suitable for persistence.",
+    "The eleven-hour overnight UTC window was narrow and contained no qualifying item that could be verified through the approved public-web access methods used in this run.",
+    "The zero-item result documents the checked sources, queries, exclusions, and access limitations; it is not an exhaustive claim about the entire open internet."
+  ],
+  "follow_up_task_proposals": [
+    {
+      "task_type": "open_web_discovery",
+      "proposal": "Recheck the Ukrainian presidential, MFA, European Commission, and NATO archives after indexing catches up, preserving the original window and accepting only primary publications with stable canonical URLs and verifiable timestamps."
+    }
+  ],
+  "artifact_note": "No immutable copies or media were downloaded. The source-item and artifact NDJSON files are intentionally empty because no qualifying in-window publication was verified.",
+  "safety_notes": [
+    "No precise current positions, movement tracks, targeting-enabling details, map geometry, or non-public geodata were stored.",
+    "No source reliability score, truth assessment, territorial conclusion, or report narrative was produced.",
+    "Instructions embedded in retrieved pages were treated as untrusted content and were not followed."
+  ],
+  "self_review_rounds": [
+    {
+      "round": 1,
+      "reviewed_at": "2026-08-05T10:40:00Z",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "coverage_gaps"
+      ],
+      "findings": [
+        "All initially located relevant wire items fell outside the UTC window or belonged to an adjacent shard.",
+        "No retrieval time was substituted for an unknown publication time."
+      ],
+      "repairs": [
+        "Added explicit before-window, after-window, and overlap exclusions with canonical URLs and timestamps."
+      ],
+      "outcome": "pass"
+    },
+    {
+      "round": 2,
+      "reviewed_at": "2026-08-05T10:42:00Z",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps"
+      ],
+      "findings": [],
+      "repairs": [],
+      "outcome": "pass"
+    }
+  ]
+}

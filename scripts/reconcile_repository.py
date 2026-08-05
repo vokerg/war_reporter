@@ -166,6 +166,18 @@ def point_in_window(value: str, start: datetime, end: datetime) -> bool:
     return start <= moment < end
 
 
+def period_overlaps_window(period: Any, start: datetime, end: datetime) -> bool:
+    if not isinstance(period, dict):
+        return False
+    lower_value = period.get("start")
+    upper_value = period.get("end")
+    if not isinstance(lower_value, str) or not isinstance(upper_value, str):
+        return False
+    lower = parse(lower_value)
+    upper = parse(upper_value)
+    return lower < upper and lower < end and upper > start
+
+
 def claim_overlaps_window(claim: dict[str, Any], start: datetime, end: datetime) -> bool:
     event_time = claim.get("event_time")
     if not isinstance(event_time, dict):
@@ -215,9 +227,15 @@ def frozen_report_inputs(root: Path, start: datetime, end: datetime) -> dict[str
     for assessment_id, assessment in assessments_by_id.items():
         if assessment.get("record_status") != "approved":
             continue
+        reporting_period = assessment.get("reporting_period")
         as_of = assessment.get("as_of")
+        overlaps = (
+            period_overlaps_window(reporting_period, start, end)
+            if reporting_period is not None
+            else isinstance(as_of, str) and point_in_window(as_of, start, end)
+        )
         claim_ids = assessment.get("claim_ids")
-        if not isinstance(as_of, str) or not point_in_window(as_of, start, end):
+        if not overlaps:
             continue
         if not isinstance(claim_ids, list) or not claim_ids or not all(
             isinstance(claim_id, str) and claim_id in approved_claims for claim_id in claim_ids
@@ -688,6 +706,7 @@ def build_report_input_assessment(root: Path, duty: dict[str, Any], created_at: 
         "definition_of_done": [
             "Merged evidence overlapping the frozen UTC window was reviewed for reportable claims",
             "Any created claim or assessment has explicit provenance, uncertainty, and approved or non-approved editorial status",
+            "Every approved assessment intended as a daily-report input declares a reporting_period overlapping the frozen UTC window while as_of remains the actual assessment time",
             "Unsupported or insufficiently corroborated material remains unapproved and is documented as a coverage gap",
             "A queue proposal file records any narrower follow-up duties or an explicit empty proposals list",
             "Two separate self-review rounds passed and a receipt was persisted",

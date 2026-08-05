@@ -2,7 +2,7 @@
   "task_id": "task_20260804_03_ua_analysis_media",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "leased",
+  "state": "pr_open",
   "priority": 85,
   "created_at": "2026-08-04T18:28:29Z",
   "parent_issue": 5,
@@ -59,5 +59,17 @@
     "base_sha": "7d8f3e13261f24e121ec4f8b63c6d200df4e2eb1",
     "leased_at": "2026-08-05T04:41:01Z",
     "lease_until": "2026-08-05T06:41:01Z"
+  },
+  "result": {
+    "branch": "work/task_20260804_03_ua_analysis_media",
+    "pr_number": 16,
+    "completed_at": "2026-08-05T04:48:20Z",
+    "summary": "Persisted one draft source profile and four in-window Ukrainian media source items with canonical URLs, minute timestamps normalized to UTC, provenance notes, quote locators, exclusions, and safety metadata. No final truth assessment was added.",
+    "coverage_gaps": [
+      "Discovery is not exhaustive across all Ukrainian media.",
+      "Search-engine freshness lagged for several Ukrainian outlets.",
+      "No authenticated social-platform or archive API was available.",
+      "No immutable artifacts were captured, so no byte hashes were produced."
+    ]
   }
 }

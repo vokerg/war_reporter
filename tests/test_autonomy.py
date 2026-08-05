@@ -14,7 +14,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 from finalize_merged_task import finalize
 from reconcile_repository import apply_plan, plan_duties, task_index
-from validate_autonomy import validate_auto_merge_trust_boundary, validate_receipt
+from validate_autonomy import proposal_output_allowed, validate_auto_merge_trust_boundary, validate_receipt
 from validate_pr_scope import validate_scope
 
 
@@ -41,6 +41,12 @@ class AutonomyTests(unittest.TestCase):
         })
         (root / "tasks").mkdir()
         return root
+
+    def test_proposals_cannot_grant_control_plane_paths(self) -> None:
+        self.assertTrue(proposal_output_allowed("data/observations/example.ndjson"))
+        self.assertTrue(proposal_output_allowed("catalogs/sources/example.json"))
+        self.assertFalse(proposal_output_allowed("tasks/escalated.json"))
+        self.assertFalse(proposal_output_allowed(".github/workflows/escalated.yml"))
 
     def test_write_capable_controller_uses_trusted_main_validators(self) -> None:
         root = self.make_root()
@@ -166,10 +172,15 @@ class AutonomyTests(unittest.TestCase):
         head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
         self.assertEqual(validate_scope(root, task_id, 3, base, head), [])
         dump(root / "config/forbidden.json", {})
+        widened = json.loads((root / "tasks/task_example.json").read_text())
+        widened["allowed_output_paths"] = ["data/example.json", "config/**"]
+        dump(root / "tasks/task_example.json", widened)
         subprocess.run(["git", "add", "."], cwd=root, check=True)
         subprocess.run(["git", "commit", "-m", "bad"], cwd=root, check=True, stdout=subprocess.DEVNULL)
         bad_head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root, text=True).strip()
-        self.assertTrue(any("outside task scope" in error for error in validate_scope(root, task_id, 3, base, bad_head)))
+        errors = validate_scope(root, task_id, 3, base, bad_head)
+        self.assertTrue(any("outside base task scope" in error for error in errors))
+        self.assertTrue(any("immutable task contract field changed: allowed_output_paths" in error for error in errors))
 
 
 if __name__ == "__main__":

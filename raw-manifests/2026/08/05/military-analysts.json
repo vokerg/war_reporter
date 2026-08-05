@@ -1,0 +1,158 @@
+{
+  "scan_id": "scan_task_20260805_06_military_analysts_run_20260805T051200Z_b6e31d7a",
+  "task_id": "task_20260805_06_military_analysts",
+  "worker_run_id": "run_20260805T051200Z_b6e31d7a",
+  "retrieved_at": "2026-08-05T05:22:30Z",
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
+  },
+  "scope": {
+    "region": "ukraine-war",
+    "topics": [
+      "military-analysis",
+      "capabilities",
+      "logistics"
+    ],
+    "access_classification": "public_web_only"
+  },
+  "search_strategy": {
+    "methods": [
+      "Exact-title and exact-date web search",
+      "Site-restricted search of analyst institutions, specialist outlets, newsletters, and public social indexes",
+      "Direct inspection of accessible institutional archive pages",
+      "UTC-window screening and overlap screening against official and international-media shards"
+    ],
+    "queries": [
+      "Russian Offensive Campaign Assessment August 4 2026",
+      "site:understandingwar.org Ukraine August 4 2026",
+      "site:criticalthreats.org Ukraine August 4 2026",
+      "site:rusi.org Ukraine August 4 2026 military analysis logistics capabilities",
+      "site:warontherocks.com Ukraine August 4 2026 military analysis",
+      "Ukraine military analysis August 5 2026 capabilities logistics analyst",
+      "site:cepa.org August 4 2026 Ukraine defense military analysis",
+      "site:fpri.org Ukraine August 4 2026 military analysis",
+      "site:phillipspobrien.substack.com Ukraine August 5 2026",
+      "site:x.com/RALee85 Ukraine North Korean missile unit August 5 2026",
+      "site:x.com/KofmanMichael Ukraine August 4 2026"
+    ]
+  },
+  "source_checks": [
+    {
+      "source_entity_id": "src_institute_for_study_of_war",
+      "website": "https://understandingwar.org/",
+      "outcome": "no_verified_in_window_primary_item",
+      "notes": "The August 4 assessment was not surfaced by the approved search indexes during the run. The accessible public relay linked the August 3 assessment, but the primary page returned HTTP 403 and its exact publication timestamp could not be verified. The relay time was not substituted for the primary publication time."
+    },
+    {
+      "source_entity_id": "src_royal_united_services_institute",
+      "website": "https://www.rusi.org/",
+      "outcome": "no_verified_in_window_item",
+      "notes": "The accessible Ukraine archive showed relevant publications through July 28 and in-the-news references through August 3, but no qualifying August 4-5 military-analysis publication in the assigned window."
+    },
+    {
+      "source_entity_id": "src_war_on_the_rocks",
+      "website": "https://warontherocks.com/",
+      "outcome": "no_verified_in_window_item",
+      "notes": "Exact-date and site-restricted searches did not surface a qualifying publication."
+    },
+    {
+      "source_entity_id": "src_cepa",
+      "website": "https://cepa.org/",
+      "outcome": "relevant_item_out_of_window_primary_rate_limited",
+      "notes": "Ukraine's Defense Crisis Isn't Over Yet was traced to a CEPA canonical URL, but public relay evidence dated it July 27, outside the task window. Direct primary access returned HTTP 429."
+    },
+    {
+      "source_entity_id": "src_phillips_p_obrien_newsletter",
+      "website": "https://phillipspobrien.substack.com/",
+      "outcome": "no_verified_in_window_scope_item",
+      "notes": "The public archive surfaced a recent non-Ukraine post and the last clearly relevant Ukraine military update on July 26, outside the window."
+    }
+  ],
+  "verified_in_window_item_ids": [],
+  "candidate_leads": [
+    {
+      "source_entity_id": "src_institute_for_study_of_war",
+      "canonical_url": "https://understandingwar.org/research/russia-ukraine/russian-offensive-campaign-assessment-august-3-2026/",
+      "title": "Russian Offensive Campaign Assessment, August 3, 2026",
+      "publication_time_status": "exact_primary_time_unavailable",
+      "window_status": "not_verified",
+      "primary_access": "http_403",
+      "discovery_evidence_url": "https://www.reddit.com/r/ukraine/comments/1vf0eeq/russian_offensive_campaign_assessment_the/",
+      "disposition": "not_persisted_as_source_item"
+    }
+  ],
+  "excluded_secondary_items": [
+    {
+      "canonical_url": "https://www.reuters.com/business/aerospace-defense/north-korean-missile-unit-deploys-russia-ukraine-war-kyiv-says-2026-08-05/",
+      "published_at": "2026-08-05T04:02:16Z",
+      "reason": "Exact in-window media report containing Rob Lee commentary, excluded to avoid overlap with the international-media shard and because the analyst's primary publication was not available."
+    },
+    {
+      "canonical_url": "https://www.businessinsider.com/ukraine-drones-target-lock-strike-even-when-pilot-link-lost-2026-8",
+      "published_at_status": "date_only_search_result",
+      "reason": "Secondary media feature on drone capabilities; exact in-window timestamp was not exposed and the item overlaps the international-media shard."
+    }
+  ],
+  "out_of_window_leads": [
+    {
+      "source_entity_id": "src_cepa",
+      "title": "Ukraine's Defense Crisis Isn't Over Yet",
+      "published_at": "2026-07-27",
+      "canonical_url": "https://cepa.org/article/ukraines-defense-crisis-isnt-over-yet/",
+      "exclusion_reason": "Published before the task window"
+    },
+    {
+      "source_entity_id": "src_phillips_p_obrien_newsletter",
+      "title": "Weekend Update #195: The Worst Week Becomes Much Better (But Not The Best)",
+      "published_at": "2026-07-26",
+      "canonical_url": "https://phillipspobrien.substack.com/p/weekend-update-195-the-worst-week",
+      "exclusion_reason": "Published before the task window"
+    },
+    {
+      "source_entity_id": "src_royal_united_services_institute",
+      "title": "Four Years On: An Update on the Air War Over Ukraine",
+      "published_at": "2026-07-28",
+      "canonical_url": "https://www.rusi.org/explore-our-research/publications/commentary/four-years-update-air-war-over-ukraine",
+      "exclusion_reason": "Published before the task window"
+    }
+  ],
+  "access_failures": [
+    {
+      "url": "https://understandingwar.org/research/russia-ukraine/russian-offensive-campaign-assessment-august-3-2026/",
+      "failure": "HTTP 403 from approved connector",
+      "effect": "No primary full text or exact publication timestamp could be verified"
+    },
+    {
+      "url": "https://www.criticalthreats.org/analysis/",
+      "failure": "HTTP 403 from approved connector",
+      "effect": "The live analysis archive could not be inspected directly"
+    },
+    {
+      "url": "https://cepa.org/article/ukraines-defense-crisis-isnt-over-yet/",
+      "failure": "HTTP 429 from approved connector",
+      "effect": "Primary page metadata and text could not be captured"
+    }
+  ],
+  "coverage_gaps": [
+    "Search-engine indexes lagged live analyst sites and did not expose an August 4 ISW/CTP assessment during the run.",
+    "Several primary institutional pages returned HTTP 403 or 429; no access controls were bypassed.",
+    "Public social-platform search did not expose stable primary analyst posts with exact timestamps and canonical URLs suitable for persistence.",
+    "Secondary media articles containing analyst commentary were excluded to avoid overlap with the international-media shard.",
+    "The zero-item result documents the checked sources and queries and is not an exhaustive statement about the entire open internet."
+  ],
+  "follow_up_task_proposals": [
+    {
+      "task_type": "open_web_discovery",
+      "proposal": "Recheck ISW/CTP archives after indexing catches up and persist the August 4 assessment only if its primary timestamp and canonical page are publicly verifiable."
+    },
+    {
+      "task_type": "open_web_discovery",
+      "proposal": "Recheck public newsletter and social archives for exact-timestamp analyst publications from the window without substituting relay timestamps."
+    }
+  ],
+  "safety_notes": [
+    "No precise current positions, movement tracks, targeting-enabling details, map geometry, or non-public geodata were stored.",
+    "No reliability score, truth assessment, territorial conclusion, or report narrative was produced."
+  ]
+}

@@ -189,3 +189,12 @@ The ordinary command `копай` must bootstrap when needed; the user is not re
 ## Parallel operation
 
 Ten chats may all receive `копай` at once. They share project instructions but coordinate only through GitHub. Project memory is not a lock and must never be used to decide task ownership.
+
+## Canonicalization and bootstrap gate
+
+Discovery workers must not create extraction, claim, corroboration, assessment, map-publication, or report tasks unless repository validation confirms that source-profile and source-item canonicalization is complete.
+
+A worker may bootstrap a new campaign only when all queue backpressure checks pass simultaneously: no eligible ready tasks, no active leases, no open worker PRs, the prior campaign is closed or explicitly carried over, and the configured backlog limit is not exceeded. “No eligible ready task” alone never means “no work exists.”
+
+The repository currently uses one GitHub identity for worker and merge-controller actions. Review is therefore **administrative review**, not cryptographically independent review. Research PRs must not describe this arrangement as independent review unless distinct authenticated identities are configured and enforced.
+

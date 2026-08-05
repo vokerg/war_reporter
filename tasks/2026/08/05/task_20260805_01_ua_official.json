@@ -1,32 +1,11 @@
 {
-  "task_id": "task_20260805_01_ua_official",
-  "task_type": "open_web_discovery",
-  "role": "open-web-discovery",
-  "state": "merged",
-  "priority": 90,
-  "created_at": "2026-08-05T05:06:14Z",
-  "parent_issue": 33,
-  "issue_number": 35,
-  "depends_on_task_ids": [],
-  "window": {"from": "2026-08-04T18:00:00Z", "to": "2026-08-05T05:00:00Z"},
-  "scope": {
-    "source_ids": [],
-    "source_groups": [],
-    "regions": ["ukraine-war"],
-    "topics": ["ukrainian-official-statements", "frontline", "strikes"],
-    "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"]
-  },
-  "exclusions": [
-    "Items already represented by canonical URL, platform ID, or content hash",
-    "Access-control bypass, private material, and unsafe non-public geodata",
-    "Precise current operational positions or targeting-enabling detail"
-  ],
   "allowed_output_paths": [
     "catalogs/sources/2026/08/05/ua-official.json",
     "data/source-items/2026/08/05/ua-official.ndjson",
     "data/artifacts/2026/08/05/ua-official.ndjson",
     "raw-manifests/2026/08/05/ua-official.json"
   ],
+  "created_at": "2026-08-05T05:06:14Z",
   "definition_of_done": [
     "The assigned public-web discovery shard and UTC window were searched",
     "Primary publications were preferred and upstream lineage was recorded",
@@ -34,25 +13,60 @@
     "Candidate source profiles and follow-up task proposals were persisted when justified",
     "No final truth assessment, territorial conclusion, or report narrative was added"
   ],
+  "depends_on_task_ids": [],
+  "exclusions": [
+    "Items already represented by canonical URL, platform ID, or content hash",
+    "Access-control bypass, private material, and unsafe non-public geodata",
+    "Precise current operational positions or targeting-enabling detail"
+  ],
   "idempotency_key": "open_web_discovery:ua-official:20260804T1800Z:20260805T0500Z:ukraine-war",
-  "lease": {
-    "worker_run_id": "run_20260805T051000Z_4c8e7a21",
-    "lease_branch": "work/task_20260805_01_ua_official",
-    "base_sha": "38f03b1edb29ee38762460a653474f9d52b6c89b",
-    "leased_at": "2026-08-05T05:10:21Z",
-    "lease_until": "2026-08-05T07:10:21Z"
-  },
+  "issue_number": 35,
+  "lease": null,
+  "parent_issue": 33,
+  "priority": 90,
   "result": {
     "branch": "work/task_20260805_01_ua_official",
-    "pr_number": 36,
-    "completed_at": "2026-08-05T05:14:00Z",
-    "summary": "Registered five in-window Ukrainian official source items: two General Staff publications and three DSNS aftermath/casualty updates, with explicit revision lineage and operational-safety exclusions. Existing canonical source profiles were reused; no immutable artifacts or final assessments were created.",
+    "completed_at": "2026-08-05T05:18:15Z",
     "coverage_gaps": [
       "Telegram public previews do not provide API-grade completeness, stable content hashes, or edit history.",
       "Real-time Air Force alerts were excluded for operational-safety reasons, and no safe aggregate Air Force summary was visible before the cutoff.",
       "The General Staff losses infographic was registered only as metadata; its image contents were not captured or verified.",
       "DSNS casualty figures changed across updates and remain attributable official statements rather than assessed facts.",
       "This bounded scan is not an exhaustive search of every Ukrainian government or military account."
+    ],
+    "merge_sha": "6ea834cbb14815f967ff5ec2f180264c7f8d90e0",
+    "merged_at": "2026-08-05T05:18:15Z",
+    "pr_number": 36,
+    "summary": "Registered five in-window Ukrainian official source items: two General Staff publications and three DSNS aftermath/casualty updates, with explicit revision lineage and operational-safety exclusions. Existing canonical source profiles were reused; no immutable artifacts or final assessments were created."
+  },
+  "role": "open-web-discovery",
+  "scope": {
+    "content_types": [
+      "post",
+      "article",
+      "report",
+      "briefing",
+      "document",
+      "image",
+      "video",
+      "map"
+    ],
+    "regions": [
+      "ukraine-war"
+    ],
+    "source_groups": [],
+    "source_ids": [],
+    "topics": [
+      "ukrainian-official-statements",
+      "frontline",
+      "strikes"
     ]
+  },
+  "state": "merged",
+  "task_id": "task_20260805_01_ua_official",
+  "task_type": "open_web_discovery",
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
   }
 }

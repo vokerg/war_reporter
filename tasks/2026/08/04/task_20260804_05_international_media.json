@@ -1,28 +1,45 @@
 {
-  "task_id": "task_20260804_05_international_media",
-  "task_type": "open_web_discovery",
-  "role": "open-web-discovery",
-  "state": "merged",
-  "priority": 80,
+  "allowed_output_paths": [
+    "catalogs/sources/2026/08/04/international-media.json",
+    "data/source-items/2026/08/04/international-media.ndjson",
+    "data/artifacts/2026/08/04/international-media.ndjson",
+    "raw-manifests/2026/08/04/international-media.json"
+  ],
   "created_at": "2026-08-04T18:28:29Z",
-  "parent_issue": 5,
-  "issue_number": 13,
+  "definition_of_done": [
+    "The assigned public-web discovery shard and UTC window were searched",
+    "Primary publications were preferred and upstream lineage was recorded",
+    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
+    "Candidate source profiles and follow-up task proposals were persisted when justified",
+    "No final truth assessment, territorial conclusion, or report narrative was added"
+  ],
   "depends_on_task_ids": [],
-  "window": {
-    "from": "2026-08-03T18:00:00Z",
-    "to": "2026-08-04T18:00:00Z"
+  "exclusions": [
+    "Items already represented by canonical URL, platform ID, or content hash",
+    "Access-control bypass, private material, and unsafe non-public geodata",
+    "Precise current operational positions or targeting-enabling detail"
+  ],
+  "idempotency_key": "open_web_discovery:international-media:20260803T1800Z:20260804T1800Z:ukraine-war",
+  "issue_number": 13,
+  "lease": null,
+  "parent_issue": 5,
+  "priority": 80,
+  "result": {
+    "branch": "work/task_20260804_05_international_media",
+    "completed_at": "2026-08-05T05:11:21Z",
+    "coverage_gaps": [
+      "Only four items from two outlets had publication timestamps verified inside the bounded UTC window.",
+      "Associated Press candidates were excluded because exact publication timestamps could not be verified against the cutoff.",
+      "BBC, CNN, DW and France 24 candidate pages were not retrievable through the approved connector because of robots/access restrictions.",
+      "No image, video, map or immutable webpage artifacts were captured."
+    ],
+    "merge_sha": "c611b6ecf0f095314e853b82af939eb39749dc70",
+    "merged_at": "2026-08-05T05:11:21Z",
+    "pr_number": 18,
+    "summary": "Registered four international-media items with verified publication timestamps inside the bounded UTC window, three draft source profiles, explicit lineage notes, exclusions, access failures, and follow-up task proposals."
   },
+  "role": "open-web-discovery",
   "scope": {
-    "source_ids": [],
-    "source_groups": [],
-    "regions": [
-      "ukraine-war"
-    ],
-    "topics": [
-      "international-media",
-      "operations",
-      "external-support"
-    ],
     "content_types": [
       "post",
       "article",
@@ -32,44 +49,23 @@
       "image",
       "video",
       "map"
+    ],
+    "regions": [
+      "ukraine-war"
+    ],
+    "source_groups": [],
+    "source_ids": [],
+    "topics": [
+      "international-media",
+      "operations",
+      "external-support"
     ]
   },
-  "exclusions": [
-    "Items already represented by canonical URL, platform ID, or content hash",
-    "Access-control bypass, private material, and unsafe non-public geodata",
-    "Precise current operational positions or targeting-enabling detail"
-  ],
-  "allowed_output_paths": [
-    "catalogs/sources/2026/08/04/international-media.json",
-    "data/source-items/2026/08/04/international-media.ndjson",
-    "data/artifacts/2026/08/04/international-media.ndjson",
-    "raw-manifests/2026/08/04/international-media.json"
-  ],
-  "definition_of_done": [
-    "The assigned public-web discovery shard and UTC window were searched",
-    "Primary publications were preferred and upstream lineage was recorded",
-    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
-    "Candidate source profiles and follow-up task proposals were persisted when justified",
-    "No final truth assessment, territorial conclusion, or report narrative was added"
-  ],
-  "idempotency_key": "open_web_discovery:international-media:20260803T1800Z:20260804T1800Z:ukraine-war",
-  "lease": {
-    "worker_run_id": "run_20260805T044109Z_5e6c91a4",
-    "lease_branch": "work/task_20260804_05_international_media",
-    "base_sha": "7d8f3e13261f24e121ec4f8b63c6d200df4e2eb1",
-    "leased_at": "2026-08-05T04:41:20Z",
-    "lease_until": "2026-08-05T06:41:20Z"
-  },
-  "result": {
-    "branch": "work/task_20260804_05_international_media",
-    "pr_number": 18,
-    "completed_at": "2026-08-05T04:47:30Z",
-    "summary": "Registered four international-media items with verified publication timestamps inside the bounded UTC window, three draft source profiles, explicit lineage notes, exclusions, access failures, and follow-up task proposals.",
-    "coverage_gaps": [
-      "Only four items from two outlets had publication timestamps verified inside the bounded UTC window.",
-      "Associated Press candidates were excluded because exact publication timestamps could not be verified against the cutoff.",
-      "BBC, CNN, DW and France 24 candidate pages were not retrievable through the approved connector because of robots/access restrictions.",
-      "No image, video, map or immutable webpage artifacts were captured."
-    ]
+  "state": "merged",
+  "task_id": "task_20260804_05_international_media",
+  "task_type": "open_web_discovery",
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
   }
 }

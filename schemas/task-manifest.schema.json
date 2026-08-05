@@ -4,43 +4,19 @@
   "title": "Task manifest",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "task_id",
-    "task_type",
-    "state",
-    "window",
-    "scope",
-    "exclusions",
-    "allowed_output_paths",
-    "definition_of_done",
-    "idempotency_key"
-  ],
+  "required": ["task_id", "task_type", "state", "window", "scope", "exclusions", "allowed_output_paths", "definition_of_done", "idempotency_key"],
   "properties": {
     "task_id": {"type": "string", "pattern": "^task_[a-z0-9][a-z0-9_-]*$"},
     "task_type": {
-      "enum": [
-        "campaign", "source_scan", "open_web_discovery", "extract_observations",
-        "investigate_claim", "source_profile_review", "map_update", "daily_report",
-        "weekly_report", "snapshot_report", "translate_report", "correction", "validation"
-      ]
+      "enum": ["campaign", "source_scan", "open_web_discovery", "extract_observations", "investigate_claim", "source_profile_review", "map_update", "daily_report", "weekly_report", "snapshot_report", "translate_report", "correction", "validation"]
     },
     "role": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
-    "state": {
-      "enum": [
-        "planned", "ready", "leased", "collecting", "pr_open", "validating",
-        "review", "merged", "blocked", "lease_expired", "rejected", "cancelled", "duplicate"
-      ]
-    },
+    "state": {"enum": ["planned", "ready", "leased", "collecting", "pr_open", "validating", "review", "merged", "blocked", "lease_expired", "rejected", "cancelled", "duplicate"]},
     "priority": {"type": "integer", "minimum": 0, "maximum": 100, "default": 50},
     "created_at": {"type": "string", "format": "date-time"},
     "parent_issue": {"type": ["integer", "null"], "minimum": 1},
     "issue_number": {"type": ["integer", "null"], "minimum": 1},
-    "depends_on_task_ids": {
-      "type": "array",
-      "items": {"type": "string", "pattern": "^task_[a-z0-9][a-z0-9_-]*$"},
-      "uniqueItems": true,
-      "default": []
-    },
+    "depends_on_task_ids": {"type": "array", "items": {"type": "string", "pattern": "^task_[a-z0-9][a-z0-9_-]*$"}, "uniqueItems": true, "default": []},
     "window": {
       "type": "object",
       "additionalProperties": false,
@@ -55,35 +31,16 @@
       "additionalProperties": false,
       "required": ["source_ids", "regions", "topics", "content_types"],
       "properties": {
-        "source_ids": {
-          "type": "array",
-          "items": {"type": "string", "pattern": "^src_[a-z0-9][a-z0-9_-]*$"},
-          "uniqueItems": true
-        },
-        "source_groups": {
-          "type": "array",
-          "items": {"type": "string", "minLength": 1},
-          "uniqueItems": true,
-          "default": []
-        },
+        "source_ids": {"type": "array", "items": {"type": "string", "pattern": "^src_[a-z0-9][a-z0-9_-]*$"}, "uniqueItems": true},
+        "source_groups": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true, "default": []},
         "regions": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
         "topics": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
         "content_types": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
       }
     },
     "exclusions": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
-    "allowed_output_paths": {
-      "type": "array",
-      "minItems": 1,
-      "items": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"},
-      "uniqueItems": true
-    },
-    "definition_of_done": {
-      "type": "array",
-      "minItems": 1,
-      "items": {"type": "string", "minLength": 1},
-      "uniqueItems": true
-    },
+    "allowed_output_paths": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"}, "uniqueItems": true},
+    "definition_of_done": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
     "idempotency_key": {"type": "string", "minLength": 8},
     "lease": {
       "type": ["object", "null"],
@@ -106,12 +63,10 @@
         "branch": {"type": "string", "pattern": "^work/task_[a-z0-9][a-z0-9_-]*$"},
         "pr_number": {"type": "integer", "minimum": 1},
         "completed_at": {"type": ["string", "null"], "format": "date-time"},
+        "merge_sha": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+        "merged_at": {"type": "string", "format": "date-time"},
         "summary": {"type": "string", "minLength": 1},
-        "coverage_gaps": {
-          "type": "array",
-          "items": {"type": "string", "minLength": 1},
-          "uniqueItems": true
-        }
+        "coverage_gaps": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
       }
     }
   },
@@ -121,12 +76,16 @@
       "then": {"required": ["lease"], "properties": {"lease": {"type": "object"}}}
     },
     {
-      "if": {"properties": {"state": {"enum": ["planned", "ready"]}}, "required": ["state"]},
+      "if": {"properties": {"state": {"enum": ["planned", "ready", "merged", "blocked", "lease_expired", "rejected", "cancelled", "duplicate"]}}, "required": ["state"]},
       "then": {"properties": {"lease": {"type": "null"}}}
     },
     {
       "if": {"properties": {"state": {"enum": ["pr_open", "validating", "review", "merged"]}}, "required": ["state"]},
       "then": {"required": ["result"]}
+    },
+    {
+      "if": {"properties": {"state": {"const": "merged"}}, "required": ["state"]},
+      "then": {"properties": {"result": {"required": ["branch", "pr_number", "merge_sha", "merged_at"]}}}
     },
     {
       "if": {"properties": {"state": {"const": "blocked"}}, "required": ["state"]},

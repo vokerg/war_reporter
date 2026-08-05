@@ -1,28 +1,45 @@
 {
-  "task_id": "task_20260804_02_ru_official",
-  "task_type": "open_web_discovery",
-  "role": "open-web-discovery",
-  "state": "merged",
-  "priority": 90,
+  "allowed_output_paths": [
+    "catalogs/sources/2026/08/04/ru-official.json",
+    "data/source-items/2026/08/04/ru-official.ndjson",
+    "data/artifacts/2026/08/04/ru-official.ndjson",
+    "raw-manifests/2026/08/04/ru-official.json"
+  ],
   "created_at": "2026-08-04T18:28:29Z",
-  "parent_issue": 5,
-  "issue_number": 9,
+  "definition_of_done": [
+    "The assigned public-web discovery shard and UTC window were searched",
+    "Primary publications were preferred and upstream lineage was recorded",
+    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
+    "Candidate source profiles and follow-up task proposals were persisted when justified",
+    "No final truth assessment, territorial conclusion, or report narrative was added"
+  ],
   "depends_on_task_ids": [],
-  "window": {
-    "from": "2026-08-03T18:00:00Z",
-    "to": "2026-08-04T18:00:00Z"
+  "exclusions": [
+    "Items already represented by canonical URL, platform ID, or content hash",
+    "Access-control bypass, private material, and unsafe non-public geodata",
+    "Precise current operational positions or targeting-enabling detail"
+  ],
+  "idempotency_key": "open_web_discovery:ru-official:20260803T1800Z:20260804T1800Z:ukraine-war",
+  "issue_number": 9,
+  "lease": null,
+  "parent_issue": 5,
+  "priority": 90,
+  "result": {
+    "branch": "work/task_20260804_02_ru_official",
+    "completed_at": "2026-08-05T05:00:19Z",
+    "coverage_gaps": [
+      "Telegram public previews expose only a recent window and may not preserve later edits or deletions.",
+      "No immutable page captures were stored; source-item content hashes and artifact manifests therefore remain absent.",
+      "MAX and VK mirrors were not collected because the public-web search did not provide equally stable, directly inspectable post pages.",
+      "This is a bounded discovery pass, not an exhaustive survey of every Russian federal or regional official account."
+    ],
+    "merge_sha": "125bde9ef75f17def6458c16b43bbae0617d26c1",
+    "merged_at": "2026-08-05T05:00:19Z",
+    "pr_number": 12,
+    "summary": "Recorded three draft candidate profiles for Russian official sources and six in-window Russian Ministry of Defence Telegram source items, including explicit upstream lineage for the daily summary. No truth assessment or immutable artifact capture was added."
   },
+  "role": "open-web-discovery",
   "scope": {
-    "source_ids": [],
-    "source_groups": [],
-    "regions": [
-      "ukraine-war"
-    ],
-    "topics": [
-      "russian-official-statements",
-      "frontline",
-      "strikes"
-    ],
     "content_types": [
       "post",
       "article",
@@ -32,44 +49,23 @@
       "image",
       "video",
       "map"
+    ],
+    "regions": [
+      "ukraine-war"
+    ],
+    "source_groups": [],
+    "source_ids": [],
+    "topics": [
+      "russian-official-statements",
+      "frontline",
+      "strikes"
     ]
   },
-  "exclusions": [
-    "Items already represented by canonical URL, platform ID, or content hash",
-    "Access-control bypass, private material, and unsafe non-public geodata",
-    "Precise current operational positions or targeting-enabling detail"
-  ],
-  "allowed_output_paths": [
-    "catalogs/sources/2026/08/04/ru-official.json",
-    "data/source-items/2026/08/04/ru-official.ndjson",
-    "data/artifacts/2026/08/04/ru-official.ndjson",
-    "raw-manifests/2026/08/04/ru-official.json"
-  ],
-  "definition_of_done": [
-    "The assigned public-web discovery shard and UTC window were searched",
-    "Primary publications were preferred and upstream lineage was recorded",
-    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
-    "Candidate source profiles and follow-up task proposals were persisted when justified",
-    "No final truth assessment, territorial conclusion, or report narrative was added"
-  ],
-  "idempotency_key": "open_web_discovery:ru-official:20260803T1800Z:20260804T1800Z:ukraine-war",
-  "lease": {
-    "worker_run_id": "run_20260805T044015Z_8ecdaa09",
-    "lease_branch": "work/task_20260804_02_ru_official",
-    "base_sha": "7d8f3e13261f24e121ec4f8b63c6d200df4e2eb1",
-    "leased_at": "2026-08-05T04:40:52Z",
-    "lease_until": "2026-08-05T06:40:52Z"
-  },
-  "result": {
-    "branch": "work/task_20260804_02_ru_official",
-    "pr_number": 12,
-    "completed_at": "2026-08-05T04:59:30Z",
-    "summary": "Recorded three draft candidate profiles for Russian official sources and six in-window Russian Ministry of Defence Telegram source items, including explicit upstream lineage for the daily summary. No truth assessment or immutable artifact capture was added.",
-    "coverage_gaps": [
-      "Telegram public previews expose only a recent window and may not preserve later edits or deletions.",
-      "No immutable page captures were stored; source-item content hashes and artifact manifests therefore remain absent.",
-      "MAX and VK mirrors were not collected because the public-web search did not provide equally stable, directly inspectable post pages.",
-      "This is a bounded discovery pass, not an exhaustive survey of every Russian federal or regional official account."
-    ]
+  "state": "merged",
+  "task_id": "task_20260804_02_ru_official",
+  "task_type": "open_web_discovery",
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
   }
 }

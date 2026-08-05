@@ -116,7 +116,9 @@
     },
     {
       "task_type": "source_scan",
-      "input_source_ids": ["src_air_force_ua"],
+      "input_source_ids": [
+        "src_air_force_ua"
+      ],
       "purpose": "Search for a later safe aggregate air-attack summary without retaining real-time route or movement alerts."
     }
   ],
@@ -124,5 +126,6 @@
     "No precise current positions, movement routes, or active-unit locations were persisted.",
     "Granular frontline localities and active-response facility details were omitted from excerpts and summaries.",
     "No final truth assessment, territorial conclusion, reliability score, or report narrative was created."
-  ]
+  ],
+  "retrieved_at": "2026-08-05T05:12:30Z"
 }

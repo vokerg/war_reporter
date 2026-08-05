@@ -1,28 +1,45 @@
 {
-  "task_id": "task_20260804_03_ua_analysis_media",
-  "task_type": "open_web_discovery",
-  "role": "open-web-discovery",
-  "state": "merged",
-  "priority": 85,
+  "allowed_output_paths": [
+    "catalogs/sources/2026/08/04/ua-analysis-media.json",
+    "data/source-items/2026/08/04/ua-analysis-media.ndjson",
+    "data/artifacts/2026/08/04/ua-analysis-media.ndjson",
+    "raw-manifests/2026/08/04/ua-analysis-media.json"
+  ],
   "created_at": "2026-08-04T18:28:29Z",
-  "parent_issue": 5,
-  "issue_number": 11,
+  "definition_of_done": [
+    "The assigned public-web discovery shard and UTC window were searched",
+    "Primary publications were preferred and upstream lineage was recorded",
+    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
+    "Candidate source profiles and follow-up task proposals were persisted when justified",
+    "No final truth assessment, territorial conclusion, or report narrative was added"
+  ],
   "depends_on_task_ids": [],
-  "window": {
-    "from": "2026-08-03T18:00:00Z",
-    "to": "2026-08-04T18:00:00Z"
+  "exclusions": [
+    "Items already represented by canonical URL, platform ID, or content hash",
+    "Access-control bypass, private material, and unsafe non-public geodata",
+    "Precise current operational positions or targeting-enabling detail"
+  ],
+  "idempotency_key": "open_web_discovery:ua-analysis-media:20260803T1800Z:20260804T1800Z:ukraine-war",
+  "issue_number": 11,
+  "lease": null,
+  "parent_issue": 5,
+  "priority": 85,
+  "result": {
+    "branch": "work/task_20260804_03_ua_analysis_media",
+    "completed_at": "2026-08-05T05:06:41Z",
+    "coverage_gaps": [
+      "Discovery is not exhaustive across all Ukrainian media.",
+      "Search-engine freshness lagged for several Ukrainian outlets.",
+      "No authenticated social-platform or archive API was available.",
+      "No immutable artifacts were captured, so no byte hashes were produced."
+    ],
+    "merge_sha": "b47c2b6a05d0e4e6ce3a795327333a044d9e096c",
+    "merged_at": "2026-08-05T05:06:41Z",
+    "pr_number": 16,
+    "summary": "Persisted one draft source profile and four in-window Ukrainian media source items with canonical URLs, minute timestamps normalized to UTC, provenance notes, quote locators, exclusions, and safety metadata. No final truth assessment was added. Merge completion was explicitly authorized by the repository administrator."
   },
+  "role": "open-web-discovery",
   "scope": {
-    "source_ids": [],
-    "source_groups": [],
-    "regions": [
-      "ukraine-war"
-    ],
-    "topics": [
-      "ukrainian-analysis",
-      "ukrainian-media",
-      "operations"
-    ],
     "content_types": [
       "post",
       "article",
@@ -32,44 +49,23 @@
       "image",
       "video",
       "map"
+    ],
+    "regions": [
+      "ukraine-war"
+    ],
+    "source_groups": [],
+    "source_ids": [],
+    "topics": [
+      "ukrainian-analysis",
+      "ukrainian-media",
+      "operations"
     ]
   },
-  "exclusions": [
-    "Items already represented by canonical URL, platform ID, or content hash",
-    "Access-control bypass, private material, and unsafe non-public geodata",
-    "Precise current operational positions or targeting-enabling detail"
-  ],
-  "allowed_output_paths": [
-    "catalogs/sources/2026/08/04/ua-analysis-media.json",
-    "data/source-items/2026/08/04/ua-analysis-media.ndjson",
-    "data/artifacts/2026/08/04/ua-analysis-media.ndjson",
-    "raw-manifests/2026/08/04/ua-analysis-media.json"
-  ],
-  "definition_of_done": [
-    "The assigned public-web discovery shard and UTC window were searched",
-    "Primary publications were preferred and upstream lineage was recorded",
-    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
-    "Candidate source profiles and follow-up task proposals were persisted when justified",
-    "No final truth assessment, territorial conclusion, or report narrative was added"
-  ],
-  "idempotency_key": "open_web_discovery:ua-analysis-media:20260803T1800Z:20260804T1800Z:ukraine-war",
-  "lease": {
-    "worker_run_id": "run_20260805T044101Z_bf89d16c",
-    "lease_branch": "work/task_20260804_03_ua_analysis_media",
-    "base_sha": "7d8f3e13261f24e121ec4f8b63c6d200df4e2eb1",
-    "leased_at": "2026-08-05T04:41:01Z",
-    "lease_until": "2026-08-05T06:41:01Z"
-  },
-  "result": {
-    "branch": "work/task_20260804_03_ua_analysis_media",
-    "pr_number": 16,
-    "completed_at": "2026-08-05T04:48:20Z",
-    "summary": "Persisted one draft source profile and four in-window Ukrainian media source items with canonical URLs, minute timestamps normalized to UTC, provenance notes, quote locators, exclusions, and safety metadata. No final truth assessment was added. Merge completion was explicitly authorized by the repository administrator.",
-    "coverage_gaps": [
-      "Discovery is not exhaustive across all Ukrainian media.",
-      "Search-engine freshness lagged for several Ukrainian outlets.",
-      "No authenticated social-platform or archive API was available.",
-      "No immutable artifacts were captured, so no byte hashes were produced."
-    ]
+  "state": "merged",
+  "task_id": "task_20260804_03_ua_analysis_media",
+  "task_type": "open_web_discovery",
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
   }
 }

@@ -1,28 +1,46 @@
 {
-  "task_id": "task_20260805_02_ru_official",
-  "task_type": "open_web_discovery",
-  "role": "open-web-discovery",
-  "state": "merged",
-  "priority": 90,
+  "allowed_output_paths": [
+    "catalogs/sources/2026/08/05/ru-official.json",
+    "data/source-items/2026/08/05/ru-official.ndjson",
+    "data/artifacts/2026/08/05/ru-official.ndjson",
+    "raw-manifests/2026/08/05/ru-official.json"
+  ],
   "created_at": "2026-08-05T05:06:14Z",
-  "parent_issue": 33,
-  "issue_number": 40,
+  "definition_of_done": [
+    "The assigned public-web discovery shard and UTC window were searched",
+    "Primary publications were preferred and upstream lineage was recorded",
+    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
+    "Candidate source profiles and follow-up task proposals were persisted when justified",
+    "No final truth assessment, territorial conclusion, or report narrative was added"
+  ],
   "depends_on_task_ids": [],
-  "window": {
-    "from": "2026-08-04T18:00:00Z",
-    "to": "2026-08-05T05:00:00Z"
+  "exclusions": [
+    "Items already represented by canonical URL, platform ID, or content hash",
+    "Access-control bypass, private material, and unsafe non-public geodata",
+    "Precise current operational positions or targeting-enabling detail"
+  ],
+  "idempotency_key": "open_web_discovery:ru-official:20260804T1800Z:20260805T0500Z:ukraine-war",
+  "issue_number": 40,
+  "lease": null,
+  "parent_issue": 33,
+  "priority": 90,
+  "result": {
+    "branch": "work/task_20260805_02_ru_official",
+    "completed_at": "2026-08-05T05:27:31Z",
+    "coverage_gaps": [
+      "Telegram public previews may not preserve later edits or deletions.",
+      "No immutable page or video capture was stored; content hashes and artifact records therefore remain absent.",
+      "The two retained posts are source-attributed Ministry statements and were not independently corroborated or assessed.",
+      "MAX and VK mirrors were not collected because equally stable, directly inspectable post pages were not located during the bounded pass.",
+      "This is a bounded discovery pass, not an exhaustive survey of every Russian federal, military, or regional official account."
+    ],
+    "merge_sha": "b6e4ebe8ccdd19f5fa3b52e7be51c632659427f0",
+    "merged_at": "2026-08-05T05:27:31Z",
+    "pr_number": 43,
+    "summary": "Recorded two Russian Ministry of Defence Telegram source items published inside the bounded night window. Existing Russian official source profiles were reused; no new profile, immutable artifact, truth assessment, or report narrative was added. A second self-review confirmed timestamp normalization, identifier consistency, source-profile resolution, path scope, lineage disclosure, and safety boundaries."
   },
+  "role": "open-web-discovery",
   "scope": {
-    "source_ids": [],
-    "source_groups": [],
-    "regions": [
-      "ukraine-war"
-    ],
-    "topics": [
-      "russian-official-statements",
-      "frontline",
-      "strikes"
-    ],
     "content_types": [
       "post",
       "article",
@@ -32,45 +50,23 @@
       "image",
       "video",
       "map"
+    ],
+    "regions": [
+      "ukraine-war"
+    ],
+    "source_groups": [],
+    "source_ids": [],
+    "topics": [
+      "russian-official-statements",
+      "frontline",
+      "strikes"
     ]
   },
-  "exclusions": [
-    "Items already represented by canonical URL, platform ID, or content hash",
-    "Access-control bypass, private material, and unsafe non-public geodata",
-    "Precise current operational positions or targeting-enabling detail"
-  ],
-  "allowed_output_paths": [
-    "catalogs/sources/2026/08/05/ru-official.json",
-    "data/source-items/2026/08/05/ru-official.ndjson",
-    "data/artifacts/2026/08/05/ru-official.ndjson",
-    "raw-manifests/2026/08/05/ru-official.json"
-  ],
-  "definition_of_done": [
-    "The assigned public-web discovery shard and UTC window were searched",
-    "Primary publications were preferred and upstream lineage was recorded",
-    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
-    "Candidate source profiles and follow-up task proposals were persisted when justified",
-    "No final truth assessment, territorial conclusion, or report narrative was added"
-  ],
-  "idempotency_key": "open_web_discovery:ru-official:20260804T1800Z:20260805T0500Z:ukraine-war",
-  "lease": {
-    "worker_run_id": "run_20260805T051015Z_4f7c2a91",
-    "lease_branch": "work/task_20260805_02_ru_official",
-    "base_sha": "38f03b1edb29ee38762460a653474f9d52b6c89b",
-    "leased_at": "2026-08-05T05:11:27Z",
-    "lease_until": "2026-08-05T07:11:27Z"
-  },
-  "result": {
-    "branch": "work/task_20260805_02_ru_official",
-    "pr_number": 43,
-    "completed_at": "2026-08-05T05:24:00Z",
-    "summary": "Recorded two Russian Ministry of Defence Telegram source items published inside the bounded night window. Existing Russian official source profiles were reused; no new profile, immutable artifact, truth assessment, or report narrative was added. A second self-review confirmed timestamp normalization, identifier consistency, source-profile resolution, path scope, lineage disclosure, and safety boundaries.",
-    "coverage_gaps": [
-      "Telegram public previews may not preserve later edits or deletions.",
-      "No immutable page or video capture was stored; content hashes and artifact records therefore remain absent.",
-      "The two retained posts are source-attributed Ministry statements and were not independently corroborated or assessed.",
-      "MAX and VK mirrors were not collected because equally stable, directly inspectable post pages were not located during the bounded pass.",
-      "This is a bounded discovery pass, not an exhaustive survey of every Russian federal, military, or regional official account."
-    ]
+  "state": "merged",
+  "task_id": "task_20260805_02_ru_official",
+  "task_type": "open_web_discovery",
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
   }
 }

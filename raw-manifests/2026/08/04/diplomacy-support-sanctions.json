@@ -1,19 +1,111 @@
 {
-  "task_id": "task_20260804_09_diplomacy_support_sanctions",
-  "worker_run_id": "run_20260805T0441Z_2e7f52cd",
-  "window": {
-    "from": "2026-08-03T18:00:00Z",
-    "to": "2026-08-04T18:00:00Z"
-  },
+  "access_failures": [
+    {
+      "impact": "Primary-source lineage remains descriptive rather than linked.",
+      "status": "not_found_in_index",
+      "target": "August 4 Turkish Foreign Ministry statement cited by Reuters"
+    },
+    {
+      "impact": "The legal text and decree number remain unresolved.",
+      "status": "not_found_in_index",
+      "target": "August 4 Russian presidential decree cited by Reuters"
+    }
+  ],
+  "artifact_note": "No immutable article copies or media were downloaded. The artifact NDJSON is intentionally empty; canonical URLs and retrieval metadata were preserved instead.",
+  "artifacts": [],
+  "coverage_gaps": [
+    "No directly accessible primary Turkish statement was found for the August 4 navigation-safety call.",
+    "No directly accessible official Russian decree text was found for the Type C account amendment.",
+    "No separate public transcript was found for the agriculture minister interview quoted by Reuters.",
+    "The retained set is English-language and Reuters-only; it should be supplemented with primary Turkish, Ukrainian, and Russian records before downstream assessment."
+  ],
+  "excluded_candidates": [
+    {
+      "reason": "Published at 2026-08-03T09:33:11Z, before the task window opened.",
+      "url": "https://apnews.com/article/russia-ukraine-war-glide-bombs-patriots-zaporizhzhia-9e4000f63b54cf814704ff60373f2bb9"
+    }
+  ],
+  "follow_up_task_proposals": [
+    {
+      "proposal": "Acquire and identify the canonical Turkish Foreign Ministry statement underlying item_reuters_20260804_black_sea_navigation.",
+      "task_type": "source_research"
+    },
+    {
+      "proposal": "Acquire the official Russian decree text, number, and publication record underlying item_reuters_20260804_type_c_deposits.",
+      "task_type": "source_research"
+    },
+    {
+      "proposal": "Locate Ukrainian government records or a transcript corresponding to the agriculture minister's Black Sea security appeal.",
+      "task_type": "corroboration"
+    }
+  ],
+  "items": [
+    {
+      "canonical_url": "https://www.reuters.com/world/middle-east/turkey-calls-russia-ukraine-ensure-black-sea-safety-after-drone-attack-2026-08-04/",
+      "discovery_note": "Reports a Turkish Foreign Ministry call directed at both Russia and Ukraine after a Turkish-owned vessel was struck. Retained as a diplomatic signal; attribution and incident responsibility are not assessed here.",
+      "publication_timestamp_basis": "Reuters page timestamp",
+      "quote_locator": "Headline and body paragraphs immediately following the 2026-08-04 09:14 UTC timestamp.",
+      "short_excerpt": "take measures to ensure navigational safety in the Black Sea",
+      "source_item_id": "item_reuters_20260804_black_sea_navigation",
+      "topic_tags": [
+        "diplomacy",
+        "black-sea-navigation"
+      ],
+      "upstream_lineage": {
+        "described_source": "Republic of Türkiye Ministry of Foreign Affairs statement",
+        "public_upstream_url_found": false
+      }
+    },
+    {
+      "canonical_url": "https://www.reuters.com/world/ukraine-turns-alternative-grain-export-routes-counts-losses-russia-blocks-ports-2026-08-04/",
+      "discovery_note": "Contains an appeal by Ukraine's agriculture minister for allied help securing Black Sea export operations. Retained as a support request and food-security diplomacy lead, not as verification of strike or loss figures.",
+      "publication_timestamp_basis": "Reuters page timestamp",
+      "quote_locator": "Section headed NO LONG-TERM ALTERNATIVE and the final paragraphs on Black Sea security.",
+      "short_excerpt": "There is no alternative to the ports of Odesa",
+      "source_item_id": "item_20260804_reuters_grain_routes",
+      "topic_tags": [
+        "military-support",
+        "diplomacy",
+        "black-sea-security",
+        "food-security"
+      ],
+      "upstream_lineage": {
+        "described_source": "Reuters interview with Ukrainian Agriculture Minister Taras Vysotskyi",
+        "public_upstream_url_found": false
+      }
+    },
+    {
+      "canonical_url": "https://www.reuters.com/business/finance/putin-lifts-recent-deposit-restrictions-foreign-nationals-firms-russia-based-2026-08-04/",
+      "discovery_note": "Reports an amendment to Russian financial countermeasures affecting some foreign depositors. Retained as a sanctions-policy lead; the underlying decree should be acquired before legal interpretation.",
+      "publication_timestamp_basis": "Reuters page timestamp",
+      "quote_locator": "Body paragraphs describing exemptions and withdrawals from Type C accounts.",
+      "short_excerpt": "freely manage their funds and withdraw ruble equivalents",
+      "source_item_id": "item_reuters_20260804_type_c_deposits",
+      "topic_tags": [
+        "sanctions",
+        "counter-sanctions",
+        "financial-controls"
+      ],
+      "upstream_lineage": {
+        "described_source": "Presidential decree of the Russian Federation effective 2026-08-04",
+        "public_upstream_url_found": false
+      }
+    }
+  ],
   "retrieved_at": "2026-08-05T04:46:00Z",
+  "safety_review": {
+    "contains_precise_current_operational_positions": false,
+    "contains_private_or_access_controlled_material": false,
+    "contains_targeting_enabling_detail": false
+  },
   "scope": {
+    "public_sources_only": true,
     "region": "ukraine-war",
     "topics": [
       "diplomacy",
       "military-support",
       "sanctions"
-    ],
-    "public_sources_only": true
+    ]
   },
   "searches": [
     {
@@ -33,102 +125,10 @@
       "result": "An Associated Press item was located but excluded because its publication timestamp, 2026-08-03T09:33:11Z, preceded the task window."
     }
   ],
-  "items": [
-    {
-      "source_item_id": "item_reuters_20260804_black_sea_navigation",
-      "canonical_url": "https://www.reuters.com/world/middle-east/turkey-calls-russia-ukraine-ensure-black-sea-safety-after-drone-attack-2026-08-04/",
-      "topic_tags": [
-        "diplomacy",
-        "black-sea-navigation"
-      ],
-      "publication_timestamp_basis": "Reuters page timestamp",
-      "quote_locator": "Headline and body paragraphs immediately following the 2026-08-04 09:14 UTC timestamp.",
-      "short_excerpt": "take measures to ensure navigational safety in the Black Sea",
-      "discovery_note": "Reports a Turkish Foreign Ministry call directed at both Russia and Ukraine after a Turkish-owned vessel was struck. Retained as a diplomatic signal; attribution and incident responsibility are not assessed here.",
-      "upstream_lineage": {
-        "described_source": "Republic of Türkiye Ministry of Foreign Affairs statement",
-        "public_upstream_url_found": false
-      }
-    },
-    {
-      "source_item_id": "item_reuters_20260804_ukraine_grain_routes",
-      "canonical_url": "https://www.reuters.com/world/ukraine-turns-alternative-grain-export-routes-counts-losses-russia-blocks-ports-2026-08-04/",
-      "topic_tags": [
-        "military-support",
-        "diplomacy",
-        "black-sea-security",
-        "food-security"
-      ],
-      "publication_timestamp_basis": "Reuters page timestamp",
-      "quote_locator": "Section headed NO LONG-TERM ALTERNATIVE and the final paragraphs on Black Sea security.",
-      "short_excerpt": "There is no alternative to the ports of Odesa",
-      "discovery_note": "Contains an appeal by Ukraine's agriculture minister for allied help securing Black Sea export operations. Retained as a support request and food-security diplomacy lead, not as verification of strike or loss figures.",
-      "upstream_lineage": {
-        "described_source": "Reuters interview with Ukrainian Agriculture Minister Taras Vysotskyi",
-        "public_upstream_url_found": false
-      }
-    },
-    {
-      "source_item_id": "item_reuters_20260804_type_c_deposits",
-      "canonical_url": "https://www.reuters.com/business/finance/putin-lifts-recent-deposit-restrictions-foreign-nationals-firms-russia-based-2026-08-04/",
-      "topic_tags": [
-        "sanctions",
-        "counter-sanctions",
-        "financial-controls"
-      ],
-      "publication_timestamp_basis": "Reuters page timestamp",
-      "quote_locator": "Body paragraphs describing exemptions and withdrawals from Type C accounts.",
-      "short_excerpt": "freely manage their funds and withdraw ruble equivalents",
-      "discovery_note": "Reports an amendment to Russian financial countermeasures affecting some foreign depositors. Retained as a sanctions-policy lead; the underlying decree should be acquired before legal interpretation.",
-      "upstream_lineage": {
-        "described_source": "Presidential decree of the Russian Federation effective 2026-08-04",
-        "public_upstream_url_found": false
-      }
-    }
-  ],
-  "artifacts": [],
-  "artifact_note": "No immutable article copies or media were downloaded. The artifact NDJSON is intentionally empty; canonical URLs and retrieval metadata were preserved instead.",
-  "access_failures": [
-    {
-      "target": "August 4 Turkish Foreign Ministry statement cited by Reuters",
-      "status": "not_found_in_index",
-      "impact": "Primary-source lineage remains descriptive rather than linked."
-    },
-    {
-      "target": "August 4 Russian presidential decree cited by Reuters",
-      "status": "not_found_in_index",
-      "impact": "The legal text and decree number remain unresolved."
-    }
-  ],
-  "excluded_candidates": [
-    {
-      "url": "https://apnews.com/article/russia-ukraine-war-glide-bombs-patriots-zaporizhzhia-9e4000f63b54cf814704ff60373f2bb9",
-      "reason": "Published at 2026-08-03T09:33:11Z, before the task window opened."
-    }
-  ],
-  "coverage_gaps": [
-    "No directly accessible primary Turkish statement was found for the August 4 navigation-safety call.",
-    "No directly accessible official Russian decree text was found for the Type C account amendment.",
-    "No separate public transcript was found for the agriculture minister interview quoted by Reuters.",
-    "The retained set is English-language and Reuters-only; it should be supplemented with primary Turkish, Ukrainian, and Russian records before downstream assessment."
-  ],
-  "follow_up_task_proposals": [
-    {
-      "task_type": "source_research",
-      "proposal": "Acquire and identify the canonical Turkish Foreign Ministry statement underlying item_reuters_20260804_black_sea_navigation."
-    },
-    {
-      "task_type": "source_research",
-      "proposal": "Acquire the official Russian decree text, number, and publication record underlying item_reuters_20260804_type_c_deposits."
-    },
-    {
-      "task_type": "corroboration",
-      "proposal": "Locate Ukrainian government records or a transcript corresponding to the agriculture minister's Black Sea security appeal."
-    }
-  ],
-  "safety_review": {
-    "contains_precise_current_operational_positions": false,
-    "contains_targeting_enabling_detail": false,
-    "contains_private_or_access_controlled_material": false
-  }
+  "task_id": "task_20260804_09_diplomacy_support_sanctions",
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
+  },
+  "worker_run_id": "run_20260805T0441Z_2e7f52cd"
 }

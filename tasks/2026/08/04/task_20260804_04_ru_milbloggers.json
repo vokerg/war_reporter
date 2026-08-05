@@ -1,28 +1,45 @@
 {
-  "task_id": "task_20260804_04_ru_milbloggers",
-  "task_type": "open_web_discovery",
-  "role": "open-web-discovery",
-  "state": "merged",
-  "priority": 85,
+  "allowed_output_paths": [
+    "catalogs/sources/2026/08/04/ru-milbloggers.json",
+    "data/source-items/2026/08/04/ru-milbloggers.ndjson",
+    "data/artifacts/2026/08/04/ru-milbloggers.ndjson",
+    "raw-manifests/2026/08/04/ru-milbloggers.json"
+  ],
   "created_at": "2026-08-04T18:28:29Z",
-  "parent_issue": 5,
-  "issue_number": 10,
+  "definition_of_done": [
+    "The assigned public-web discovery shard and UTC window were searched",
+    "Primary publications were preferred and upstream lineage was recorded",
+    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
+    "Candidate source profiles and follow-up task proposals were persisted when justified",
+    "No final truth assessment, territorial conclusion, or report narrative was added"
+  ],
   "depends_on_task_ids": [],
-  "window": {
-    "from": "2026-08-03T18:00:00Z",
-    "to": "2026-08-04T18:00:00Z"
+  "exclusions": [
+    "Items already represented by canonical URL, platform ID, or content hash",
+    "Access-control bypass, private material, and unsafe non-public geodata",
+    "Precise current operational positions or targeting-enabling detail"
+  ],
+  "idempotency_key": "open_web_discovery:ru-milbloggers:20260803T1800Z:20260804T1800Z:ukraine-war",
+  "issue_number": 10,
+  "lease": null,
+  "parent_issue": 5,
+  "priority": 85,
+  "result": {
+    "branch": "work/task_20260804_04_ru_milbloggers",
+    "completed_at": "2026-08-05T05:09:47Z",
+    "coverage_gaps": [
+      "Telegram public previews did not expose timezone-bearing publication datetimes, so source items use day precision and preserve preview times in the raw manifest.",
+      "Reliable in-window backward pagination was unavailable for RVvoenkor and Colonelcassad.",
+      "Named upstream Reuters, Kotsnews, Russian Ministry of Defence, Rutube, and Soloviev Live materials were not registered in this milblogger-only shard.",
+      "The bounded public-web search is not an exhaustive scan of the open internet."
+    ],
+    "merge_sha": "3f892d8aa6f65c353f89ad7eb6d9082468b87181",
+    "merged_at": "2026-08-05T05:09:47Z",
+    "pr_number": 15,
+    "summary": "Registered two draft source profiles and four public Telegram source items from the bounded Russian-milblogger discovery window, with quote locators, named upstream lineage, exclusions, access failures, and follow-up proposals. No truth assessment, media artifact, map geometry, or targeting-enabling detail was added."
   },
+  "role": "open-web-discovery",
   "scope": {
-    "source_ids": [],
-    "source_groups": [],
-    "regions": [
-      "ukraine-war"
-    ],
-    "topics": [
-      "russian-milbloggers",
-      "operations",
-      "claims"
-    ],
     "content_types": [
       "post",
       "article",
@@ -32,44 +49,23 @@
       "image",
       "video",
       "map"
+    ],
+    "regions": [
+      "ukraine-war"
+    ],
+    "source_groups": [],
+    "source_ids": [],
+    "topics": [
+      "russian-milbloggers",
+      "operations",
+      "claims"
     ]
   },
-  "exclusions": [
-    "Items already represented by canonical URL, platform ID, or content hash",
-    "Access-control bypass, private material, and unsafe non-public geodata",
-    "Precise current operational positions or targeting-enabling detail"
-  ],
-  "allowed_output_paths": [
-    "catalogs/sources/2026/08/04/ru-milbloggers.json",
-    "data/source-items/2026/08/04/ru-milbloggers.ndjson",
-    "data/artifacts/2026/08/04/ru-milbloggers.ndjson",
-    "raw-manifests/2026/08/04/ru-milbloggers.json"
-  ],
-  "definition_of_done": [
-    "The assigned public-web discovery shard and UTC window were searched",
-    "Primary publications were preferred and upstream lineage was recorded",
-    "Canonical URLs, timestamps, language, quote locators, and access failures were recorded",
-    "Candidate source profiles and follow-up task proposals were persisted when justified",
-    "No final truth assessment, territorial conclusion, or report narrative was added"
-  ],
-  "idempotency_key": "open_web_discovery:ru-milbloggers:20260803T1800Z:20260804T1800Z:ukraine-war",
-  "lease": {
-    "worker_run_id": "run_20260805T044026Z_5c91d2a4",
-    "lease_branch": "work/task_20260804_04_ru_milbloggers",
-    "base_sha": "7d8f3e13261f24e121ec4f8b63c6d200df4e2eb1",
-    "leased_at": "2026-08-05T04:40:26Z",
-    "lease_until": "2026-08-05T06:40:26Z"
-  },
-  "result": {
-    "branch": "work/task_20260804_04_ru_milbloggers",
-    "pr_number": 15,
-    "completed_at": "2026-08-05T04:49:11Z",
-    "summary": "Registered two draft source profiles and four public Telegram source items from the bounded Russian-milblogger discovery window, with quote locators, named upstream lineage, exclusions, access failures, and follow-up proposals. No truth assessment, media artifact, map geometry, or targeting-enabling detail was added.",
-    "coverage_gaps": [
-      "Telegram public previews did not expose timezone-bearing publication datetimes, so source items use day precision and preserve preview times in the raw manifest.",
-      "Reliable in-window backward pagination was unavailable for RVvoenkor and Colonelcassad.",
-      "Named upstream Reuters, Kotsnews, Russian Ministry of Defence, Rutube, and Soloviev Live materials were not registered in this milblogger-only shard.",
-      "The bounded public-web search is not an exhaustive scan of the open internet."
-    ]
+  "state": "merged",
+  "task_id": "task_20260804_04_ru_milbloggers",
+  "task_type": "open_web_discovery",
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
   }
 }

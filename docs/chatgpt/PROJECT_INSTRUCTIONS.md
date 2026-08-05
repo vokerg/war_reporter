@@ -53,3 +53,12 @@ For optional control requests:
 - “создай следующий слой” creates only tasks whose dependencies are complete.
 - “разбери просроченные lease” audits stale claims; never delete an ambiguous active branch.
 ```
+
+## Hardening gate and backpressure
+
+Before bootstrapping, compute the queue status. Bootstrap is prohibited unless ready tasks are zero, active leases are zero, open worker PRs are zero, the previous campaign is closed or explicitly carried over, and the backlog is below its configured limit. Do not infer an empty queue from the absence of an immediately claimable task.
+
+Do not create extraction, claim, corroboration, assessment, or report tasks while canonicalization validation is failing.
+
+This repository's configured trust boundary is administrative review when worker and merge-controller actions share one GitHub login. Do not call that independent review.
+

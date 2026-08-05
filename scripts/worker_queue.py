@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reference queue and local lease implementation for ChatGPT Project workers."""
+"""Reference queue, lease, and bootstrap-backpressure implementation."""
 
 from __future__ import annotations
 
@@ -17,6 +17,18 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ROUTING_PATH = REPOSITORY_ROOT / "config" / "worker-routing.json"
 ACTIVE_STATES = {"leased", "collecting", "pr_open", "validating", "review"}
 TERMINAL_STATES = {"merged", "rejected", "cancelled", "duplicate"}
+DISCOVERY_TASK_TYPES = {"source_scan", "open_web_discovery"}
+DOWNSTREAM_TASK_TYPES = {
+    "extract_observations",
+    "investigate_claim",
+    "source_profile_review",
+    "map_update",
+    "daily_report",
+    "weekly_report",
+    "snapshot_report",
+    "translate_report",
+    "correction",
+}
 
 
 @dataclass(frozen=True)
@@ -35,6 +47,35 @@ class Task:
     @property
     def created_at(self) -> str:
         return str(self.value.get("created_at", "9999-12-31T23:59:59Z"))
+
+
+@dataclass(frozen=True)
+class QueueStatus:
+    ready_tasks: int
+    active_leases: int
+    open_worker_prs: int
+    nonterminal_backlog: int
+    previous_campaign_closed: bool
+    backlog_limit: int
+
+    @property
+    def bootstrap_allowed(self) -> bool:
+        return not self.blocking_reasons
+
+    @property
+    def blocking_reasons(self) -> tuple[str, ...]:
+        reasons: list[str] = []
+        if self.ready_tasks != 0:
+            reasons.append("ready_tasks_nonzero")
+        if self.active_leases != 0:
+            reasons.append("active_leases_nonzero")
+        if self.open_worker_prs != 0:
+            reasons.append("open_worker_prs_nonzero")
+        if not self.previous_campaign_closed:
+            reasons.append("previous_campaign_open")
+        if self.nonterminal_backlog >= self.backlog_limit:
+            reasons.append("backlog_limit_reached")
+        return tuple(reasons)
 
 
 def utc_now() -> datetime:
@@ -64,9 +105,8 @@ def iter_task_documents(tasks_root: Path) -> Iterable[Task]:
         value = load_json(path)
         documents = value if isinstance(value, list) else [value]
         for document in documents:
-            if not isinstance(document, dict) or "task_id" not in document:
-                continue
-            yield Task(path, document)
+            if isinstance(document, dict) and "task_id" in document:
+                yield Task(path, document)
 
 
 def load_routing(path: Path = DEFAULT_ROUTING_PATH) -> dict[str, str]:
@@ -94,15 +134,31 @@ def index_tasks(tasks_root: Path) -> dict[str, Task]:
     return result
 
 
-def ready_tasks(tasks_root: Path, supported_task_types: set[str] | None = None) -> list[Task]:
+def canonicalization_complete(root: Path = REPOSITORY_ROOT) -> bool:
+    gate = root / "config" / "hardening-gate.json"
+    if not gate.is_file():
+        return False
+    value = load_json(gate)
+    return value.get("canonicalization_complete") is True
+
+
+def ready_tasks(
+    tasks_root: Path,
+    supported_task_types: set[str] | None = None,
+    *,
+    canonicalization_is_complete: bool | None = None,
+) -> list[Task]:
     tasks = index_tasks(tasks_root)
+    gate = canonicalization_complete(tasks_root.resolve().parents[0]) if canonicalization_is_complete is None else canonicalization_is_complete
     eligible: list[Task] = []
     for task in tasks.values():
         value = task.value
         if value.get("state") != "ready":
             continue
-        task_type = value.get("task_type")
+        task_type = str(value.get("task_type"))
         if supported_task_types is not None and task_type not in supported_task_types:
+            continue
+        if task_type in DOWNSTREAM_TASK_TYPES and not gate:
             continue
         dependencies = value.get("depends_on_task_ids", [])
         if not isinstance(dependencies, list):
@@ -113,12 +169,34 @@ def ready_tasks(tasks_root: Path, supported_task_types: set[str] | None = None) 
     return sorted(eligible, key=lambda task: (-task.priority, task.created_at, task.task_id))
 
 
+def queue_status(
+    tasks_root: Path,
+    *,
+    open_worker_prs: int,
+    previous_campaign_closed: bool,
+    backlog_limit: int,
+) -> QueueStatus:
+    if backlog_limit < 1:
+        raise ValueError("backlog_limit must be positive")
+    tasks = index_tasks(tasks_root)
+    ready = sum(1 for task in tasks.values() if task.value.get("state") == "ready")
+    active = sum(1 for task in tasks.values() if task.value.get("state") in ACTIVE_STATES)
+    nonterminal = sum(1 for task in tasks.values() if task.value.get("state") not in TERMINAL_STATES)
+    return QueueStatus(
+        ready_tasks=ready,
+        active_leases=active,
+        open_worker_prs=open_worker_prs,
+        nonterminal_backlog=nonterminal,
+        previous_campaign_closed=previous_campaign_closed,
+        backlog_limit=backlog_limit,
+    )
+
+
 def _lease_path(state_dir: Path, task_id: str) -> Path:
     return state_dir / "leases" / f"{task_id}.json"
 
 
 def claim_local(task: Task, state_dir: Path, worker_run_id: str, *, now: datetime | None = None, lease_minutes: int = 120) -> bool:
-    """Atomically claim a task using O_EXCL. This simulates GitHub create-ref semantics."""
     if task.value.get("state") != "ready":
         return False
     instant = (now or utc_now()).astimezone(UTC)
@@ -174,6 +252,14 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     role.add_argument("task_type")
     next_task = subparsers.add_parser("next")
     next_task.add_argument("--limit", type=int, default=10)
+    status = subparsers.add_parser("status")
+    status.add_argument("--open-worker-prs", type=int, required=True)
+    status.add_argument("--previous-campaign-closed", action="store_true")
+    status.add_argument("--backlog-limit", type=int, default=100)
+    can_bootstrap = subparsers.add_parser("can-bootstrap")
+    can_bootstrap.add_argument("--open-worker-prs", type=int, required=True)
+    can_bootstrap.add_argument("--previous-campaign-closed", action="store_true")
+    can_bootstrap.add_argument("--backlog-limit", type=int, default=100)
     claim = subparsers.add_parser("claim-local")
     claim.add_argument("task_id")
     claim.add_argument("--state-dir", type=Path, default=REPOSITORY_ROOT / ".war-reporter")
@@ -196,7 +282,8 @@ def main(argv: list[str] | None = None) -> int:
         print(role_for_task(args.task_type, args.routing))
         return 0
     if args.command == "next":
-        for task in ready_tasks(args.tasks_root)[: args.limit]:
+        gate = canonicalization_complete(REPOSITORY_ROOT)
+        for task in ready_tasks(args.tasks_root, canonicalization_is_complete=gate)[: args.limit]:
             print(json.dumps({
                 "task_id": task.task_id,
                 "task_type": task.value.get("task_type"),
@@ -206,9 +293,27 @@ def main(argv: list[str] | None = None) -> int:
                 "path": str(task.path),
             }, ensure_ascii=False))
         return 0
+    if args.command in {"status", "can-bootstrap"}:
+        status = queue_status(
+            args.tasks_root,
+            open_worker_prs=args.open_worker_prs,
+            previous_campaign_closed=args.previous_campaign_closed,
+            backlog_limit=args.backlog_limit,
+        )
+        payload = {
+            "ready_tasks": status.ready_tasks,
+            "active_leases": status.active_leases,
+            "open_worker_prs": status.open_worker_prs,
+            "nonterminal_backlog": status.nonterminal_backlog,
+            "previous_campaign_closed": status.previous_campaign_closed,
+            "backlog_limit": status.backlog_limit,
+            "bootstrap_allowed": status.bootstrap_allowed,
+            "blocking_reasons": list(status.blocking_reasons),
+        }
+        print(json.dumps(payload, ensure_ascii=False, sort_keys=True))
+        return 0 if args.command == "status" or status.bootstrap_allowed else 3
     if args.command == "claim-local":
-        tasks = index_tasks(args.tasks_root)
-        task = tasks.get(args.task_id)
+        task = index_tasks(args.tasks_root).get(args.task_id)
         if task is None:
             print(f"unknown task: {args.task_id}", file=sys.stderr)
             return 2

@@ -47,6 +47,24 @@
       "type": "string",
       "format": "date-time"
     },
+    "reporting_period": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start",
+        "end"
+      ],
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "conclusion": {
       "type": "object",
       "additionalProperties": false,

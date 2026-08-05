@@ -1,0 +1,128 @@
+{
+  "task_id": "task_20260805_01_ua_official",
+  "worker_run_id": "run_20260805T051000Z_4c8e7a21",
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
+  },
+  "searched_at": "2026-08-05T05:12:30Z",
+  "method": "Bounded public-web search and direct review of public official-channel previews. No authentication, platform API, access-control bypass, bulk content capture, or binary download was used.",
+  "sources_checked": [
+    {
+      "source_entity_id": "src_general_staff_ua",
+      "access_url": "https://t.me/s/GeneralStaffZSU",
+      "status": "searched",
+      "result": "Two in-window primary publications registered: an edited evening operational update and a losses infographic whose image contents were not transcribed."
+    },
+    {
+      "source_entity_id": "src_dsns_ua",
+      "access_url": "https://t.me/s/dsns_telegram",
+      "status": "searched",
+      "result": "Three in-window public aftermath and casualty updates registered, including explicit revision lineage for the Kyiv-region update."
+    },
+    {
+      "source_entity_id": "src_air_force_ua",
+      "access_url": "https://t.me/s/kpszsu",
+      "status": "searched_excluded_for_safety",
+      "result": "The preview contained real-time alert messages describing directions and movement. These were not registered because they could preserve targeting-enabling operational detail; no safe aggregate summary was visible before the cutoff."
+    },
+    {
+      "source_entity_id": "src_president_ua",
+      "access_url": "https://www.president.gov.ua/",
+      "status": "searched_no_in_window_result",
+      "result": "The relevant presidential address displayed 4 August 2026 at 20:03 Europe/Kyiv, equivalent to 17:03 UTC, and therefore preceded the assigned window."
+    },
+    {
+      "source_entity_id": null,
+      "access_url": "https://mod.gov.ua/",
+      "status": "searched_no_additional_result",
+      "result": "No additional clearly in-window primary item was admitted without overlapping another discovery shard."
+    }
+  ],
+  "included_items": [
+    {
+      "source_item_id": "item_20260805_generalstaff_2200",
+      "short_excerpt_original": "Загалом від початку цієї доби відбулося 216 бойових зіткнень.",
+      "quote_locator": "Opening aggregate sentence of Telegram message 41760.",
+      "summary": "The General Staff published an edited evening operational account. Only the high-level aggregate was retained; granular locality and active-front detail was not reproduced.",
+      "publication_time_basis": "The public preview displayed 19:02 UTC and the heading explicitly dated the report to 4 August 2026.",
+      "lineage_note": "Primary General Staff publication; underlying unit-level reporting and edit history were not separately resolved."
+    },
+    {
+      "source_item_id": "item_20260805_generalstaff_losses",
+      "short_excerpt_original": "Загальні бойові втрати противника з 24.02.22 по 05.08.26 (орієнтовно)",
+      "quote_locator": "Caption of Telegram message 41761.",
+      "summary": "The General Staff published an image described as an approximate cumulative-losses infographic. The image was not downloaded and no numerical contents were transcribed.",
+      "publication_time_basis": "The public preview displayed 03:47 UTC and the caption explicitly dated the infographic to 5 August 2026.",
+      "lineage_note": "Primary General Staff publication; no immutable artifact or content hash was captured."
+    },
+    {
+      "source_item_id": "item_20260805_dsns_kyiv_region_initial",
+      "short_excerpt_original": "Київщина: триває ліквідація наслідків масованої ворожої атаки",
+      "quote_locator": "Opening heading of Telegram message 70733.",
+      "summary": "DSNS reported ongoing emergency response after an overnight attack in Kyiv region. Detailed facility and locality information was deliberately omitted.",
+      "publication_time_basis": "The public preview displayed 01:27 UTC and the body explicitly referred to the night of 5 August.",
+      "lineage_note": "Primary DSNS publication; later message 70744 is recorded as a revision."
+    },
+    {
+      "source_item_id": "item_20260805_dsns_kyiv_casualty_update",
+      "short_excerpt_original": "кількість постраждалих ... зросла до 15 осіб, 1 людина загинула",
+      "quote_locator": "Opening sentence of Telegram message 70738.",
+      "summary": "DSNS issued a Kyiv casualty update and stated that emergency-response work continued. District-level fire details were not retained.",
+      "publication_time_basis": "The public preview displayed 03:16 UTC within the 5 August message sequence.",
+      "lineage_note": "Primary DSNS casualty update; it concerns Kyiv city and is separate from the Kyiv-region revision chain."
+    },
+    {
+      "source_item_id": "item_20260805_dsns_kyiv_region_update",
+      "short_excerpt_original": "Оновлено: триває ліквідація наслідків масованої ворожої атаки на Київщині",
+      "quote_locator": "Opening heading of Telegram message 70744.",
+      "summary": "DSNS published a revised Kyiv-region aftermath update with changed casualty information. Detailed active response locations and facilities were not retained.",
+      "publication_time_basis": "The public preview displayed 04:06 UTC within the 5 August message sequence.",
+      "lineage_note": "Recorded as a revision of item_20260805_dsns_kyiv_region_initial."
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "source": "Повітряні Сили ЗСУ",
+      "reason": "Real-time alerts described current directions and movement and were excluded as potentially targeting-enabling operational detail."
+    },
+    {
+      "source": "Президент України",
+      "reason": "The displayed publication time normalized to 17:03 UTC on 4 August, before the 18:00 UTC window start."
+    }
+  ],
+  "artifact_capture": {
+    "captured": false,
+    "reason": "No immutable permitted artifact was downloaded. Telegram previews did not provide stable content hashes or edit histories, and the losses infographic was not copied or transcribed."
+  },
+  "coverage_gaps": [
+    "Telegram public previews do not provide API-grade completeness, stable content hashes, or edit history.",
+    "Real-time Air Force alerts were excluded for operational-safety reasons, and no safe aggregate Air Force summary was visible before the cutoff.",
+    "The General Staff losses infographic was registered only as metadata; its image contents were not captured or verified.",
+    "DSNS casualty figures changed across updates and remain attributable official statements rather than assessed facts.",
+    "This bounded scan is not an exhaustive search of every Ukrainian government or military account."
+  ],
+  "follow_up_task_proposals": [
+    {
+      "task_type": "extract_observations",
+      "input_source_item_ids": [
+        "item_20260805_generalstaff_2200",
+        "item_20260805_generalstaff_losses",
+        "item_20260805_dsns_kyiv_region_initial",
+        "item_20260805_dsns_kyiv_casualty_update",
+        "item_20260805_dsns_kyiv_region_update"
+      ],
+      "purpose": "Create atomic attributable observations while preserving qualifiers, revision lineage, and the distinction between official statements and assessment."
+    },
+    {
+      "task_type": "source_scan",
+      "input_source_ids": ["src_air_force_ua"],
+      "purpose": "Search for a later safe aggregate air-attack summary without retaining real-time route or movement alerts."
+    }
+  ],
+  "safety_notes": [
+    "No precise current positions, movement routes, or active-unit locations were persisted.",
+    "Granular frontline localities and active-response facility details were omitted from excerpts and summaries.",
+    "No final truth assessment, territorial conclusion, reliability score, or report narrative was created."
+  ]
+}

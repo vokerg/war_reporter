@@ -4,6 +4,24 @@ on:
   pull_request:
     types: [closed]
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Merged worker pull request number
+        required: true
+        type: string
+      merge_sha:
+        description: Actual squash merge commit SHA
+        required: true
+        type: string
+      merged_at:
+        description: Actual pull request merge timestamp
+        required: true
+        type: string
+      head_ref:
+        description: Merged worker branch ref
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -11,26 +29,34 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: finalize-task-${{ github.event.pull_request.number }}
+  group: finalize-task-${{ github.event_name == 'workflow_dispatch' && inputs.pr_number || github.event.pull_request.number }}
   cancel-in-progress: false
 
 jobs:
   finalize:
     if: >-
-      github.event.pull_request.merged == true &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      startsWith(github.event.pull_request.head.ref, 'work/task_')
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.merged == true &&
+       github.event.pull_request.head.repo.full_name == github.repository &&
+       startsWith(github.event.pull_request.head.ref, 'work/task_')) ||
+      (github.event_name == 'workflow_dispatch' &&
+       startsWith(inputs.head_ref, 'work/task_') &&
+       inputs.pr_number != '' &&
+       inputs.merge_sha != '' &&
+       inputs.merged_at != '')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       GH_TOKEN: ${{ github.token }}
       GITHUB_TOKEN: ${{ github.token }}
+      FINALIZE_PR_NUMBER: ${{ github.event_name == 'workflow_dispatch' && inputs.pr_number || github.event.pull_request.number }}
+      FINALIZE_MERGE_SHA: ${{ github.event_name == 'workflow_dispatch' && inputs.merge_sha || github.event.pull_request.merge_commit_sha }}
+      FINALIZE_MERGED_AT: ${{ github.event_name == 'workflow_dispatch' && inputs.merged_at || github.event.pull_request.merged_at }}
+      FINALIZE_HEAD_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.head_ref || github.event.pull_request.head.ref }}
     steps:
       - name: Best-effort worker branch cleanup
-        env:
-          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
-          gh api --method DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$HEAD_REF" || \
+          gh api --method DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$FINALIZE_HEAD_REF" || \
             echo "::warning::Worker branch cleanup deferred; finalization continues."
 
       - name: Check out main
@@ -49,19 +75,14 @@ jobs:
 
       - name: Finalize manifest
         id: finalize
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
-          MERGED_AT: ${{ github.event.pull_request.merged_at }}
-          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
-          task_id="${HEAD_REF#work/}"
+          task_id="${FINALIZE_HEAD_REF#work/}"
           python scripts/finalize_merged_task.py \
             --task-id "$task_id" \
-            --pr-number "$PR_NUMBER" \
-            --merge-sha "$MERGE_SHA" \
-            --merged-at "$MERGED_AT" \
-            --branch "$HEAD_REF" | tee /tmp/finalized-task.json
+            --pr-number "$FINALIZE_PR_NUMBER" \
+            --merge-sha "$FINALIZE_MERGE_SHA" \
+            --merged-at "$FINALIZE_MERGED_AT" \
+            --branch "$FINALIZE_HEAD_REF" | tee /tmp/finalized-task.json
           echo "task_id=$task_id" >> "$GITHUB_OUTPUT"
           echo "issue_number=$(python -c 'import json; print(json.load(open("/tmp/finalized-task.json")).get("issue_number") or "")')" >> "$GITHUB_OUTPUT"
 
@@ -91,9 +112,8 @@ jobs:
         if: steps.changed.outputs.value == 'true'
         env:
           TASK_ID: ${{ steps.finalize.outputs.task_id }}
-          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
         run: |
-          short="${MERGE_SHA:0:12}"
+          short="${FINALIZE_MERGE_SHA:0:12}"
           branch="control/finalize/$TASK_ID/$short"
           git switch -c "$branch"
           git config user.name "war-reporter-finalizer[bot]"

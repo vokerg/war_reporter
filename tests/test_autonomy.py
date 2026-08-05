@@ -51,18 +51,35 @@ class AutonomyTests(unittest.TestCase):
     def test_write_capable_controller_uses_trusted_main_validators(self) -> None:
         root = self.make_root()
         workflow = root / ".github/workflows/auto-merge-reviewed.yml"
+        finalizer = root / ".github/workflows/finalize-task-merge.yml"
         workflow.parent.mkdir(parents=True, exist_ok=True)
-        workflow.write_text(
-            "ref: main\npath: trusted\npath: pr-head\n"
+        valid_auto = (
+            "actions: write\nref: main\npath: trusted\npath: pr-head\n"
             "validated_sha\n"
             "python trusted/scripts/validate_autonomy.py\n"
-            "python trusted/scripts/validate_pr_scope.py\n",
-            encoding="utf-8",
+            "python trusted/scripts/validate_pr_scope.py\n"
+            "gh workflow run finalize-task-merge.yml\n"
+            "-f pr_number=\n-f merge_sha=\n-f merged_at=\n-f head_ref=\n"
         )
+        valid_finalizer = (
+            "workflow_dispatch:\n"
+            "FINALIZE_PR_NUMBER:\n"
+            "FINALIZE_MERGE_SHA:\n"
+            "FINALIZE_MERGED_AT:\n"
+            "FINALIZE_HEAD_REF:\n"
+        )
+        workflow.write_text(valid_auto, encoding="utf-8")
+        finalizer.write_text(valid_finalizer, encoding="utf-8")
         self.assertEqual(validate_auto_merge_trust_boundary(root), [])
+
         workflow.write_text("python scripts/validate_autonomy.py\n", encoding="utf-8")
         errors = validate_auto_merge_trust_boundary(root)
         self.assertTrue(any("may not execute validator from PR head" in error for error in errors))
+
+        workflow.write_text(valid_auto, encoding="utf-8")
+        finalizer.write_text("pull_request:\n", encoding="utf-8")
+        errors = validate_auto_merge_trust_boundary(root)
+        self.assertTrue(any("dispatch-finalizer" in error for error in errors))
 
     def test_two_review_rounds_are_ordered_and_complete(self) -> None:
         root = self.make_root()

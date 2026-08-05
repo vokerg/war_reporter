@@ -6,7 +6,7 @@ on:
     types: [completed]
 
 permissions:
-  actions: read
+  actions: write
   contents: write
   pull-requests: write
 
@@ -114,6 +114,29 @@ jobs:
             -f sha="$HEAD_SHA" \
             -f commit_title="[task] $TASK_ID" > /tmp/merge.json
           jq -e '.merged == true' /tmp/merge.json
+
+      - name: Dispatch post-merge finalization
+        if: steps.pr.outputs.eligible == 'true'
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > /tmp/merged-pr.json
+          merge_sha="$(jq -r '.merge_commit_sha // empty' /tmp/merged-pr.json)"
+          merged_at="$(jq -r '.merged_at // empty' /tmp/merged-pr.json)"
+          head_ref="$(jq -r '.head.ref // empty' /tmp/merged-pr.json)"
+          test -n "$merge_sha"
+          test -n "$merged_at"
+          [[ "$head_ref" == work/task_* ]]
+          (
+            cd trusted
+            gh workflow run finalize-task-merge.yml \
+              --ref main \
+              -f pr_number="$PR_NUMBER" \
+              -f merge_sha="$merge_sha" \
+              -f merged_at="$merged_at" \
+              -f head_ref="$head_ref"
+          )
 
       - name: Best-effort branch cleanup
         if: steps.pr.outputs.eligible == 'true'

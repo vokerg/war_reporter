@@ -1,0 +1,95 @@
+{
+  "task_id": "task_20260805_02_ru_official",
+  "worker_run_id": "run_20260805T051015Z_4f7c2a91",
+  "searched_at": "2026-08-05T05:15:21Z",
+  "window": {
+    "from": "2026-08-04T18:00:00Z",
+    "to": "2026-08-05T05:00:00Z"
+  },
+  "scope": {
+    "shard": "russian-official-statements",
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "russian-official-statements",
+      "frontline",
+      "strikes"
+    ]
+  },
+  "access_method": "public_web",
+  "search_log": [
+    {
+      "target": "Ministry of Defence of the Russian Federation",
+      "url": "https://t.me/s/mod_russia",
+      "result": "Public channel preview accessible; two posts inside the bounded UTC window were recorded."
+    },
+    {
+      "target": "Ministry of Foreign Affairs of the Russian Federation",
+      "url": "https://t.me/s/MID_Russia",
+      "result": "Public channel preview checked. Visible posts inside the night window concerned unrelated bilateral, electoral, cultural, or maritime matters; no clearly in-scope frontline or strike statement was retained."
+    },
+    {
+      "target": "Kremlin News",
+      "url": "https://t.me/s/news_kremlin",
+      "result": "Public channel preview checked; no clearly dated frontline or strike statement attributable to the Kremlin was identified inside the bounded night window."
+    },
+    {
+      "target": "Official websites",
+      "queries": [
+        "site:mil.ru 5 августа 2026 Украина Минобороны заявление",
+        "site:mid.ru 5 августа 2026 Украина заявление",
+        "site:kremlin.ru 5 августа 2026 Украина"
+      ],
+      "result": "Search indexing did not surface a stable official webpage matching the retained Telegram posts and exact bounded window."
+    }
+  ],
+  "items": [
+    {
+      "source_item_id": "item_20260804_mod_66272",
+      "quote_locator": "Telegram public channel preview, post body opening and following sentence; preview lines 308-315.",
+      "short_excerpt": "Одним залпом в пепел",
+      "publication_time_note": "Displayed as 02:03 Moscow time on 5 August; normalized to 2026-08-04T23:03:00Z.",
+      "assessment": "not_assessed",
+      "safety_note": "Only the broad region and source-attributed claim category were registered; no coordinates, movement track, or targeting detail was stored."
+    },
+    {
+      "source_item_id": "item_20260805_mod_66273",
+      "quote_locator": "Telegram public channel preview, post body and linked place-name phrase; preview lines 324-330.",
+      "short_excerpt": "как брали Юрченково",
+      "publication_time_note": "Displayed as 03:33 Moscow time on 5 August; normalized to 2026-08-05T00:33:00Z.",
+      "assessment": "not_assessed",
+      "safety_note": "The record preserves a retrospective source description without coordinates, current unit positions, or actionable operational detail."
+    }
+  ],
+  "candidate_source_profiles": [],
+  "artifacts_created": [],
+  "follow_up_task_proposals": [
+    {
+      "task_type": "extract_observations",
+      "scope": "Extract atomic, explicitly attributed observations from source items item_20260804_mod_66272 and item_20260805_mod_66273, preserving source qualifiers and excluding precise operational geodata."
+    }
+  ],
+  "access_failures": [
+    {
+      "target": "Individual Telegram post pages",
+      "detail": "Direct post fetches returned cache-miss errors; the public channel preview exposed the post identifiers, text, displayed times, and canonical links."
+    },
+    {
+      "target": "mil.ru indexed pages",
+      "detail": "No stable current official page corresponding to the two retained Telegram posts was located through approved public-web search."
+    }
+  ],
+  "coverage_gaps": [
+    "Telegram public previews may not preserve later edits or deletions.",
+    "No immutable page or video capture was stored; content hashes and artifact records therefore remain absent.",
+    "The two retained posts are source-attributed Ministry statements and were not independently corroborated or assessed.",
+    "MAX and VK mirrors were not collected because equally stable, directly inspectable post pages were not located during the bounded pass.",
+    "This is a bounded discovery pass, not an exhaustive survey of every Russian federal, military, or regional official account."
+  ],
+  "safety": {
+    "precise_coordinates_recorded": false,
+    "non_public_material_used": false,
+    "final_truth_assessment_added": false
+  }
+}

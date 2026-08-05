@@ -1,0 +1,26 @@
+: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--root", type=Path, default=ROOT)
+    sub = parser.add_subparsers(dest="command", required=True)
+    plan_parser = sub.add_parser("plan")
+    plan_parser.add_argument("--now")
+    apply_parser = sub.add_parser("apply")
+    apply_parser.add_argument("--plan-file", type=Path, required=True)
+    apply_parser.add_argument("--parent-issue", type=int)
+    args = parser.parse_args(argv)
+    root = args.root.resolve()
+    try:
+        if args.command == "plan":
+            now = parse(args.now) if args.now else None
+            result = plan_duties(root, now)
+        else:
+            result = apply_plan(root, load(args.plan_file), args.parent_issue)
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError) as exc:
+        print(f"repository reconciliation failed: {exc}", file=sys.stderr)
+        return 1
+    print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

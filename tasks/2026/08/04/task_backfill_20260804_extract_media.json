@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_extract_media",
   "task_type": "extract_observations",
   "role": "extractor",
-  "state": "pr_open",
+  "state": "review",
   "priority": 85,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -76,7 +76,7 @@
   "result": {
     "branch": "work/task_backfill_20260804_extract_media",
     "pr_number": 94,
-    "completed_at": null,
+    "completed_at": "2026-08-05T19:00:30Z",
     "summary": "Created 16 atomic draft observations from 13 assigned media source items while preserving media attribution, upstream-lineage limitations, paywall constraints, original-language excerpts, and verification qualifiers.",
     "coverage_gaps": [
       "No observation was created from item_20260804_ft_wildberries because the Financial Times article body was paywalled and the frozen repository contained no permitted substantive excerpt or artifact beyond title metadata.",

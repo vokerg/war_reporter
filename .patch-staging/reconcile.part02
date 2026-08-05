@@ -135,3 +135,4 @@ def plan_duties(root: Path, now: datetime | None = None) -> dict[str, Any]:
                 and isinstance(task["window"].get("from"), str)
                 and isinstance(task["window"].get("to"), str)
                 and parse(task["window"]["from"]) < end
+ 

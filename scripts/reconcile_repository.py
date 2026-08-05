@@ -629,7 +629,7 @@ def unique_strings(values: list[str]) -> list[str]:
     return list(dict.fromkeys(values))
 
 
-def task_from_proposal(root: Path, duty: dict[str, Any], created_at: str, tasks: dict[str, tuple[Path, dict[str, Any]]]) -> tuple[Path, dict[str, Any]]]:
+def task_from_proposal(root: Path, duty: dict[str, Any], created_at: str, tasks: dict[str, tuple[Path, dict[str, Any]]]) -> tuple[Path, dict[str, Any]]:
     proposal = dict(duty["proposal"])
     key = proposal["idempotency_key"]
     task_id = proposal.get("task_id") or f"task_auto_{hashlib.sha256(key.encode()).hexdigest()[:16]}"

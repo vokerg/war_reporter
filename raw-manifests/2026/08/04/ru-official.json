@@ -1,0 +1,114 @@
+{
+  "task_id": "task_20260804_02_ru_official",
+  "worker_run_id": "run_20260805T044015Z_8ecdaa09",
+  "searched_at": "2026-08-05T04:42:39Z",
+  "window": {
+    "from": "2026-08-03T18:00:00Z",
+    "to": "2026-08-04T18:00:00Z"
+  },
+  "scope": {
+    "shard": "russian-official-statements",
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "russian-official-statements",
+      "frontline",
+      "strikes"
+    ]
+  },
+  "access_method": "public_web",
+  "search_log": [
+    {
+      "target": "Ministry of Defence of the Russian Federation",
+      "url": "https://t.me/s/mod_russia",
+      "result": "Public channel preview accessible; six in-window posts recorded."
+    },
+    {
+      "target": "Ministry of Foreign Affairs of the Russian Federation",
+      "url": "https://t.me/s/MID_Russia",
+      "result": "Public channel preview checked; no clearly in-scope frontline or strike statement identified in the visible in-window material."
+    },
+    {
+      "target": "Kremlin News",
+      "url": "https://t.me/s/news_kremlin",
+      "result": "Public channel preview checked; no clearly in-scope frontline or strike statement identified in the visible in-window material."
+    },
+    {
+      "target": "Official websites",
+      "queries": [
+        "site:mil.ru 4 августа 2026 сводка Министерства обороны специальной военной операции",
+        "site:kremlin.ru 4 августа 2026 Украина",
+        "site:mid.ru 4 августа 2026 Украина заявление официальный"
+      ],
+      "result": "Search indexing did not surface stable current official pages matching the bounded window; Telegram public previews were used as canonical discovery targets."
+    }
+  ],
+  "items": [
+    {
+      "source_item_id": "item_20260804_mod_66255",
+      "quote_locator": "Telegram post body, opening sentence; public preview lines 54–60.",
+      "short_excerpt": "продолжено нанесение ударов по портам",
+      "publication_time_note": "Displayed as 05:11 Moscow time on the 4 August sequence; normalized to 02:11Z.",
+      "assessment": "not_assessed"
+    },
+    {
+      "source_item_id": "item_20260804_mod_66256",
+      "quote_locator": "Telegram post body, sole paragraph; public preview lines 70–72.",
+      "short_excerpt": "перехвачены и уничтожены 320 украинских беспилотных аппаратов",
+      "publication_time_note": "Displayed as 05:30 Moscow time on 4 August; normalized to 02:30Z.",
+      "assessment": "not_assessed"
+    },
+    {
+      "source_item_id": "item_20260804_mod_66263",
+      "quote_locator": "Telegram post body, opening sentence; public preview lines 181–186.",
+      "short_excerpt": "установили контроль над населенным пунктом Бакшеевка",
+      "publication_time_note": "Displayed as 11:21 Moscow time on 4 August; normalized to 08:21Z.",
+      "assessment": "not_assessed"
+    },
+    {
+      "source_item_id": "item_20260804_mod_66266",
+      "quote_locator": "Telegram post body, opening sentence and list; public preview lines 216–223.",
+      "short_excerpt": "продолжают нанесение ударов по портам",
+      "publication_time_note": "Displayed as 14:17 Moscow time on 4 August; normalized to 11:17Z.",
+      "assessment": "not_assessed"
+    },
+    {
+      "source_item_id": "item_20260804_mod_66268",
+      "quote_locator": "Telegram post body, sole paragraph; public preview lines 248–251.",
+      "short_excerpt": "перехвачены и уничтожены 304 украинских беспилотных аппарата",
+      "publication_time_note": "Displayed as 17:38 Moscow time on 4 August; normalized to 14:38Z.",
+      "assessment": "not_assessed"
+    },
+    {
+      "source_item_id": "item_20260804_mod_66271",
+      "quote_locator": "Telegram post body, summary heading and linked bullets; public preview lines 290–299.",
+      "short_excerpt": "Главное за день",
+      "publication_time_note": "Displayed as 20:02 Moscow time on 4 August; normalized to 17:02Z.",
+      "assessment": "not_assessed",
+      "lineage_note": "Summary repeats or links earlier Ministry posts and is not independent corroboration."
+    }
+  ],
+  "artifacts_created": [],
+  "access_failures": [
+    {
+      "target": "Individual Telegram embed pages",
+      "detail": "Several direct post fetches returned cache-miss errors, while the public channel preview exposed post identifiers, text, and displayed times."
+    },
+    {
+      "target": "mil.ru indexed pages",
+      "detail": "Search results were dominated by historical pages and did not yield stable current daily briefing URLs for the bounded window."
+    }
+  ],
+  "coverage_gaps": [
+    "Telegram public previews expose only a recent window and may not preserve later edits or deletions.",
+    "No immutable page captures were stored; source-item content hashes and artifact manifests therefore remain absent.",
+    "MAX and VK mirrors were not collected because the public-web search did not provide equally stable, directly inspectable post pages.",
+    "This is a bounded discovery pass, not an exhaustive survey of every Russian federal or regional official account."
+  ],
+  "safety": {
+    "precise_coordinates_recorded": false,
+    "non_public_material_used": false,
+    "final_truth_assessment_added": false
+  }
+}

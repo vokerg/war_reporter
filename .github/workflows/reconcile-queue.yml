@@ -99,6 +99,7 @@ jobs:
           git diff --check main...HEAD
           python -m unittest discover -s tests -v
           python scripts/validate_data.py
+          python scripts/validate_queue_references.py
           python scripts/validate_worker_queue.py
           python scripts/validate_autonomy.py
 
@@ -108,6 +109,7 @@ jobs:
           git diff --check main...HEAD
           python scripts/reconcile_repository.py plan > /tmp/second-pass-plan.json
           python scripts/validate_data.py
+          python scripts/validate_queue_references.py
           python scripts/validate_worker_queue.py
           python scripts/validate_autonomy.py
 

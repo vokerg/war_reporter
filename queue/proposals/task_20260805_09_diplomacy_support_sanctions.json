@@ -13,13 +13,7 @@
         "to": "2026-08-05T05:00:00Z"
       },
       "scope": {
-        "source_ids": [
-          "src_president_of_ukraine",
-          "src_mfa_ukraine",
-          "src_council_of_the_european_union",
-          "src_european_commission",
-          "src_nato"
-        ],
+        "source_ids": [],
         "source_groups": [],
         "regions": [
           "ukraine-war"
@@ -40,13 +34,14 @@
       "exclusions": [
         "Do not broaden the original UTC window",
         "Do not substitute retrieval, relay, or search-index times for primary publication timestamps",
-        "Do not add a truth assessment, source reliability score, operational narrative, or duplicate adjacent-shard item"
+        "Do not add a truth assessment, source reliability score, operational narrative, or duplicate adjacent-shard item",
+        "Do not inspect any archive other than the President of Ukraine, Ministry of Foreign Affairs of Ukraine, Council of the European Union, European Commission, and NATO public primary archives"
       ],
       "allowed_output_paths": [
         "raw-manifests/2026/08/05/diplomacy-support-sanctions-validation.json"
       ],
       "definition_of_done": [
-        "Recheck the named primary archives after indexing delay without broadening the source or temporal scope",
+        "Recheck only the President of Ukraine, Ministry of Foreign Affairs of Ukraine, Council of the European Union, European Commission, and NATO public primary archives after indexing delay without broadening the temporal scope",
         "Record whether any stable canonical publication with a verifiable in-window timestamp now appears",
         "Preserve a zero-item outcome when no qualifying primary publication can be verified"
       ],

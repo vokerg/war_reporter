@@ -2,7 +2,7 @@
   "task_id": "task_20260804_01_ua_official",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "pr_open",
+  "state": "merged",
   "priority": 90,
   "created_at": "2026-08-04T18:28:29Z",
   "parent_issue": 5,
@@ -53,17 +53,11 @@
     "No final truth assessment, territorial conclusion, or report narrative was added"
   ],
   "idempotency_key": "open_web_discovery:ua-official:20260803T1800Z:20260804T1800Z:ukraine-war",
-  "lease": {
-    "worker_run_id": "run_20260805T043600Z_7a4e91c2",
-    "lease_branch": "work/task_20260804_01_ua_official",
-    "base_sha": "7d8f3e13261f24e121ec4f8b63c6d200df4e2eb1",
-    "leased_at": "2026-08-05T04:38:41Z",
-    "lease_until": "2026-08-05T06:38:41Z"
-  },
+  "lease": null,
   "result": {
     "branch": "work/task_20260804_01_ua_official",
     "pr_number": 8,
-    "completed_at": "2026-08-05T04:44:53Z",
+    "completed_at": "2026-08-05T04:54:00Z",
     "summary": "Registered four draft Ukrainian official source profiles, three in-window General Staff source items, and a bounded discovery manifest with lineage, exclusions, safety notes, and follow-up proposals. No immutable artifacts or final assessments were created.",
     "coverage_gaps": [
       "Telegram public previews do not expose API-grade completeness, edit history, or stable content hashes.",

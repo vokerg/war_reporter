@@ -32,8 +32,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p /tmp/current-workflows
+          cp -a .github/workflows/. /tmp/current-workflows/
           cat .autonomy/bootstrap/payload-*.b64 | tr -d '\n' | base64 --decode > /tmp/autonomy-runtime.tar.gz
-          tar -xzf /tmp/autonomy-runtime.tar.gz --exclude='./.github/workflows/*'
+          tar -xzf /tmp/autonomy-runtime.tar.gz
           rm -rf .autonomy/bootstrap
 
       - name: Set up Python
@@ -56,6 +58,9 @@ jobs:
 
       - name: Commit permanent runtime files
         run: |
+          rm -rf .github/workflows
+          mkdir -p .github/workflows
+          cp -a /tmp/current-workflows/. .github/workflows/
           git config user.name "war-reporter-autonomy[bot]"
           git config user.email "war-reporter-autonomy[bot]@users.noreply.github.com"
           git add -A

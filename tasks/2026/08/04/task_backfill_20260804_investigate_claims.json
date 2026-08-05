@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_investigate_claims",
   "task_type": "investigate_claim",
   "role": "corroborator",
-  "state": "pr_open",
+  "state": "review",
   "priority": 75,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -100,7 +100,7 @@
   "result": {
     "branch": "work/task_backfill_20260804_investigate_claims",
     "pr_number": 98,
-    "completed_at": null,
+    "completed_at": "2026-08-05T19:32:00Z",
     "summary": "Editorially approved 28 merged dependency observations, normalized 19 approved claims with lineage-aware outcomes, and produced seven approved editorial assessments without promoting source assertions beyond frozen evidence.",
     "coverage_gaps": [
       "No separate observation or claim was created from item_20260804_mod_66271 because the official dependency identified it as a summary repeating upstream Russian Ministry of Defence items rather than independent evidence.",

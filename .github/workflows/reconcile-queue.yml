@@ -1,0 +1,124 @@
+name: Reconcile self-sustaining queue
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: repository-duty-reconciliation
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Install validation dependency
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Plan duties
+        id: plan
+        run: |
+          python scripts/reconcile_repository.py plan > /tmp/duty-plan.json
+          cat /tmp/duty-plan.json
+          count="$(python -c 'import json; print(len(json.load(open("/tmp/duty-plan.json"))["duties"]))')"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+
+      - name: Materialize control-plane changes
+        if: steps.plan.outputs.count != '0'
+        id: materialize
+        run: |
+          stamp="$(date -u +%Y%m%dT%H00Z)"
+          branch="control/reconcile/$stamp"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            echo "A reconciliation controller already owns $branch."
+            exit 0
+          fi
+          git switch -c "$branch"
+
+          parent_issue=""
+          if python -c 'import json; raise SystemExit(0 if any(d["kind"]=="discovery_campaign" for d in json.load(open("/tmp/duty-plan.json"))["duties"]) else 1)'; then
+            window="$(python -c 'import json; d=next(x for x in json.load(open("/tmp/duty-plan.json"))["duties"] if x["kind"]=="discovery_campaign"); print(d["window"]["from"]+" to "+d["window"]["to"])')"
+            issue_url="$(gh issue create \
+              --title "[campaign] Automated discovery $window" \
+              --body "Automatically created by the repository-duty reconciler. Covers all configured discovery shards for $window. The operator does not need to decompose or route this campaign.")"
+            parent_issue="${issue_url##*/}"
+          fi
+
+          if [ -n "$parent_issue" ]; then
+            python scripts/reconcile_repository.py apply --plan-file /tmp/duty-plan.json --parent-issue "$parent_issue"
+          else
+            python scripts/reconcile_repository.py apply --plan-file /tmp/duty-plan.json
+          fi
+
+          if git diff --quiet; then
+            echo "No materialized changes."
+            exit 0
+          fi
+
+          git config user.name "war-reporter-queue[bot]"
+          git config user.email "war-reporter-queue[bot]@users.noreply.github.com"
+          git add tasks
+          git commit -m "[queue] Reconcile due repository duties"
+          git push origin "$branch"
+          pr_url="$(gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "[queue] Reconcile due repository duties" \
+            --body "Automated control-plane PR. Creates due task manifests/issues only; it contains no research findings.")"
+          echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
+
+      - name: Control-plane self-review pass 1
+        if: steps.materialize.outputs.pr_url != ''
+        run: |
+          git diff --check main...HEAD
+          python -m unittest discover -s tests -v
+          python scripts/validate_data.py
+          python scripts/validate_worker_queue.py
+          python scripts/validate_autonomy.py
+
+      - name: Control-plane self-review pass 2
+        if: steps.materialize.outputs.pr_url != ''
+        run: |
+          git diff --check main...HEAD
+          python scripts/reconcile_repository.py plan > /tmp/second-pass-plan.json
+          python -m unittest discover -s tests -v
+          python scripts/validate_data.py
+          python scripts/validate_worker_queue.py
+          python scripts/validate_autonomy.py
+
+      - name: Squash-merge control PR
+        if: steps.materialize.outputs.pr_url != ''
+        env:
+          PR_URL: ${{ steps.materialize.outputs.pr_url }}
+        run: |
+          gh pr merge "$PR_URL" \
+            --squash \
+            --delete-branch \
+            --subject "[queue] Reconcile due repository duties"

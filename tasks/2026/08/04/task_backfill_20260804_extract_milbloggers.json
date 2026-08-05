@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_extract_milbloggers",
   "task_type": "extract_observations",
   "role": "extractor",
-  "state": "pr_open",
+  "state": "review",
   "priority": 80,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -64,7 +64,7 @@
   "result": {
     "branch": "work/task_backfill_20260804_extract_milbloggers",
     "pr_number": 96,
-    "completed_at": null,
+    "completed_at": "2026-08-05T19:14:00Z",
     "summary": "Created four atomic draft observations from the four assigned Dva Majors and Rybar source items while preserving channel attribution, Russian-language excerpts, day-level publication bounds, preview times, unresolved upstream lineage, and safety withholding.",
     "coverage_gaps": [
       "Telegram previews did not expose timezone-bearing publication timestamps; source-item day precision and preview times were preserved without inventing exact UTC publication times.",

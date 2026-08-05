@@ -2,7 +2,7 @@
   "task_id": "task_20260805_05_international_media",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "leased",
+  "state": "pr_open",
   "priority": 80,
   "created_at": "2026-08-05T05:06:14Z",
   "parent_issue": 33,
@@ -44,5 +44,17 @@
     "base_sha": "38f03b1edb29ee38762460a653474f9d52b6c89b",
     "leased_at": "2026-08-05T05:11:19Z",
     "lease_until": "2026-08-05T07:11:19Z"
+  },
+  "result": {
+    "branch": "work/task_20260805_05_international_media",
+    "pr_number": 42,
+    "completed_at": "2026-08-05T05:15:29Z",
+    "summary": "Registered three international-media items with verified publication timestamps inside the bounded UTC window, explicit Reuters-to-Guardian lineage, excluded-candidate reasoning, access failures and follow-up task proposals; no duplicate source profiles or final truth assessments were added.",
+    "coverage_gaps": [
+      "Only three items from two outlets had publication timestamps verified inside the narrow eleven-hour UTC window.",
+      "The Associated Press candidate was excluded because an exact publication timestamp could not be verified against the task bounds.",
+      "BBC candidate pages were not retrievable through the approved connector because of robots/access restrictions.",
+      "No image, video, map or immutable webpage artifacts were captured."
+    ]
   }
 }

@@ -12,6 +12,7 @@ from jsonschema import Draft202012Validator
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
+from reconcile_repository import task_from_proposal
 from validate_queue_references import validate_repository
 
 
@@ -79,6 +80,51 @@ class QueueReferenceTests(unittest.TestCase):
         widened = dict(scope)
         widened["unsupported"] = []
         self.assertTrue(list(Draft202012Validator(proposal_scope_schema).iter_errors(widened)))
+
+    def test_materialization_preserves_exact_source_item_scope(self) -> None:
+        root = self.make_root()
+        producer = {
+            "task_id": "task_producer",
+            "state": "merged",
+            "parent_issue": 33,
+        }
+        tasks = {
+            "task_producer": (root / "tasks/task_producer.json", producer),
+        }
+        duty = {
+            "producer_task_id": "task_producer",
+            "proposal": {
+                "task_type": "extract_observations",
+                "priority": 60,
+                "depends_on_task_ids": ["task_producer"],
+                "window": {
+                    "from": "2026-08-04T18:00:00Z",
+                    "to": "2026-08-05T05:00:00Z",
+                },
+                "scope": {
+                    "source_ids": ["src_example"],
+                    "source_item_ids": ["item_example"],
+                    "source_groups": [],
+                    "regions": ["example"],
+                    "topics": ["example"],
+                    "content_types": ["article"],
+                },
+                "exclusions": ["No scope broadening"],
+                "allowed_output_paths": ["data/observations/example.ndjson"],
+                "definition_of_done": ["Exact source-item scope is preserved"],
+                "idempotency_key": "extract_observations:example",
+            },
+        }
+
+        _, task = task_from_proposal(
+            root,
+            duty,
+            "2026-08-05T12:00:00Z",
+            tasks,
+        )
+
+        self.assertEqual(task["scope"]["source_item_ids"], ["item_example"])
+        self.assertEqual(validate_repository(root), [])
 
 
 if __name__ == "__main__":

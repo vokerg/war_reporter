@@ -115,7 +115,13 @@
       "then": {"required": ["blocked_reason"]}
     },
     {
-      "if": {"properties": {"task_type": {"const": "daily_report"}}, "required": ["task_type"]},
+      "if": {
+        "properties": {
+          "task_type": {"const": "daily_report"},
+          "state": {"not": {"const": "planned"}}
+        },
+        "required": ["task_type", "state"]
+      },
       "then": {"required": ["report_inputs"]}
     }
   ]

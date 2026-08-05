@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_daily_report_en",
   "task_type": "daily_report",
   "role": "report-editor",
-  "state": "ready",
+  "state": "review",
   "priority": 65,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -53,7 +53,13 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "backfill_daily_report:2026-08-04:ukraine-war:en:v1",
-  "lease": null,
+  "lease": {
+    "worker_run_id": "run_20260805T200900Z_report04",
+    "lease_branch": "work/task_backfill_20260804_daily_report_en",
+    "base_sha": "e53572f75bfcb47d11e7bbb3767faa9c65b46702",
+    "leased_at": "2026-08-05T20:09:00Z",
+    "lease_until": "2026-08-05T22:09:00Z"
+  },
   "report_inputs": {
     "assessment_ids": [
       "asm_20260804_air_defense_counts",
@@ -86,5 +92,19 @@
       "clm_20260804_zaluzhnyi_nato_criticism"
     ],
     "claim_set_sha256": "7675dfa8238555c84a1bdbf8506778796b33896fab7c8510923c101f0f1cddcf"
+  },
+  "result": {
+    "branch": "work/task_backfill_20260804_daily_report_en",
+    "pr_number": 104,
+    "completed_at": "2026-08-05T20:19:00Z",
+    "summary": "Produced the approved English daily report for 4 August 2026 from the exact frozen set of 19 approved claims and seven approved assessments. The report distinguishes confirmed publication and attribution events from unverified or probabilistic underlying operational propositions, preserves incompatible metrics separately, records unresolved questions and coverage gaps, and introduces no new evidence.",
+    "coverage_gaps": [
+      "No prior approved daily report is present in the frozen input contract, so change against a previous published baseline cannot be measured.",
+      "Strike, bridge-damage, and territorial-control propositions lack independent confirmation in the frozen evidence.",
+      "The 320, 304, and 117 unmanned-aircraft figures use unresolved reporting intervals, categories, and attribution and cannot be combined or compared.",
+      "Primary ministry, legal, port, vessel, partner, transcript, shelter-inventory, and engagement-count records are absent where identified in the approved assessments.",
+      "The Kherson video's date, perpetrator identity, and legal characterization remain unresolved.",
+      "Precise current operational locations and targeting-enabling detail were excluded under the safety policy."
+    ]
   }
 }

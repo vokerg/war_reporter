@@ -128,12 +128,15 @@ jobs:
           test -n "$merge_sha"
           test -n "$merged_at"
           [[ "$head_ref" == work/task_* ]]
-          gh workflow run finalize-task-merge.yml \
-            --ref main \
-            -f pr_number="$PR_NUMBER" \
-            -f merge_sha="$merge_sha" \
-            -f merged_at="$merged_at" \
-            -f head_ref="$head_ref"
+          (
+            cd trusted
+            gh workflow run finalize-task-merge.yml \
+              --ref main \
+              -f pr_number="$PR_NUMBER" \
+              -f merge_sha="$merge_sha" \
+              -f merged_at="$merged_at" \
+              -f head_ref="$head_ref"
+          )
 
       - name: Best-effort branch cleanup
         if: steps.pr.outputs.eligible == 'true'

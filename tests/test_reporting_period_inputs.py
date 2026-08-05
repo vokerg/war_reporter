@@ -88,18 +88,29 @@ class ReportingPeriodInputTests(unittest.TestCase):
         self.assertEqual(len(frozen["claim_ids"]), 19)
         self.assertEqual(len(frozen["assessment_ids"]), 7)
 
-        plan = reconcile.plan_duties(
-            REPO_ROOT,
-            datetime(2026, 8, 5, 20, 0, tzinfo=UTC),
+        task_path = (
+            REPO_ROOT
+            / "tasks/2026/08/04/task_backfill_20260804_daily_report_en.json"
         )
-        promotion = next(
-            duty
-            for duty in plan["duties"]
-            if duty["kind"] == "promote_tasks"
-            and "task_backfill_20260804_daily_report_en" in duty["task_ids"]
-        )
-        report_inputs = promotion["report_inputs_by_task"]["task_backfill_20260804_daily_report_en"]
-        self.assertEqual(report_inputs, frozen)
+        task = json.loads(task_path.read_text(encoding="utf-8"))
+        if task["state"] == "planned":
+            plan = reconcile.plan_duties(
+                REPO_ROOT,
+                datetime(2026, 8, 5, 20, 0, tzinfo=UTC),
+            )
+            promotion = next(
+                duty
+                for duty in plan["duties"]
+                if duty["kind"] == "promote_tasks"
+                and "task_backfill_20260804_daily_report_en" in duty["task_ids"]
+            )
+            report_inputs = promotion["report_inputs_by_task"][
+                "task_backfill_20260804_daily_report_en"
+            ]
+            self.assertEqual(report_inputs, frozen)
+        else:
+            self.assertEqual(task["state"], "ready")
+            self.assertEqual(task["report_inputs"], frozen)
 
 
 if __name__ == "__main__":

@@ -127,6 +127,25 @@ class HardeningTests(unittest.TestCase):
         self.assertTrue(any("not of type 'null'" in error.message for error in errors))
         self.assertTrue(any("merge_sha" in error.message or "merged_at" in error.message for error in errors))
 
+    def test_daily_report_inputs_are_required_before_execution_not_while_planned(self) -> None:
+        schema = json.loads((ROOT / "schemas/task-manifest.schema.json").read_text())
+        validator = Draft202012Validator(schema, format_checker=FormatChecker())
+        task = {
+            "task_id": "task_report",
+            "task_type": "daily_report",
+            "state": "planned",
+            "window": {"from": "2026-08-05T00:00:00Z", "to": "2026-08-06T00:00:00Z"},
+            "scope": {"source_ids": [], "source_groups": [], "regions": [], "topics": [], "content_types": []},
+            "exclusions": [],
+            "allowed_output_paths": ["reports/daily/example.md"],
+            "definition_of_done": ["done"],
+            "idempotency_key": "daily_report:planned:test",
+            "lease": None,
+        }
+        self.assertEqual(list(validator.iter_errors(task)), [])
+        task["state"] = "ready"
+        self.assertTrue(any("report_inputs" in error.message for error in validator.iter_errors(task)))
+
     def test_bootstrap_requires_all_backpressure_conditions(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             tasks_root = Path(directory)

@@ -2,7 +2,7 @@
   "task_id": "task_20260805_05_international_media",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "review",
+  "state": "merged",
   "priority": 80,
   "created_at": "2026-08-05T05:06:14Z",
   "parent_issue": 33,
@@ -38,17 +38,13 @@
     "No final truth assessment, territorial conclusion, or report narrative was added"
   ],
   "idempotency_key": "open_web_discovery:international-media:20260804T1800Z:20260805T0500Z:ukraine-war",
-  "lease": {
-    "worker_run_id": "run_20260805T051110Z_8f3c2a91",
-    "lease_branch": "work/task_20260805_05_international_media",
-    "base_sha": "38f03b1edb29ee38762460a653474f9d52b6c89b",
-    "leased_at": "2026-08-05T05:11:19Z",
-    "lease_until": "2026-08-05T07:11:19Z"
-  },
+  "lease": null,
   "result": {
     "branch": "work/task_20260805_05_international_media",
     "pr_number": 42,
     "completed_at": "2026-08-05T05:15:29Z",
+    "merge_sha": "7b7005c0da314899cdb7f247e7c17e46c124f896",
+    "merged_at": "2026-08-05T10:28:07Z",
     "summary": "Registered three international-media items with verified publication timestamps inside the bounded UTC window, explicit Reuters-to-Guardian lineage, excluded-candidate reasoning, access failures and follow-up task proposals; no duplicate source profiles or final truth assessments were added. Self-review found no blocking issues.",
     "coverage_gaps": [
       "Only three items from two outlets had publication timestamps verified inside the narrow eleven-hour UTC window.",

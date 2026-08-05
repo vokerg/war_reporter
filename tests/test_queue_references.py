@@ -116,12 +116,13 @@ class QueueReferenceTests(unittest.TestCase):
             },
         }
 
-        _, task = task_from_proposal(
+        path, task = task_from_proposal(
             root,
             duty,
             "2026-08-05T12:00:00Z",
             tasks,
         )
+        dump(path, task)
 
         self.assertEqual(task["scope"]["source_item_ids"], ["item_example"])
         self.assertEqual(validate_repository(root), [])

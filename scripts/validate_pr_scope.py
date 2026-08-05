@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate that a worker PR only changes its manifest, declared outputs, and derived control receipts."""
+"""Validate that a worker PR stays inside its immutable base task contract."""
 from __future__ import annotations
 
 import argparse
@@ -11,19 +11,40 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+MUTABLE_TASK_FIELDS = {"state", "lease", "result", "blocked_reason", "issue_number"}
 
 
 def load(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def task_from_document(value: Any, task_id: str) -> dict[str, Any] | None:
+    for item in value if isinstance(value, list) else [value]:
+        if isinstance(item, dict) and item.get("task_id") == task_id:
+            return item
+    return None
+
+
 def find_task(root: Path, task_id: str) -> tuple[Path, dict[str, Any]]:
     for path in sorted((root / "tasks").rglob("*.json")):
-        value = load(path)
-        for item in value if isinstance(value, list) else [value]:
-            if isinstance(item, dict) and item.get("task_id") == task_id:
-                return path, item
+        task = task_from_document(load(path), task_id)
+        if task is not None:
+            return path, task
     raise ValueError(f"task manifest not found: {task_id}")
+
+
+def task_at_revision(root: Path, revision: str, relative_path: str, task_id: str) -> dict[str, Any]:
+    result = subprocess.run(
+        ["git", "show", f"{revision}:{relative_path}"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    task = task_from_document(json.loads(result.stdout), task_id)
+    if task is None:
+        raise ValueError(f"base task manifest does not contain {task_id}: {relative_path}")
+    return task
 
 
 def changed_files(root: Path, base: str, head: str) -> list[str]:
@@ -46,26 +67,40 @@ def path_allowed(path: str, patterns: list[str]) -> bool:
     return False
 
 
+def validate_immutable_contract(base_task: dict[str, Any], head_task: dict[str, Any], manifest_path: Path) -> list[str]:
+    errors: list[str] = []
+    fields = sorted((set(base_task) | set(head_task)) - MUTABLE_TASK_FIELDS)
+    for field in fields:
+        if head_task.get(field) != base_task.get(field):
+            errors.append(f"{manifest_path}: immutable task contract field changed: {field}")
+    return errors
+
+
 def validate_scope(root: Path, task_id: str, pr_number: int, base: str, head: str) -> list[str]:
     errors: list[str] = []
-    manifest_path, task = find_task(root, task_id)
-    if task.get("state") != "review":
+    manifest_path, head_task = find_task(root, task_id)
+    relative_manifest = manifest_path.relative_to(root).as_posix()
+    base_task = task_at_revision(root, base, relative_manifest, task_id)
+    errors.extend(validate_immutable_contract(base_task, head_task, manifest_path))
+
+    if head_task.get("state") != "review":
         errors.append(f"{manifest_path}: auto-merge requires state review")
-    result = task.get("result")
+    result = head_task.get("result")
     if not isinstance(result, dict) or result.get("pr_number") != pr_number:
         errors.append(f"{manifest_path}: result.pr_number must be {pr_number}")
     expected_branch = f"work/{task_id}"
     if not isinstance(result, dict) or result.get("branch") != expected_branch:
         errors.append(f"{manifest_path}: result.branch must be {expected_branch}")
-    allowed = list(task.get("allowed_output_paths", []))
+
+    allowed = list(base_task.get("allowed_output_paths", []))
     allowed.extend([
-        manifest_path.relative_to(root).as_posix(),
+        relative_manifest,
         f"review/self/{task_id}.json",
         f"queue/proposals/{task_id}.json",
     ])
     for path in changed_files(root, base, head):
         if not path_allowed(path, allowed):
-            errors.append(f"changed path is outside task scope: {path}")
+            errors.append(f"changed path is outside base task scope: {path}")
     receipt = root / "review/self" / f"{task_id}.json"
     if not receipt.is_file():
         errors.append(f"missing self-review receipt: {receipt.relative_to(root)}")

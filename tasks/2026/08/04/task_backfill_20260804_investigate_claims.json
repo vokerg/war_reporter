@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_investigate_claims",
   "task_type": "investigate_claim",
   "role": "corroborator",
-  "state": "planned",
+  "state": "ready",
   "priority": 75,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -48,9 +48,20 @@
       "item_ru_milbloggers_rybar_82204"
     ],
     "source_groups": [],
-    "regions": ["ukraine-war"],
-    "topics": ["backfill", "claim-normalization", "corroboration", "editorial-assessment"],
-    "content_types": ["observation", "claim", "assessment"]
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "backfill",
+      "claim-normalization",
+      "corroboration",
+      "editorial-assessment"
+    ],
+    "content_types": [
+      "observation",
+      "claim",
+      "assessment"
+    ]
   },
   "exclusions": [
     "Source items or observations outside the frozen UTC window",

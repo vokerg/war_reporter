@@ -58,6 +58,9 @@ jobs:
       - name: Run validator tests
         run: python -m unittest discover -s tests -v
 
+      - name: Validate GitHub repository metadata
+        run: python scripts/validate_repository_metadata.py
+
       - name: Validate canonical source watchlist
         run: |
           python scripts/validate_source_watchlist.py

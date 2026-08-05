@@ -14,7 +14,7 @@ sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 from finalize_merged_task import finalize
 from reconcile_repository import apply_plan, plan_duties, task_index
-from validate_autonomy import validate_receipt
+from validate_autonomy import validate_auto_merge_trust_boundary, validate_receipt
 from validate_pr_scope import validate_scope
 
 
@@ -41,6 +41,22 @@ class AutonomyTests(unittest.TestCase):
         })
         (root / "tasks").mkdir()
         return root
+
+    def test_write_capable_controller_uses_trusted_main_validators(self) -> None:
+        root = self.make_root()
+        workflow = root / ".github/workflows/auto-merge-reviewed.yml"
+        workflow.parent.mkdir(parents=True, exist_ok=True)
+        workflow.write_text(
+            "ref: main\npath: trusted\npath: pr-head\n"
+            "validated_sha\n"
+            "python trusted/scripts/validate_autonomy.py\n"
+            "python trusted/scripts/validate_pr_scope.py\n",
+            encoding="utf-8",
+        )
+        self.assertEqual(validate_auto_merge_trust_boundary(root), [])
+        workflow.write_text("python scripts/validate_autonomy.py\n", encoding="utf-8")
+        errors = validate_auto_merge_trust_boundary(root)
+        self.assertTrue(any("may not execute validator from PR head" in error for error in errors))
 
     def test_two_review_rounds_are_ordered_and_complete(self) -> None:
         root = self.make_root()

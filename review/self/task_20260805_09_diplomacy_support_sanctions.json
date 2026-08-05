@@ -1,0 +1,55 @@
+{
+  "task_id": "task_20260805_09_diplomacy_support_sanctions",
+  "pr_number": 52,
+  "rounds": [
+    {
+      "round": 1,
+      "reviewed_at": "2026-08-05T11:03:10Z",
+      "reviewer_run_id": "run_20260805T110300Z_recheck09",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps"
+      ],
+      "findings": [
+        "The bounded scan retained zero source items because no primary publication with a stable canonical URL and verifiable timestamp inside the exact UTC window was found.",
+        "Before-window, after-window, and adjacent-shard candidates are explicitly excluded rather than admitted or duplicated.",
+        "Empty source-catalog, source-item, and artifact outputs agree with the raw manifest and do not imply an exhaustive claim about the open internet.",
+        "No precise operational positions, sensitive geometry, restricted material, reliability assessment, truth assessment, or report narrative was added.",
+        "Exact-head repository validation run 224 passed all validator, queue, trust-boundary, autonomy, proposal, and live-ref audit stages."
+      ],
+      "repairs": [
+        "Created the required standalone two-round self-review receipt that was missing from the original worker patch.",
+        "Converted the raw follow-up idea into an allowed bounded validation proposal instead of the disallowed open_web_discovery proposal type."
+      ],
+      "outcome": "pass"
+    },
+    {
+      "round": 2,
+      "reviewed_at": "2026-08-05T11:03:25Z",
+      "reviewer_run_id": "run_20260805T110300Z_recheck09",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps"
+      ],
+      "findings": [
+        "A second full reread found the five research outputs internally consistent: all admitted datasets are empty, while search provenance, exclusions, access limitations, and uncertainty are preserved in the raw manifest.",
+        "No retrieval time or secondary relay time is substituted for an unknown primary publication time.",
+        "The repaired patch remains inside the worker task boundary plus the required review and proposal receipts.",
+        "No exceptional legal, identity, security, correction, or sensitive-geodata condition is present."
+      ],
+      "repairs": [],
+      "outcome": "pass"
+    }
+  ],
+  "exceptional_condition": false
+}

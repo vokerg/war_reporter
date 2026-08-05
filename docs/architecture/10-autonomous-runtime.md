@@ -23,7 +23,9 @@ operator invocation / hourly schedule / merged PR
 
 ## Queue reproduction
 
-The system does not rely on an operator to create the next layer. Every task writes `queue/proposals/<task_id>.json`. After the producer merges, the reconciler validates each proposal, enforces dependency linkage and allowed task types, rejects control-plane paths, deduplicates by idempotency key, and creates `ready` or `planned` manifests.
+The system does not rely on an operator to create the next layer. Every task writes `queue/proposals/<task_id>.json`. After the producer merges, the reconciler validates each proposal, enforces dependency linkage and allowed task types, deduplicates by idempotency key, and creates `ready` or `planned` manifests.
+
+Proposal-generated task permissions are restricted to data-plane roots: `catalogs/`, `data/`, `maps/`, `raw-manifests/`, and `reports/`. A worker cannot use a proposal to grant access to workflows, schemas, scripts, tasks, review receipts, tests, or other control-plane files.
 
 An empty proposal list is meaningful: it records that the worker considered downstream work and found none justified.
 
@@ -39,11 +41,19 @@ Both rounds use the configured check set: scope, provenance, deduplication, temp
 
 Self-review is not represented as independent review. It is an accountable administrative quality gate.
 
-## Merge and cleanup boundary
+## Merge and scope boundary
 
-Workers cannot directly merge. A GitHub Actions controller receives the successful validation event, verifies the exact head, task scope, receipt, and exceptional-condition status, then squash-merges. Post-merge automation records actual merge metadata.
+Workers cannot directly merge. A GitHub Actions controller receives the successful validation event, verifies that the current PR head is the exact SHA validated by CI, checks the task receipt and exceptional-condition status, and then squash-merges.
 
-Branch deletion is controller-owned. Failure to delete a branch is cleanup debt, not incomplete research. The hourly reconciler retries it.
+The write-capable controller executes validator code only from trusted `main`. The reviewed PR head is checked out separately and treated as untrusted data. It cannot replace its own merge gates.
+
+Worker permissions are taken from the base task manifest on `main`, not from the modified head manifest. Task-contract fields such as scope, dependencies, idempotency key, and `allowed_output_paths` are immutable inside the worker PR. Only lifecycle/result metadata may change.
+
+Hardening and other control-plane PRs are excluded from the worker auto-merge path.
+
+## Cleanup boundary
+
+Branch deletion is controller-owned. Workers must not spend task time attempting GitHub Connector branch deletion. Failure to delete a branch is cleanup debt, not incomplete research, and the hourly reconciler retries it.
 
 ## Exceptional human gate
 

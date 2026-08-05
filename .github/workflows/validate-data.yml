@@ -61,6 +61,9 @@ jobs:
       - name: Validate repository records and raw manifests
         run: python scripts/validate_data.py
 
+      - name: Validate task and proposal scope references
+        run: python scripts/validate_queue_references.py
+
       - name: Validate queue and trust boundary
         run: python scripts/validate_worker_queue.py
 

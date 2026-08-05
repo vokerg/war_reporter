@@ -2,7 +2,7 @@
   "task_id": "task_20260804_07_strikes_infrastructure",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "leased",
+  "state": "pr_open",
   "priority": 80,
   "created_at": "2026-08-04T18:28:29Z",
   "parent_issue": 5,
@@ -15,9 +15,24 @@
   "scope": {
     "source_ids": [],
     "source_groups": [],
-    "regions": ["ukraine-war"],
-    "topics": ["strikes", "air-defense", "infrastructure"],
-    "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"]
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "strikes",
+      "air-defense",
+      "infrastructure"
+    ],
+    "content_types": [
+      "post",
+      "article",
+      "report",
+      "briefing",
+      "document",
+      "image",
+      "video",
+      "map"
+    ]
   },
   "exclusions": [
     "Items already represented by canonical URL, platform ID, or content hash",
@@ -44,5 +59,17 @@
     "base_sha": "7d8f3e13261f24e121ec4f8b63c6d200df4e2eb1",
     "leased_at": "2026-08-05T04:41:48Z",
     "lease_until": "2026-08-05T06:41:48Z"
+  },
+  "result": {
+    "branch": "work/task_20260804_07_strikes_infrastructure",
+    "pr_number": 22,
+    "completed_at": "2026-08-05T04:48:27Z",
+    "summary": "Bounded public-web discovery registered three draft source profiles and four source items covering warehouse strikes, port and shipping disruption, and a paywalled parallel report. Attribution and shared upstream lineage were preserved without truth assessment.",
+    "coverage_gaps": [
+      "Direct upstream statements from all named regional authorities, companies and ministries were not exhaustively registered.",
+      "One Financial Times item was limited to public metadata because full text required a subscription.",
+      "No binaries or full-text artifacts were downloaded or hashed.",
+      "Discovery records do not verify casualties, damage, military use, targeting intent or attribution."
+    ]
   }
 }

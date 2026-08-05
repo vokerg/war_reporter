@@ -1,0 +1,50 @@
+name: Build static publication site
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/build-site.yml"
+      - "data/reports/**"
+      - "maps/**"
+      - "reports/**"
+      - "scripts/build_site.py"
+      - "site/**"
+      - "tests/test_build_site.py"
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Run site builder tests
+        run: python -m unittest tests.test_build_site -v
+
+      - name: Build publication site
+        run: python scripts/build_site.py --strict --output _site
+
+      - name: Verify generated entry points
+        run: |
+          test -f _site/index.html
+          test -f _site/data/catalog.json
+          test -f _site/data/map.geojson
+          test -f _site/.nojekyll

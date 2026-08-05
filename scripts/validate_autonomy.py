@@ -43,6 +43,35 @@ def schema_errors(value: Any, schema: Any, path: Path) -> list[str]:
     return errors
 
 
+def validate_auto_merge_trust_boundary(root: Path) -> list[str]:
+    path = root / ".github/workflows/auto-merge-reviewed.yml"
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return [f"auto-merge workflow unavailable: {exc}"]
+    required_markers = (
+        "ref: main",
+        "path: trusted",
+        "path: pr-head",
+        "python trusted/scripts/validate_autonomy.py",
+        "python trusted/scripts/validate_pr_scope.py",
+        "validated_sha",
+    )
+    errors = [
+        f"{path}: missing trusted-controller marker: {marker}"
+        for marker in required_markers
+        if marker not in text
+    ]
+    unsafe_markers = (
+        "python scripts/validate_autonomy.py",
+        "python scripts/validate_pr_scope.py",
+    )
+    for marker in unsafe_markers:
+        if marker in text:
+            errors.append(f"{path}: write-capable controller may not execute validator from PR head: {marker}")
+    return errors
+
+
 def validate_config(root: Path) -> list[str]:
     errors: list[str] = []
     for relative in REQUIRED_RUNTIME_FILES:
@@ -55,6 +84,7 @@ def validate_config(root: Path) -> list[str]:
     except (OSError, json.JSONDecodeError) as exc:
         return errors + [f"autonomy configuration unavailable: {exc}"]
     errors.extend(schema_errors(config, schema, config_path))
+    errors.extend(validate_auto_merge_trust_boundary(root))
     if config.get("self_review", {}).get("required_rounds") != 2:
         errors.append("autonomy requires exactly two self-review rounds")
     if config.get("reports") != {"daily": "automatic", "weekly": "on_demand", "monthly": "on_demand"}:

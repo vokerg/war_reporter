@@ -1,0 +1,57 @@
+{
+  "task_id": "task_auto_bb110619963930f9",
+  "pr_number": 76,
+  "rounds": [
+    {
+      "round": 1,
+      "reviewed_at": "2026-08-05T12:27:45Z",
+      "reviewer_run_id": "run_20260805T122530Z_bb110619",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps"
+      ],
+      "findings": [
+        "The recheck stayed limited to the five named official public archives and the frozen 2026-08-04T18:00:00Z–2026-08-05T05:00:00Z window.",
+        "No stable canonical primary publication with a verifiable primary timestamp inside the window was confirmed.",
+        "A NATO result dated August 5 was from 2025 and required explicit exclusion rather than admission.",
+        "Archive and search representations may lag, so the result must remain bounded non-verification rather than proof of absence.",
+        "No retrieval, crawl, relay, or search-result timestamp was substituted for a primary publication timestamp.",
+        "No source item, binary artifact, assessment, report narrative, or sensitive operational detail was introduced."
+      ],
+      "repairs": [
+        "Recorded the wrong-year NATO result in excluded candidates.",
+        "Added explicit archive/index-lag, immutable-capture, scope, and non-exhaustiveness coverage gaps.",
+        "Persisted an explicit empty downstream proposal file because no further bounded task was justified."
+      ],
+      "outcome": "pass"
+    },
+    {
+      "round": 2,
+      "reviewed_at": "2026-08-05T12:31:01Z",
+      "reviewer_run_id": "run_20260805T122530Z_bb110619",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps"
+      ],
+      "findings": [
+        "A second full reread found the raw manifest, zero-item outcome, exclusions, access limitations, proposal receipt, task result, and coverage gaps internally consistent.",
+        "All task changes remain inside the declared validation output plus required proposal, review, and task-control paths.",
+        "Exact-head repository contract run 279 passed validator tests, data validation, queue-reference validation, trust-boundary validation, autonomy/proposal validation, and live-ref audit.",
+        "No exceptional legal, identity, correction, security, or sensitive-geodata condition is present."
+      ],
+      "repairs": [],
+      "outcome": "pass"
+    }
+  ],
+  "exceptional_condition": false
+}

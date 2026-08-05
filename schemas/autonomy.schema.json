@@ -91,7 +91,7 @@
         "eligible_head_prefix",
         "worker_direct_merge_allowed",
         "administrative_same_repository_controller_allowed",
-        "human_review_required_for"
+        "automatic_withhold_for"
       ],
       "properties": {
         "enabled": {"const": true},
@@ -101,7 +101,7 @@
         "eligible_head_prefix": {"const": "work/task_"},
         "worker_direct_merge_allowed": {"const": false},
         "administrative_same_repository_controller_allowed": {"const": true},
-        "human_review_required_for": {
+        "automatic_withhold_for": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,

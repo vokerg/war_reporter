@@ -8,7 +8,7 @@ The primary runtime is a ChatGPT Project with parallel worker chats. The routine
 копай
 ```
 
-One invocation is enough to check repository duties, create or promote necessary tasks, claim one task, complete it, self-review it twice, and hand it to automatic exact-head squash merge. The operator does not need to know the internal queue or role topology.
+One invocation checks repository duties, creates or promotes necessary tasks, claims one task, completes it, self-reviews it twice, and hands it to automatic exact-head squash merge. The operator does not need to know the internal queue or role topology.
 
 The long-running supervisor command is:
 
@@ -16,7 +16,7 @@ The long-running supervisor command is:
 continuous loop
 ```
 
-Aliases are `continuous-loop`, `копай непрерывно`, and `непрерывный цикл`. This mode repeats the complete `копай` lifecycle. It waits for the current task's actual squash merge and post-merge finalization on `main`, refreshes repository state, consumes any newly materialized proposals, and claims the next eligible task. It does not voluntarily finish after one task or one empty queue scan.
+Aliases are `continuous-loop`, `копай непрерывно`, and `непрерывный цикл`. This mode repeats the complete `копай` lifecycle. It waits for the current task's actual squash merge and post-merge finalization on `main`, refreshes repository state, consumes newly materialized proposals, and claims the next eligible task. It does not voluntarily finish after one task or one empty queue scan.
 
 ## Autonomous control loop
 
@@ -31,7 +31,15 @@ Aliases are `continuous-loop`, `копай непрерывно`, and `непр�
 - `finalize-task-merge.yml` records actual merge metadata and closes tasks.
 - Workers ignore Connector branch-deletion limitations; cleanup is controller-owned and non-blocking.
 
+The supervisor returns only `reconcile`, `claim`, `wait`, or `quiescent`. The former `human_gate` action is retired. Non-worker architecture/hardening PRs are outside loop scheduling, and legacy `HUMAN_REVIEW_REQUIRED:` task blockers are treated as pickable after dependency checks.
+
 Daily discovery is automatic across ten configured source shards. Daily snapshots are automatic when their full window is complete. Weekly and monthly snapshots are on-demand.
+
+## Automatic withholding
+
+The operator is not asked to adjudicate source ambiguity, rights uncertainty, sensitive geodata, released corrections, or credential/security-boundary changes. Workers fail closed on the affected material: omit it, coarsen it, preserve the correction history, or exclude the security change. They record the limitation as a coverage gap and complete the safe bounded remainder.
+
+Automatic withholding never permits invented evidence, access-control bypass, or unsafe publication.
 
 ## Static publication site
 
@@ -50,7 +58,7 @@ The site provides latest-report, archive, report-reader, map, and methodology vi
 
 1. [`AGENTS.md`](AGENTS.md) — all-the-way-down worker and supervisor contract.
 2. [`CHATGPT_PROJECT.md`](CHATGPT_PROJECT.md) — exact multi-chat runtime.
-3. [`config/autonomy.json`](config/autonomy.json) — machine-readable cadence, loop, and merge policy.
+3. [`config/autonomy.json`](config/autonomy.json) — machine-readable cadence, loop, merge, and withholding policy.
 4. [`docs/architecture/10-autonomous-runtime.md`](docs/architecture/10-autonomous-runtime.md) — atomic control-loop architecture.
 5. [`docs/architecture/11-continuous-loop.md`](docs/architecture/11-continuous-loop.md) — long-running supervisor architecture.
 6. [`docs/architecture/12-static-publication-site.md`](docs/architecture/12-static-publication-site.md) — public-site build and publication boundary.
@@ -67,7 +75,3 @@ python scripts/validate_autonomy.py
 python scripts/build_site.py --strict --output _site
 python scripts/continuous_loop.py --open-worker-prs 0 --active-work-branches 0
 ```
-
-## Explicit human-review boundary
-
-Routine bounded work should complete without human intervention. Human review remains mandatory for source-identity ambiguity, legal/rights uncertainty, sensitive-geodata release, released corrections, credential/security-boundary changes, and other exceptional safety or governance ambiguity.

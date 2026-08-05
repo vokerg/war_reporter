@@ -63,6 +63,8 @@ def validate_auto_merge_trust_boundary(root: Path) -> list[str]:
         "python trusted/scripts/validate_autonomy.py",
         "python trusted/scripts/validate_pr_scope.py",
         "validated_sha",
+        "commits/$validated_sha/pulls",
+        "candidate_count",
         "actions: write",
         "gh workflow run finalize-task-merge.yml",
         "-f pr_number=",

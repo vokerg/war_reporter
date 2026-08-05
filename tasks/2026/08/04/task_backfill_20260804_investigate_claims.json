@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_investigate_claims",
   "task_type": "investigate_claim",
   "role": "corroborator",
-  "state": "leased",
+  "state": "pr_open",
   "priority": 75,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -96,5 +96,18 @@
     "base_sha": "caed643349529c955083135de9b13be167a7348e",
     "leased_at": "2026-08-05T19:22:00Z",
     "lease_until": "2026-08-05T21:22:00Z"
+  },
+  "result": {
+    "branch": "work/task_backfill_20260804_investigate_claims",
+    "pr_number": 98,
+    "completed_at": null,
+    "summary": "Editorially approved 28 merged dependency observations, normalized 19 approved claims with lineage-aware outcomes, and produced seven approved editorial assessments without promoting source assertions beyond frozen evidence.",
+    "coverage_gaps": [
+      "No claim was normalized from item_20260804_ft_wildberries because the dependency extraction correctly produced no observation from paywalled title-only metadata.",
+      "The Suspilne mobilization framing, Dva Majors rhetorical characterization, and Rybar influence-campaign assessment were approved as accurate source records but were not promoted into substantive underlying-event claims.",
+      "Russian and Ukrainian official unmanned-aircraft figures use unresolved and potentially incompatible reporting intervals, categories, and attribution; they were not combined or directly compared.",
+      "Reuters and Rybar repetitions of Russian Ministry of Defence reporting, and overlapping Reuters, AP, and Rybar incident reporting, were treated as shared or unresolved upstream rather than independent corroboration.",
+      "Precise operational positions, routes, map geometry, targeting-enabling detail, unsupported causality, and forecasts were withheld."
+    ]
   }
 }

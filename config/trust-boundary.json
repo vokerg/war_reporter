@@ -1,9 +1,9 @@
 {
   "review_mode": "administrative",
-  "worker_identity": "vokerg",
-  "merge_controller_identity": "vokerg",
+  "worker_identity": "repository-authorized-agent",
+  "merge_controller_identity": "github-actions[bot]",
   "require_distinct_identities": false,
   "self_approval_allowed": false,
   "self_merge_allowed": false,
-  "notes": "Workers and merge-controller actions currently authenticate as the same GitHub account. Review is administrative, not independent. A future independent mode requires distinct authenticated identities and repository enforcement."
+  "notes": "Workers do not approve or directly merge their own PRs. After two separate self-review rounds, exact-head CI, scope validation, and absence of exceptional conditions, a repository-scoped GitHub Actions controller may squash-merge administratively. Human review remains mandatory for the exceptional conditions listed in config/autonomy.json."
 }

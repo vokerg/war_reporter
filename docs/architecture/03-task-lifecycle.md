@@ -1,53 +1,27 @@
 # Task lifecycle
 
-## Canonical contract
-
-The file in `tasks/` on `main` is authoritative. The GitHub issue is the human dashboard and links the manifest. Issue-form Markdown is not a machine-stable task protocol.
-
-A manifest defines task type, role, priority, creation time, dependencies, UTC window, source/region/topic/content scope, exclusions, allowed output paths, definition of done, idempotency key, state, lease, and result metadata.
-
-## States
+The manifest in `tasks/` on `main` is authoritative.
 
 ```text
-planned → ready → leased → collecting → pr_open → validating → review → merged
+planned -> ready -> leased -> collecting -> pr_open -> validating -> review -> merged
 ```
 
-Terminal or recovery states: `blocked`, `lease_expired`, `rejected`, `cancelled`, `duplicate`.
+Recovery states include `blocked`, `lease_expired`, `rejected`, `cancelled`, and `duplicate`.
 
-## Atomic task acquisition
+## Acquisition
 
-The deterministic branch `work/<task_id>` is the mutex. A worker claims a ready task by creating that ref from the exact current `main` SHA.
+`work/<task_id>` is the mutex. Successful exact-ref creation owns the task; conflict means another worker won. Random fallback branches are prohibited.
 
-- Successful create-ref: the worker owns the task.
-- Ref conflict: another worker owns it; select another task.
-- Random fallback branch names are prohibited because they permit duplicate work.
+## Completion
 
-After branch creation, the worker commits lease metadata to the task manifest and opens a draft PR immediately.
+A worker persists outputs, `queue/proposals/<task_id>.json`, and two ordered passing rounds in `review/self/<task_id>.json`; then sets the task to `review` and makes the PR ready.
 
-## Eligibility and ordering
+The merge controller verifies exact-head CI, scope, receipt, and exceptional status, then squash-merges. Post-merge finalization writes actual merge SHA/time and clears the lease.
 
-A task is eligible only when:
+## Queue continuation
 
-- state is `ready`;
-- every dependency is `merged`;
-- the idempotency key is unique;
-- no deterministic work branch or active PR exists;
-- required GitHub and research tools are available.
+Merged proposal files create bounded downstream tasks. Dependency-complete planned tasks are promoted automatically. Daily discovery and daily snapshot duties are reconciled hourly and after merges.
 
-Order candidates by priority descending, creation time ascending, then task ID.
+## Cleanup
 
-## Parallelization
-
-Shard work deterministically by source group, non-overlapping UTC window, region/topic scope, and content type. Workers must not broaden scope to “everything important.”
-
-Ten ordinary ChatGPT Project chats may acquire ten distinct tasks concurrently. Shared Project memory is not used for task ownership.
-
-## Lease recovery
-
-A controller may recover an expired lease only after verifying the deadline, branch and PR activity, and worker status. Recovery requires an issue note and deletion of the stale deterministic branch. Ambiguous activity requires human review.
-
-## Pull-request gate
-
-A PR links its issue and manifest, lists generated/modified IDs, stays inside allowed paths, documents coverage gaps, passes deterministic validation, and receives independent research/safety review as applicable.
-
-The merge controller verifies the expected head SHA, changes the manifest to `merged`, updates the issue mirror, and squash-merges. Workers never approve or merge their own work.
+Branch deletion is controller-owned and non-blocking. Workers do not retry Connector deletion failures.

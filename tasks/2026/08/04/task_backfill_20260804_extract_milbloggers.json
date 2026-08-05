@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_extract_milbloggers",
   "task_type": "extract_observations",
   "role": "extractor",
-  "state": "review",
+  "state": "merged",
   "priority": 80,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -54,23 +54,19 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "backfill_extract:2026-08-04:milbloggers:ukraine-war:v1",
-  "lease": {
-    "worker_run_id": "run_20260805T190700Z_contloop",
-    "lease_branch": "work/task_backfill_20260804_extract_milbloggers",
-    "base_sha": "20db812f65d5bd336f174dbfa211f13a0650132d",
-    "leased_at": "2026-08-05T19:08:00Z",
-    "lease_until": "2026-08-05T21:08:00Z"
-  },
+  "lease": null,
   "result": {
     "branch": "work/task_backfill_20260804_extract_milbloggers",
     "pr_number": 96,
-    "completed_at": "2026-08-05T19:14:00Z",
+    "completed_at": "2026-08-05T19:14:40Z",
     "summary": "Created four atomic draft observations from the four assigned Dva Majors and Rybar source items while preserving channel attribution, Russian-language excerpts, day-level publication bounds, preview times, unresolved upstream lineage, and safety withholding.",
     "coverage_gaps": [
       "Telegram previews did not expose timezone-bearing publication timestamps; source-item day precision and preview times were preserved without inventing exact UTC publication times.",
       "The Rybar 82198 manifest states in editorial summary that actual damage required assessment, but no original excerpt or artifact supports a separate observation for that caveat.",
       "Named upstream Reuters, Kotsnews, Russian Ministry of Defence, Rutube, and Soloviev Live materials were not registered in this shard and were not treated as independent evidence.",
       "Granular frontline positions, active-unit movements, routes, map geometry, and other targeting-enabling details were automatically withheld."
-    ]
+    ],
+    "merge_sha": "55e5a1a88d45c1e477ff7c617d59191c90854ac2",
+    "merged_at": "2026-08-05T19:14:40Z"
   }
 }

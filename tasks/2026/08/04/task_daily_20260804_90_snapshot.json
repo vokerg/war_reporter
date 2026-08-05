@@ -2,7 +2,7 @@
   "task_id": "task_daily_20260804_90_snapshot",
   "task_type": "daily_report",
   "role": "report-editor",
-  "state": "leased",
+  "state": "pr_open",
   "priority": 65,
   "created_at": "2026-08-05T15:31:00Z",
   "parent_issue": null,
@@ -73,5 +73,17 @@
     "base_sha": "19f3d4b97301b0c30eedc612a38d4d4459000ade",
     "leased_at": "2026-08-05T15:37:14Z",
     "lease_until": "2026-08-05T17:37:14Z"
+  },
+  "result": {
+    "branch": "work/task_daily_20260804_90_snapshot",
+    "pr_number": 80,
+    "completed_at": "2026-08-05T15:40:31Z",
+    "summary": "Produced a frozen zero-claim daily snapshot for 2026-08-04. The repository contained no claim or assessment records, so the report explicitly publishes no conflict findings and records the editorial boundary, unresolved pipeline work, and material coverage gaps without promoting draft source items or observations.",
+    "coverage_gaps": [
+      "No claim records or assessment records exist for the frozen UTC day.",
+      "Draft source items and observations cannot support factual report statements until claim creation and assessment are completed.",
+      "Upstream tasks retain access failures, timestamp uncertainty, missing immutable captures, and non-exhaustive source coverage.",
+      "The snapshot does not establish that no relevant events occurred; it establishes only that no approved claim-and-assessment set was available."
+    ]
   }
 }

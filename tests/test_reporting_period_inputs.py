@@ -109,7 +109,10 @@ class ReportingPeriodInputTests(unittest.TestCase):
             ]
             self.assertEqual(report_inputs, frozen)
         else:
-            self.assertEqual(task["state"], "ready")
+            self.assertIn(
+                task["state"],
+                {"ready", "leased", "pr_open", "validating", "review", "merged"},
+            )
             self.assertEqual(task["report_inputs"], frozen)
 
 

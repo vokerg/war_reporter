@@ -1,0 +1,59 @@
+{
+  "task_id": "task_backfill_20260804_extract_media",
+  "task_type": "extract_observations",
+  "role": "extractor",
+  "state": "ready",
+  "priority": 85,
+  "created_at": "2026-08-05T17:22:00Z",
+  "parent_issue": 81,
+  "issue_number": null,
+  "depends_on_task_ids": [],
+  "window": {
+    "from": "2026-08-04T00:00:00Z",
+    "to": "2026-08-05T00:00:00Z"
+  },
+  "scope": {
+    "source_ids": [],
+    "source_item_ids": [
+      "item_reuters_20260804_type_c_deposits",
+      "item_reuters_20260804_black_sea_navigation",
+      "item_20260804_reuters_port_strikes",
+      "item_20260804_reuters_fire_point_freyja",
+      "item_20260804_guardian_war_briefing",
+      "item_20260804_reuters_grain_routes",
+      "item_20260804_reuters_kherson_drone_reaction",
+      "item_20260804_reuters_warehouses",
+      "item_20260804_ft_wildberries",
+      "item_20260804_ap_drone_strikes",
+      "item_suspilne_1370662",
+      "item_suspilne_1370920",
+      "item_suspilne_1371130",
+      "item_suspilne_1371598"
+    ],
+    "source_groups": [],
+    "regions": ["ukraine-war"],
+    "topics": ["backfill", "media", "diplomacy", "strikes", "infrastructure", "reactions"],
+    "content_types": ["article"]
+  },
+  "exclusions": [
+    "Any source item outside the frozen UTC window",
+    "External web research, paywall bypass, bulk article capture, or introduction of evidence not already stored in the repository",
+    "Assertions that cannot be supported by the stored short excerpt, title, locator, or permitted artifact",
+    "Final truth assessment, source reliability scoring, report narrative, or targeting-enabling detail"
+  ],
+  "allowed_output_paths": [
+    "data/observations/2026/08/04/backfill-media.ndjson",
+    "queue/proposals/task_backfill_20260804_extract_media.json",
+    "review/self/task_backfill_20260804_extract_media.json"
+  ],
+  "definition_of_done": [
+    "Every assigned source item was reviewed against its stored source-item record and raw manifest",
+    "Each material attributable assertion supportable from frozen repository evidence was represented as an atomic draft observation, or the omission reason was recorded as a coverage gap",
+    "Paywalled, edited, derivative, and uncertain records retained explicit access and lineage qualifiers",
+    "No observation was promoted beyond draft and no claim or assessment was created",
+    "A queue proposal receipt was persisted; an empty proposals array is acceptable because the downstream graph is pre-materialized",
+    "Two separate self-review rounds passed and a receipt was persisted"
+  ],
+  "idempotency_key": "backfill_extract:2026-08-04:media:ukraine-war:v1",
+  "lease": null
+}

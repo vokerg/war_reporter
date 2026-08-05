@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_investigate_claims",
   "task_type": "investigate_claim",
   "role": "corroborator",
-  "state": "ready",
+  "state": "leased",
   "priority": 75,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -90,5 +90,11 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "backfill_claims:2026-08-04:ukraine-war:v1",
-  "lease": null
+  "lease": {
+    "worker_run_id": "run_20260805T192100Z_contloop",
+    "lease_branch": "work/task_backfill_20260804_investigate_claims",
+    "base_sha": "caed643349529c955083135de9b13be167a7348e",
+    "leased_at": "2026-08-05T19:22:00Z",
+    "lease_until": "2026-08-05T21:22:00Z"
+  }
 }

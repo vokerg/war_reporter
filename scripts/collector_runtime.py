@@ -35,6 +35,44 @@ def append_errors(root: Path, rows: list[dict[str, Any]]) -> None:
             )
 
 
+def public_error_summary(exc: Exception) -> str:
+    """Return a stable public-safe category without exception details."""
+    if isinstance(exc, requests.Timeout):
+        code = "timeout"
+    elif isinstance(exc, requests.TooManyRedirects):
+        code = "redirect_error"
+    elif isinstance(exc, requests.SSLError):
+        code = "tls_error"
+    elif isinstance(exc, requests.ConnectionError):
+        code = "connection_error"
+    elif isinstance(exc, requests.HTTPError):
+        response = getattr(exc, "response", None)
+        status = getattr(response, "status_code", None)
+        code = f"http_{status}" if isinstance(status, int) else "http_error"
+    elif isinstance(exc, json.JSONDecodeError):
+        code = "invalid_json"
+    elif isinstance(exc, CollectionError):
+        text = str(exc).lower()
+        if text.startswith("x api "):
+            match = re.match(r"x api (\d{3})", text)
+            code = f"x_api_http_{match.group(1)}" if match else "x_api_error"
+        elif "dns lookup" in text:
+            code = "dns_error"
+        elif "private destination" in text or "unsafe url" in text:
+            code = "unsafe_destination"
+        elif "cross-host redirect" in text:
+            code = "cross_host_redirect"
+        elif "too many redirects" in text:
+            code = "redirect_error"
+        elif "not configured" in text:
+            code = "missing_configuration"
+        else:
+            code = "collection_error"
+    else:
+        code = "unexpected_error"
+    return f"{type(exc).__name__}: {code}"
+
+
 def item_storage_delay_hours(
     item: dict[str, Any], settings: dict[str, Any]
 ) -> float:
@@ -217,7 +255,6 @@ def run_collection(
     total_withheld_recent = 0
     total_withheld_undated = 0
     succeeded = 0
-
     with ThreadPoolExecutor(max_workers=worker_count) as pool:
         future_to_source = {
             pool.submit(collect_one, source, settings, since): source
@@ -277,21 +314,22 @@ def run_collection(
                     added,
                 )
             except Exception as exc:
+                public_error = public_error_summary(exc)
                 row = {
                     "source": source_id,
                     "platform": source.get("platform"),
                     "url": source.get("url"),
                     "collected_at": iso(),
-                    "error": f"{type(exc).__name__}: {exc}",
+                    "error": public_error,
                 }
                 errors.append(row)
                 per_source[source_id] = {
                     **previous,
                     "status": "error",
                     "checked_at": row["collected_at"],
-                    "error": row["error"],
+                    "error": public_error,
                 }
-                LOG.warning("%s: %s", source_id, row["error"])
+                LOG.warning("%s: %s", source_id, public_error)
 
     append_errors(root / settings["error_root"], errors)
 

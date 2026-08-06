@@ -76,6 +76,58 @@ class TaskChangedPathsTests(unittest.TestCase):
         )
         self.assertEqual(violations, [])
 
+    def test_allows_recursive_glob_output(self) -> None:
+        head = self.add_task_commit(
+            changed_path="data/results/2026/08/example.ndjson",
+            allowed_path="data/results/**",
+        )
+        _, _, violations = MODULE.validate(
+            repo=self.repo,
+            base=self.base,
+            head=head,
+            head_ref="work/task_example",
+        )
+        self.assertEqual(violations, [])
+
+    def test_allows_single_level_glob_output(self) -> None:
+        head = self.add_task_commit(
+            changed_path="data/results/example.ndjson",
+            allowed_path="data/results/*.ndjson",
+        )
+        _, _, violations = MODULE.validate(
+            repo=self.repo,
+            base=self.base,
+            head=head,
+            head_ref="work/task_example",
+        )
+        self.assertEqual(violations, [])
+
+    def test_glob_does_not_authorize_sibling_path(self) -> None:
+        head = self.add_task_commit(
+            changed_path="data/other/example.ndjson",
+            allowed_path="data/results/**",
+        )
+        _, _, violations = MODULE.validate(
+            repo=self.repo,
+            base=self.base,
+            head=head,
+            head_ref="work/task_example",
+        )
+        self.assertEqual(violations, ["data/other/example.ndjson"])
+
+    def test_single_level_glob_does_not_match_nested_path(self) -> None:
+        head = self.add_task_commit(
+            changed_path="data/results/nested/example.ndjson",
+            allowed_path="data/results/*.ndjson",
+        )
+        _, _, violations = MODULE.validate(
+            repo=self.repo,
+            base=self.base,
+            head=head,
+            head_ref="work/task_example",
+        )
+        self.assertEqual(violations, ["data/results/nested/example.ndjson"])
+
     def test_allows_mandatory_derived_receipts_without_contract_mutation(self) -> None:
         task_id = "task_example"
         manifest_path = f"tasks/2026/08/06/{task_id}.json"

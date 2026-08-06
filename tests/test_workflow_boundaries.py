@@ -33,6 +33,17 @@ class WorkflowBoundaryTests(unittest.TestCase):
         self.assertNotIn("pip install", deploy_block)
         self.assertNotIn("actions/checkout", deploy_block)
 
+    def test_x_secret_is_isolated_from_non_x_smoke(self) -> None:
+        text = (WORKFLOWS / "source-smoke.yml").read_text()
+        non_x_block, x_block = text.split("\n  x:\n", 1)
+        self.assertNotIn("X_BEARER_TOKEN", non_x_block)
+        self.assertIn("if: ${{ inputs.include_x }}", x_block)
+        self.assertIn("X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}", x_block)
+        self.assertIn("ua-general-staff-x", x_block)
+        self.assertIn("x-discovery-1", x_block)
+        self.assertIn("name: non-x-source-smoke", non_x_block)
+        self.assertIn("name: x-source-smoke", x_block)
+
 
 if __name__ == "__main__":
     unittest.main()

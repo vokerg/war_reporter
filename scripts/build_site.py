@@ -25,6 +25,7 @@ try:
         utc_now,
     )
     from .html_safety import sanitize_report_html
+    from .public_status import write_public_status
 except ImportError:
     from build_report import is_permanently_redacted, is_sensitive
     from common import (
@@ -35,6 +36,7 @@ except ImportError:
         utc_now,
     )
     from html_safety import sanitize_report_html
+    from public_status import write_public_status
 
 CSS = """
 body{font-family:system-ui,sans-serif;max-width:1180px;margin:0 auto;padding:24px;line-height:1.55;background:#f6f7f9;color:#18191b}
@@ -45,6 +47,7 @@ nav{display:flex;gap:14px;flex-wrap:wrap}.wide{overflow-wrap:anywhere}img{max-wi
 .controls input,.controls select{font:inherit;padding:8px;min-width:180px}.notice{background:#fff8d8;border:1px solid #e6cf65;padding:12px;border-radius:8px}
 table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:6px;text-align:left}
 code,pre{white-space:pre-wrap;overflow-wrap:anywhere}.report{background:#fff;border:1px solid #ddd;border-radius:10px;padding:20px}
+.status-ok{background:#e9f7ed}.status-partial,.status-blocked,.status-failed,.status-unknown{background:#fff0e6}
 """
 
 FILTER_JS = """
@@ -75,11 +78,12 @@ def page(
         f"<a href='{prefix}index.html'>Отчёты</a>"
         f"<a href='{prefix}raw/index.html'>Сырые материалы</a>"
         f"<a href='{prefix}maps/index.html'>Карты из источников</a>"
+        f"<a href='{prefix}status/index.html'>Статус сбора</a>"
     )
     csp = (
         "default-src 'none'; style-src 'unsafe-inline'; "
         f"script-src 'sha256-{FILTER_SCRIPT_HASH}'; "
-        "base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+        "base-uri 'none'; form-action 'none'"
     )
     return (
         "<!doctype html><html lang='ru'><head>"
@@ -272,6 +276,18 @@ def build_site(root: Path) -> Path:
         raise ValueError("missing config/settings.json")
     site = root / settings["site_root"]
     site.mkdir(parents=True, exist_ok=True)
+    now = utc_now()
+    public_status, status_body = write_public_status(root, site, now=now)
+    status_dir = site / "status"
+    status_dir.mkdir(exist_ok=True)
+    status_body += (
+        "<p><a href='../status.json'>Machine-readable status JSON</a></p>"
+    )
+    (status_dir / "index.html").write_text(
+        page("Статус сбора", status_body, prefix="../"),
+        encoding="utf-8",
+    )
+
     report_root = root / settings["report_root"]
     reports = (
         sorted(report_root.glob("*.md"), reverse=True)
@@ -282,8 +298,21 @@ def build_site(root: Path) -> Path:
         f"<li><a href='reports/{path.stem}.html'>{path.stem}</a></li>"
         for path in reports
     )
+    run_status = str(public_status["run"]["status"])
+    stale = bool(public_status["freshness"]["stale"])
+    status_class = html.escape(run_status, quote=True)
+    status_summary = (
+        f"<p class='notice status-{status_class}'>"
+        f"Статус сбора: <strong>{html.escape(run_status)}</strong>; "
+        f"состояние устарело: {'да' if stale else 'нет'}. "
+        "<a href='status/index.html'>Подробности</a></p>"
+    )
     (site / "index.html").write_text(
-        page("War Reporter", f"<ul>{links}</ul>", prefix=""),
+        page(
+            "War Reporter",
+            status_summary + f"<ul>{links}</ul>",
+            prefix="",
+        ),
         encoding="utf-8",
     )
 
@@ -313,7 +342,6 @@ def build_site(root: Path) -> Path:
         },
         reverse=True,
     )
-    now = utc_now()
 
     raw_site = site / "raw"
     raw_site.mkdir(exist_ok=True)

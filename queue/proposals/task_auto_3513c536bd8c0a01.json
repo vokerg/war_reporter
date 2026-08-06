@@ -1,0 +1,65 @@
+{
+  "producer_task_id": "task_auto_3513c536bd8c0a01",
+  "generated_at": "2026-08-06T07:40:31Z",
+  "proposals": [
+    {
+      "task_type": "correction",
+      "priority": 95,
+      "depends_on_task_ids": [
+        "task_auto_3513c536bd8c0a01"
+      ],
+      "window": {
+        "from": "2026-07-19T00:00:00Z",
+        "to": "2026-08-06T00:00:00Z"
+      },
+      "scope": {
+        "source_ids": [
+          "src_vitaliy_klitschko"
+        ],
+        "source_item_ids": [
+          "item_20260805_klitschko_attack_consolidated",
+          "item_20260805_klitschko_casualty_update"
+        ],
+        "source_groups": [],
+        "regions": [
+          "ukraine-war"
+        ],
+        "topics": [
+          "source-date-correction",
+          "observation-lineage-correction",
+          "daily-report-input-correction"
+        ],
+        "content_types": [
+          "source_item",
+          "observation",
+          "claim",
+          "assessment",
+          "raw_manifest"
+        ]
+      },
+      "exclusions": [
+        "Do not preserve the 19 July casualty wording as a 5 August event",
+        "Do not treat reposts or secondary repetitions as independent casualty corroboration",
+        "Do not add medical identifiers, precise impact locations, or targeting-enabling detail"
+      ],
+      "allowed_output_paths": [
+        "data/source-items/2026/08/05/strikes-infrastructure.ndjson",
+        "data/observations/2026/08/05/strikes-infrastructure.ndjson",
+        "raw-manifests/2026/08/05/strikes-infrastructure.json",
+        "data/claims/2026/08/05/report-inputs.ndjson",
+        "data/assessments/2026/08/05/report-inputs.ndjson",
+        "data/source-items/2026/07/19/strikes-infrastructure-correction.ndjson",
+        "data/observations/2026/07/19/strikes-infrastructure-correction.ndjson",
+        "raw-manifests/2026/07/19/strikes-infrastructure-correction.json"
+      ],
+      "definition_of_done": [
+        "Telegram posts 7127 and 7134 are assigned to the correct July 19 chronology with stable canonical identity and timestamp provenance",
+        "The misdated 5 August source items and derived observations are corrected, withdrawn, or superseded without leaving duplicate active identities",
+        "Affected 5 August claims and assessments no longer expose the 15 injured / 9 hospitalized figures as valid 5 August report inputs",
+        "Repository-wide lineage, report-input eligibility, data, and correction validators pass",
+        "Two separate self-review rounds pass"
+      ],
+      "idempotency_key": "correction:klitschko-posts-7127-7134:2026-07-19-vs-2026-08-05"
+    }
+  ]
+}

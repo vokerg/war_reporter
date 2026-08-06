@@ -188,6 +188,9 @@ def build_public_status(
         "run": {
             "status": run_status,
             "last_run_at": last_run_at,
+            "last_successful_run_at": _safe_time(
+                state.get("last_successful_run_at")
+            ),
             "since": _safe_time(state.get("since")),
             "selected_sources": _nonnegative_int(
                 state.get("sources_configured")
@@ -303,6 +306,8 @@ def render_public_status(status: dict[str, Any]) -> str:
         "<h2>Последний проход</h2>"
         "<table><tbody>"
         f"<tr><th>Последний запуск</th><td>{_fmt(run['last_run_at'])}</td></tr>"
+        f"<tr><th>Последний полностью успешный запуск</th><td>"
+        f"{_fmt(run['last_successful_run_at'])}</td></tr>"
         f"<tr><th>Устарело</th><td>{_fmt(freshness['stale'])}</td></tr>"
         f"<tr><th>Возраст состояния, часы</th><td>"
         f"{_fmt(freshness['last_run_age_hours'])}</td></tr>"

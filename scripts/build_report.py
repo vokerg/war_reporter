@@ -141,11 +141,6 @@ def is_permanently_redacted(
     )
 
 
-def requires_refetch(item: dict[str, Any]) -> bool:
-    raw = item.get("raw")
-    return isinstance(raw, dict) and bool(raw.get("requires_refetch"))
-
-
 def render_item(
     item: dict[str, Any], settings: dict[str, Any]
 ) -> str:
@@ -166,8 +161,6 @@ def render_item(
     raw_id = markdown_escape(str(item.get("id", "")))
 
     notes: list[str] = []
-    if requires_refetch(item):
-        notes.append("реконструированная запись; нужен повторный сбор")
     if is_permanently_redacted(item, settings):
         label = (
             "Подробный фрагмент не включён автоматически: "
@@ -237,7 +230,6 @@ def build_report(
     groups = Counter(
         str(row.get("group", "other")) for row in items
     )
-    reconstructed = sum(requires_refetch(row) for row in items)
     sensitive = sum(is_permanently_redacted(row, settings) for row in items)
     state = load_json(
         root / settings["state_file"], default={}
@@ -282,10 +274,6 @@ def build_report(
                 or "нет данных"
             )
             + "**"
-        ),
-        (
-            f"- Реконструированных записей, требующих refetch: "
-            f"**{reconstructed}**"
         ),
         (
             f"- Материалов с автоматически скрытым фрагментом: "

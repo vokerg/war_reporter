@@ -1,0 +1,108 @@
+{
+  "task_id": "task_backfill_20260805_01_ua_official",
+  "worker_run_id": "run_20260806T053500Z_uaoff01",
+  "window": {
+    "from": "2026-08-05T05:00:00Z",
+    "to": "2026-08-06T00:00:00Z"
+  },
+  "searched_at": "2026-08-06T05:40:00Z",
+  "method": "Bounded public-web review of public Ukrainian official Telegram previews. No authentication, platform API, access-control bypass, bulk capture, binary download, or precise operational-location retention was used.",
+  "source_checks": [],
+  "sources_checked": [
+    {
+      "source_entity_id": "src_general_staff_ua",
+      "access_url": "https://t.me/s/GeneralStaffZSU",
+      "status": "searched",
+      "result": "Three primary in-window publications were retained: the 08:00 operational summary, the SAG-U/NSATU command-transfer statement, and the 22:00 operational summary. Granular frontline detail was omitted."
+    },
+    {
+      "source_entity_id": "src_dsns_ua",
+      "access_url": "https://t.me/s/dsns_telegram",
+      "status": "searched",
+      "result": "Three in-window aftermath updates were retained for Donetsk region, Dnipropetrovsk region, and Kyiv. District, facility, and attached-media detail was omitted."
+    }
+  ],
+  "included_items": [
+    {
+      "source_item_id": "item_20260805_generalstaff_0800_backfill",
+      "short_excerpt_original": "Загалом протягом минулої доби зафіксовано 259 бойових зіткнень.",
+      "quote_locator": "Top-level aggregate in Telegram message 41762.",
+      "summary": "The General Staff published its 08:00 operational account for 5 August. Only the top-level aggregate was retained; granular locality, active-front, and damage detail was excluded.",
+      "publication_time_basis": "The public preview displayed 05:46 UTC and the heading explicitly stated 08:00 on 5 August 2026.",
+      "lineage_note": "Primary General Staff publication; underlying unit reports and edit history were not separately resolved."
+    },
+    {
+      "source_item_id": "item_20260805_generalstaff_sagu_transfer",
+      "short_excerpt_original": "Відбулася передача командування Групою безпекової допомоги Україні (SAG-U) та Спеціальною місією НАТО з підтримки безпеки та підготовки для України (NSATU)",
+      "quote_locator": "Opening sentence of Telegram message 41766.",
+      "summary": "The General Staff reported a transfer of command for SAG-U and NSATU and attributed supporting statements to US and NATO officials.",
+      "publication_time_basis": "The public preview displayed 11:06 UTC on 5 August 2026.",
+      "lineage_note": "Ukrainian General Staff publication relaying a multinational command event; the referenced US and NATO primary records were not separately registered in this shard."
+    },
+    {
+      "source_item_id": "item_20260805_generalstaff_2200_backfill",
+      "short_excerpt_original": "Загалом від початку цієї доби відбулося 216 бойових зіткнень.",
+      "quote_locator": "Top-level aggregate in Telegram message 41773.",
+      "summary": "The General Staff published its 22:00 operational account for 5 August. Only the top-level aggregate was retained; active engagements and granular locations were excluded.",
+      "publication_time_basis": "The public preview displayed 19:03 UTC and the heading explicitly stated 22:00 on 5 August 2026.",
+      "lineage_note": "Primary General Staff publication; underlying unit reports and edit history were not separately resolved."
+    },
+    {
+      "source_item_id": "item_20260805_dsns_donetsk_uav_aftermath",
+      "short_excerpt_original": "внаслідок атак російських БпЛА поранені троє людей",
+      "quote_locator": "Heading of Telegram message 70829.",
+      "summary": "DSNS reported three injured people and completed fire suppression after reported UAV attacks in Donetsk region. Precise residential locations were omitted.",
+      "publication_time_basis": "The public preview displayed 16:29 UTC on 5 August 2026.",
+      "lineage_note": "Primary DSNS aftermath statement; attached media and local authority upstream records were not captured."
+    },
+    {
+      "source_item_id": "item_20260805_dsns_dnipro_aftermath",
+      "short_excerpt_original": "Дніпропетровщина: внаслідок російських обстрілів постраждав чоловік",
+      "quote_locator": "Heading of Telegram message 70833.",
+      "summary": "DSNS reported one injured person and multiple fires after attacks in Dnipropetrovsk region. District and facility details were omitted.",
+      "publication_time_basis": "The public preview displayed 17:24 UTC on 5 August 2026.",
+      "lineage_note": "Primary DSNS regional aftermath statement; attached media and local authority upstream records were not captured."
+    },
+    {
+      "source_item_id": "item_20260805_dsns_kyiv_evening_update",
+      "short_excerpt_original": "UPD | Київ: рятувальники продовжують ліквідовувати наслідки російського обстрілу",
+      "quote_locator": "Heading of Telegram message 70838.",
+      "summary": "DSNS published an evening update on continuing rescue and explosive-ordnance work after the Kyiv attack. District-level locations and damaged-structure details were omitted.",
+      "publication_time_basis": "The public preview displayed 18:41 UTC on 5 August 2026.",
+      "lineage_note": "Recorded as a revision/follow-up to item_20260805_dsns_kyiv_casualty_update from the earlier 00:00–05:00 UTC collection interval."
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "source": "General Staff air-attack update, Telegram message 41764",
+      "reason": "The publication stated that the attack was still ongoing and included origin, direction, and impact-location detail; it was withheld under the operational-safety exclusion."
+    },
+    {
+      "source": "General Staff strike-target update published at 07:50 UTC",
+      "reason": "The publication enumerated precise military targets, crossings, command points, and locations and was excluded as targeting-enabling detail."
+    },
+    {
+      "source": "DSNS service-dog training post",
+      "reason": "The publication was in-window but outside the task topics of official war reporting, frontline reporting, and strikes."
+    }
+  ],
+  "artifact_capture": {
+    "captured": false,
+    "reason": "No immutable permitted artifact was downloaded. Telegram previews did not provide stable content hashes or complete edit histories, and attached images or video were not copied."
+  },
+  "coverage_gaps": [
+    "Telegram public previews do not provide API-grade completeness, stable content hashes, or complete edit history.",
+    "The scan retained only a bounded set of material primary publications and is not exhaustive across all Ukrainian official institutions.",
+    "Live air-attack and precise strike-target publications were withheld because their route, target, and active-status detail could be operationally sensitive.",
+    "DSNS casualty and damage figures remain attributable official statements and were not independently assessed in this discovery task.",
+    "The SAG-U/NSATU transfer post references US and NATO statements whose primary records were not separately collected in this shard.",
+    "No attached media was downloaded, hashed, or independently verified."
+  ],
+  "follow_up_task_proposals": [],
+  "safety_notes": [
+    "No precise current positions, movement routes, active-unit locations, target coordinates, or named vulnerable facilities were persisted.",
+    "Granular frontline localities, active engagements, and emergency-response locations were omitted from excerpts and summaries.",
+    "No final truth assessment, territorial conclusion, source reliability score, or report narrative was created."
+  ],
+  "retrieved_at": "2026-08-06T05:40:00Z"
+}

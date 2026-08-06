@@ -31,39 +31,38 @@ The supervisor never directly merges a worker PR. The mandatory squash merge rem
 
 1. Read `CHATGPT_PROJECT.md`, `config/autonomy.json`, `config/worker-routing.json`, the task manifest, methodology, and safety policy from `main`.
 2. Check repository duties before claiming research: due daily discovery, dependency-complete planned tasks, merged-task proposals, due daily snapshot, and stale branch-cleanup debt.
-3. If duties are due, run the deterministic reconciliation process. Do not perform newly created research tasks inside the control-plane reconciliation step.
-4. Select one eligible task and claim it only by successfully creating `work/<task_id>` from the exact current `main` SHA.
-5. A legacy task in `blocked` whose `blocked_reason` begins with `HUMAN_REVIEW_REQUIRED:` is treated as pickable. On claim, transition it directly to `leased`, clear `blocked_reason`, and preserve the former reason as a coverage gap or automatic-withhold note where relevant.
-6. Resolve exactly one role through `config/worker-routing.json` and read the matching `.github/agents/*.agent.md` file.
-7. Modify only the task manifest, declared output paths, and the two globally derived control paths: `review/self/<task_id>.json` and `queue/proposals/<task_id>.json`.
-8. Complete the bounded task, persist evidence/provenance/coverage gaps, and update the task to `pr_open`.
-9. Run tests and validators.
-10. **Self-review round 1:** reread the task, diff, evidence lineage, timestamps, deduplication, safety classification, and test results. Repair every finding.
-11. **Self-review round 2:** begin a fresh review after round-1 repairs. Re-run the full required check set and repair any new finding.
-12. Persist `review/self/<task_id>.json` with rounds `[1, 2]`, timestamps, checks, findings, repairs, outcomes, PR number, and any withheld material.
-13. Persist `queue/proposals/<task_id>.json`, even when `proposals` is empty. Proposed tasks must be bounded, dependency-linked, and use unique idempotency keys.
-14. Update the task to `review`, make the PR non-draft, and leave the exact reviewed head unchanged except for repairs followed by another complete two-round review.
-15. The GitHub Actions merge controller verifies green exact-head CI, receipt validity, task scope, and the absence of unrepaired unsafe content, then squash-merges. Workers never approve or directly merge their own PRs.
-16. Post-merge automation records the real merge SHA/time, closes the task issue, reconciles downstream duties, and retries branch cleanup.
+3. If duties are due, run deterministic reconciliation. Reconciliation validates twice and writes task-only control-plane changes directly to `main`; it does not create a research PR or perform newly created tasks.
+4. Select one eligible `ready` task and claim it only by successfully creating `work/<task_id>` from the exact current `main` SHA.
+5. Resolve exactly one role through `config/worker-routing.json` and read the matching `.github/agents/*.agent.md` file.
+6. Modify only the task manifest, declared output paths, and the two globally derived control paths: `review/self/<task_id>.json` and `queue/proposals/<task_id>.json`.
+7. Complete the bounded task, persist evidence/provenance/coverage gaps, and update the task to `pr_open`.
+8. Run tests and validators.
+9. **Self-review round 1:** reread the task, diff, evidence lineage, timestamps, deduplication, safety classification, and test results. Repair every finding.
+10. **Self-review round 2:** begin a fresh review after round-1 repairs. Re-run the full required check set and repair any new finding.
+11. Persist `review/self/<task_id>.json` with rounds `[1, 2]`, timestamps, checks, findings, repairs, outcomes, PR number, and any withheld material.
+12. Persist `queue/proposals/<task_id>.json`, even when `proposals` is empty. Proposed tasks must be bounded, dependency-linked, and use unique idempotency keys.
+13. Update the task to `review`, make the PR non-draft, and leave the exact reviewed head unchanged except for repairs followed by another complete two-round review.
+14. The GitHub Actions merge controller verifies green exact-head CI, receipt validity, task scope, and the absence of unrepaired unsafe content, then squash-merges. Workers never approve or directly merge their own PRs.
+15. Post-merge automation records the real merge SHA/time directly on `main`, closes the task issue, triggers downstream reconciliation, and retries branch cleanup.
 
 Incomplete work should be extraordinary. Ordinary completion includes persisted outputs, two passed review rounds, a valid proposal file, a ready PR, and controller handoff.
 
 ## Continuous Loop state machine
 
-`scripts/continuous_loop.py` returns one of:
+`scripts/continuous_loop.py` returns exactly one of:
 
 - `reconcile` — materialize or promote repository duties before claiming;
 - `claim` — acquire the returned eligible task;
 - `wait` — work exists, is in flight, is not yet claimable, or quiescence is not proven;
 - `quiescent` — the only normal voluntary exit.
 
-`human_gate` is retired. Open architecture/hardening PRs and the backward-compatible `exceptional_prs` counter are telemetry only and cannot stop the loop. Legacy human-gated task manifests are returned as claim candidates after normal dependency and canonicalization checks.
+There is no operator-stop action in the supervisor state machine. A blocked task is ordinary queue state: unrelated ready work continues, while the blocked task remains non-claimable until a deterministic task update resolves or replaces it.
 
 A loop resets its idle proof whenever repository state changes, a duty appears, a task becomes claimable, or work enters or leaves an active state.
 
-## Automatic withholding instead of operator review
+## Automatic withholding
 
-The classes listed under `merge_controller.automatic_withhold_for` do not create a human-review stop. Workers must fail closed locally:
+The classes listed under `merge_controller.automatic_withhold_for` do not stop the queue. Workers fail closed locally:
 
 - omit or coarsen ambiguous or sensitive material;
 - avoid publishing rights-uncertain content;
@@ -83,9 +82,9 @@ The GitHub Connector used by ordinary workers may not expose delete-ref. Workers
 
 ## Autonomous queue reproduction
 
-The queue reproduces through hourly and post-merge reconciliation, the duty check at the start of every `копай` and Continuous Loop cycle, dependency promotion, and validated `queue/proposals/<producer_task_id>.json` files from merged tasks.
+The queue reproduces through hourly and post-finalization reconciliation, the duty check at the start of every `копай` and Continuous Loop cycle, dependency promotion, and validated `queue/proposals/<producer_task_id>.json` files from merged tasks.
 
-Automatic daily discovery covers all configured source shards. A daily snapshot task is created only after the UTC-day campaign and all materialized downstream work for that window are complete, with at least one merged input. Weekly and monthly snapshots are on-demand.
+Automatic daily discovery covers all configured source shards. A daily snapshot task is created only after the UTC-day campaign and all materialized downstream work for that window are complete, with at least one merged input. English daily reports are followed by their configured Russian translation task. Weekly and monthly snapshots are on-demand.
 
 ## Non-negotiable evidence and safety rules
 

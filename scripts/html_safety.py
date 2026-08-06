@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from urllib.parse import urlparse
+from pathlib import PurePosixPath
+from urllib.parse import unquote, urlparse
 
 from bs4 import BeautifulSoup, Comment
 
@@ -20,7 +21,11 @@ _DROP_WITH_CONTENT = {
 
 def _safe_href(value: str) -> str | None:
     value = value.strip()
-    if not value or any(ord(char) < 32 for char in value):
+    if (
+        not value
+        or any(ord(char) < 32 for char in value)
+        or "\\" in value
+    ):
         return None
     parsed = urlparse(value)
     if parsed.scheme:
@@ -32,7 +37,10 @@ def _safe_href(value: str) -> str | None:
         ):
             return None
         return value
-    if value.startswith(("//", "\\", "#")):
+    if value.startswith(("//", "#")):
+        return None
+    decoded_path = unquote(parsed.path)
+    if ".." in PurePosixPath(decoded_path).parts:
         return None
     return value
 

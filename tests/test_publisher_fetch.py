@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import unittest
+from datetime import UTC, datetime
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import requests
 
+from scripts.collector_adapters import collect_rss
 from scripts.collector_common import CollectionError
 from scripts.publisher_fetch import publisher_get, publisher_url_allowed
 
@@ -24,6 +27,7 @@ class FakeSession:
 def response(status: int, *, location: str | None = None) -> requests.Response:
     value = requests.Response()
     value.status_code = status
+    value._content = b"feed"
     if location is not None:
         value.headers["Location"] = location
     return value
@@ -33,7 +37,15 @@ class PublisherFetchTests(unittest.TestCase):
     def source(self) -> dict:
         return {
             "id": "news-rss",
+            "name": "News",
+            "platform": "rss",
             "url": "https://feeds.example.com/rss.xml",
+            "group": "media",
+            "perspective": "mixed",
+            "trust": "high",
+            "priority": 10,
+            "tags": [],
+            "enabled": True,
         }
 
     def test_source_host_parent_and_subdomains_are_allowed(self) -> None:
@@ -66,6 +78,18 @@ class PublisherFetchTests(unittest.TestCase):
                 self.source(),
                 settings,
                 "https://www.publisher.example.org/story",
+            )
+        )
+
+    def test_malformed_allowlist_is_ignored(self) -> None:
+        settings = {
+            "article_host_allowlist": {
+                "news-rss": "evil.example"
+            }
+        }
+        self.assertFalse(
+            publisher_url_allowed(
+                self.source(), settings, "https://evil.example/story"
             )
         )
 
@@ -144,6 +168,43 @@ class PublisherFetchTests(unittest.TestCase):
         self.assertEqual(
             session.calls[-1], "https://feeds.example.com/article/1"
         )
+
+    def test_disallowed_rss_entry_is_not_fetched_or_published(self) -> None:
+        parsed = SimpleNamespace(
+            bozo=False,
+            entries=[
+                {
+                    "id": "entry-1",
+                    "title": "Supplied title",
+                    "summary": "Supplied summary",
+                    "link": "https://evil.example/phishing",
+                }
+            ],
+        )
+        settings = {"request_timeout_seconds": 5}
+        feed_response = response(200)
+        feed_response.url = self.source()["url"]
+        with patch(
+            "scripts.collector_adapters.session_for", return_value=object()
+        ), patch(
+            "scripts.collector_adapters.publisher_get",
+            return_value=feed_response,
+        ), patch(
+            "scripts.collector_adapters.feedparser.parse",
+            return_value=parsed,
+        ), patch(
+            "scripts.collector_adapters.extract_publisher_article"
+        ) as article_fetch:
+            rows = collect_rss(
+                self.source(),
+                settings,
+                datetime(2026, 8, 1, tzinfo=UTC),
+            )
+        article_fetch.assert_not_called()
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["url"], self.source()["url"])
+        self.assertEqual(rows[0]["raw"]["link"], self.source()["url"])
+        self.assertNotIn("evil.example", str(rows[0]))
 
 
 if __name__ == "__main__":

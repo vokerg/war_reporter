@@ -58,7 +58,10 @@ data/raw/YYYY/MM/DD/items.ndjson  public excerpt records
 data/errors/YYYY/MM/DD/errors.ndjson source-specific failures
 data/state.json                   latest run and per-source health
 reports/daily/YYYY-MM-DD.md       automatic source digest
-scripts/collect.py                collection and public projection
+scripts/collect.py                collector facade and CLI
+scripts/collector_common.py       URL safety, extraction, public projection
+scripts/collector_adapters.py     Telegram, X, RSS and web adapters
+scripts/collector_runtime.py      cadence, embargo, state and persistence
 scripts/continuous_loop.py        one-shot/service runner
 scripts/build_report.py           source digest renderer
 scripts/build_site.py             static source reader
@@ -77,10 +80,12 @@ python -m scripts.continuous_loop --once
 cat data/state.json
 ```
 
-Exit status:
+`python -m scripts.continuous_loop --once` returns `0` only when collection and rendering complete cleanly. It returns `1` for any blocked, failed, partial or rendering-failed iteration. The precise collection state remains in `data/state.json`.
+
+The lower-level `python -m scripts.collect` command returns:
 
 - `0`: complete or cadence-idle;
-- `1`: blocked/failed or rendering failure;
+- `1`: blocked or failed;
 - `2`: partial coverage.
 
 Successful sources are retained during a partial run, but the run remains visibly incomplete.

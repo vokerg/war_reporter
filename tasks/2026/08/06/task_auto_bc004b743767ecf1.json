@@ -1,0 +1,57 @@
+{
+  "task_id": "task_auto_bc004b743767ecf1",
+  "task_type": "correction",
+  "role": "correction-editor",
+  "state": "ready",
+  "priority": 95,
+  "created_at": "2026-08-06T09:06:00Z",
+  "parent_issue": null,
+  "issue_number": null,
+  "depends_on_task_ids": [
+    "task_daily_20260805_90_snapshot",
+    "task_daily_20260805_95_translate_ru"
+  ],
+  "window": {
+    "from": "2026-08-06T08:57:28Z",
+    "to": "2026-08-06T09:03:59Z"
+  },
+  "scope": {
+    "source_ids": [],
+    "source_item_ids": [],
+    "source_groups": [],
+    "regions": [
+      "repository-control-plane"
+    ],
+    "topics": [
+      "workflow-dispatch",
+      "queue-reconciliation",
+      "pages-deployment"
+    ],
+    "content_types": [
+      "workflow",
+      "test"
+    ]
+  },
+  "exclusions": [
+    "Do not alter report content or evidence",
+    "Do not change merge eligibility or worker direct-merge policy",
+    "Do not introduce recursive workflow loops"
+  ],
+  "allowed_output_paths": [
+    ".github/workflows/finalize-task-merge.yml",
+    "tests/test_post_finalize_dispatch.py",
+    "queue/proposals/task_auto_bc004b743767ecf1.json",
+    "review/self/task_auto_bc004b743767ecf1.json"
+  ],
+  "definition_of_done": [
+    "Finalizer has actions write permission",
+    "A successful finalizer explicitly dispatches queue reconciliation on main",
+    "A successful finalizer explicitly dispatches Pages deployment on main",
+    "Tests fail if either explicit dispatch or permission is removed",
+    "No recursive workflow loop is introduced",
+    "A queue proposal receipt is persisted",
+    "Two separate self-review rounds passed and a receipt was persisted"
+  ],
+  "idempotency_key": "control_plane:finalizer_explicit_followup_dispatch:reconcile-deploy:v1",
+  "lease": null
+}

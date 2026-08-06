@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_translate_ru",
   "task_type": "translate_report",
   "role": "translator",
-  "state": "ready",
+  "state": "leased",
   "priority": 55,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -51,5 +51,11 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "backfill_translate:2026-08-04:ukraine-war:ru:v1",
-  "lease": null
+  "lease": {
+    "worker_run_id": "run_chatgpt_20260806T035858Z",
+    "lease_branch": "work/task_backfill_20260804_translate_ru",
+    "base_sha": "3d64aca0fd66a08078bef8074e4c499567ff0ad8",
+    "leased_at": "2026-08-06T03:58:58Z",
+    "lease_until": "2026-08-06T07:58:58Z"
+  }
 }

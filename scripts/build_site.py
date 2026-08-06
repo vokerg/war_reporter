@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import argparse
+import base64
+import hashlib
 import html
 import json
 from datetime import datetime
@@ -22,6 +24,7 @@ try:
         read_ndjson,
         utc_now,
     )
+    from .html_safety import sanitize_report_html
 except ImportError:
     from build_report import is_permanently_redacted, is_sensitive
     from common import (
@@ -31,6 +34,7 @@ except ImportError:
         read_ndjson,
         utc_now,
     )
+    from html_safety import sanitize_report_html
 
 CSS = """
 body{font-family:system-ui,sans-serif;max-width:1180px;margin:0 auto;padding:24px;line-height:1.55;background:#f6f7f9;color:#18191b}
@@ -43,8 +47,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:6p
 code,pre{white-space:pre-wrap;overflow-wrap:anywhere}.report{background:#fff;border:1px solid #ddd;border-radius:10px;padding:20px}
 """
 
-FILTER_SCRIPT = """
-<script>
+FILTER_JS = """
 const q=document.getElementById('q');
 const platform=document.getElementById('platform');
 const group=document.getElementById('group');
@@ -58,8 +61,11 @@ function applyFilters(){
   });
 }
 [q,platform,group].forEach(node=>node.addEventListener('input',applyFilters));
-</script>
-"""
+""".strip()
+FILTER_SCRIPT = f"<script>{FILTER_JS}</script>"
+FILTER_SCRIPT_HASH = base64.b64encode(
+    hashlib.sha256(FILTER_JS.encode("utf-8")).digest()
+).decode("ascii")
 
 
 def page(
@@ -70,9 +76,16 @@ def page(
         f"<a href='{prefix}raw/index.html'>Сырые материалы</a>"
         f"<a href='{prefix}maps/index.html'>Карты из источников</a>"
     )
+    csp = (
+        "default-src 'none'; style-src 'unsafe-inline'; "
+        f"script-src 'sha256-{FILTER_SCRIPT_HASH}'; "
+        "base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    )
     return (
         "<!doctype html><html lang='ru'><head>"
         "<meta charset='utf-8'>"
+        "<meta name='referrer' content='no-referrer'>"
+        f"<meta http-equiv='Content-Security-Policy' content=\"{csp}\">"
         "<meta name='viewport' content='width=device-width,initial-scale=1'>"
         f"<title>{html.escape(title)}</title>"
         f"<style>{CSS}</style></head><body>"
@@ -114,9 +127,16 @@ def publication_mode(
 
 
 def public_href(value: Any) -> str | None:
-    url = str(value or "")
+    url = str(value or "").strip()
+    if any(ord(char) < 32 for char in url):
+        return None
     parsed = urlparse(url)
-    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+    if (
+        parsed.scheme not in {"http", "https"}
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+    ):
         return None
     return html.escape(url, quote=True)
 
@@ -138,7 +158,10 @@ def original_link(item: dict[str, Any]) -> str:
     url = public_href(item.get("url"))
     if url is None:
         return "<p class='wide'>Оригинал недоступен · "
-    return f"<p class='wide'><a href='{url}'>Оригинал</a> · "
+    return (
+        f"<p class='wide'><a href='{url}' rel='noopener noreferrer'>"
+        "Оригинал</a> · "
+    )
 
 
 def render_item(
@@ -273,6 +296,7 @@ def build_site(root: Path) -> Path:
             extensions=["tables", "sane_lists"],
             output_format="html5",
         )
+        rendered = sanitize_report_html(rendered)
         body = f"<main class='report'>{rendered}</main>"
         (report_site / f"{path.stem}.html").write_text(
             page(path.stem, body, prefix="../"),

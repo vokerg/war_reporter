@@ -16,6 +16,8 @@ jobs:
   smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    env:
+      SMOKE_SOURCES: ${{ inputs.sources }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -28,7 +30,7 @@ jobs:
         env:
           X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
         run: |
-          sources="${{ inputs.sources }}"
+          sources="$SMOKE_SOURCES"
           if [ -z "$sources" ]; then
             sources="ua-general-staff-tg,bellingcat-rss,ua-president-web"
           fi
@@ -42,12 +44,14 @@ jobs:
         run: |
           python - <<'PY'
           import json
+          import os
           from pathlib import Path
 
           state = json.loads(Path("data/state.json").read_text(encoding="utf-8"))
+          configured = os.environ.get("SMOKE_SOURCES", "")
           expected = {
               value.strip()
-              for value in "${{ inputs.sources }}".split(",")
+              for value in configured.split(",")
               if value.strip()
           } or {
               "ua-general-staff-tg",

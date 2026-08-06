@@ -20,28 +20,12 @@ except ImportError:
 
 
 REQUIRED_SOURCE = {
-    "id",
-    "name",
-    "platform",
-    "url",
-    "group",
-    "perspective",
-    "trust",
-    "priority",
-    "enabled",
+    "id", "name", "platform", "url", "group", "perspective", "trust",
+    "priority", "enabled",
 }
 REQUIRED_ITEM = {
-    "id",
-    "source",
-    "platform",
-    "url",
-    "collected_at",
-    "title",
-    "text",
-    "html",
-    "media",
-    "tags",
-    "raw",
+    "id", "source", "platform", "url", "collected_at", "title", "text",
+    "html", "media", "tags", "raw",
 }
 PLATFORMS = {"telegram", "x", "rss", "web"}
 TRUST_LEVELS = {"primary", "high", "medium", "low", "unknown"}
@@ -49,42 +33,23 @@ PERSPECTIVES = {"ukrainian", "russian", "mixed", "unknown"}
 RUN_STATUSES = {"ok", "idle", "partial", "blocked", "failed"}
 SOURCE_STATUSES = {"ok", "error", "skipped_config", "skipped_cadence"}
 POSITIVE_INT_SETTINGS = {
-    "poll_seconds",
-    "workers",
-    "request_timeout_seconds",
-    "default_lookback_hours",
-    "telegram_max_pages",
-    "x_max_pages",
-    "web_max_links",
-    "public_excerpt_chars",
-    "public_media_limit",
+    "poll_seconds", "workers", "request_timeout_seconds",
+    "default_lookback_hours", "telegram_max_pages", "x_max_pages",
+    "web_max_links", "public_excerpt_chars", "public_media_limit",
 }
 NONNEGATIVE_NUMBER_SETTINGS = {
-    "collection_delay_hours",
-    "site_publication_delay_hours",
+    "collection_delay_hours", "site_publication_delay_hours",
     "site_sensitive_delay_hours",
 }
 DELAY_MAP_SETTINGS = {
-    "collection_delay_by_group",
-    "collection_delay_by_tag",
+    "collection_delay_by_group", "collection_delay_by_tag",
     "collection_delay_by_source",
 }
-PATH_SETTINGS = {
-    "raw_root",
-    "error_root",
-    "state_file",
-    "report_root",
-    "site_root",
-}
+PATH_SETTINGS = {"raw_root", "error_root", "state_file", "report_root", "site_root"}
 STATE_COUNTERS = {
-    "sources_configured",
-    "sources_attempted",
-    "sources_succeeded",
-    "sources_skipped",
-    "items_added",
-    "items_withheld_recent",
-    "items_withheld_undated",
-    "errors",
+    "sources_configured", "sources_attempted", "sources_succeeded",
+    "sources_skipped", "items_added", "items_withheld_recent",
+    "items_withheld_undated", "errors",
 }
 HEX_64 = re.compile(r"^[0-9a-f]{64}$")
 SAFE_ERROR = re.compile(r"^[A-Za-z_][A-Za-z0-9_.]*: [a-z0-9_]+$")
@@ -136,10 +101,7 @@ def safe_relative_path(value: Any) -> bool:
 
 def expected_platform_suffix(source_id: str) -> str | None:
     for suffix, platform in {
-        "-tg": "telegram",
-        "-x": "x",
-        "-rss": "rss",
-        "-web": "web",
+        "-tg": "telegram", "-x": "x", "-rss": "rss", "-web": "web",
     }.items():
         if source_id.endswith(suffix):
             return platform
@@ -191,9 +153,7 @@ def validate_settings(settings: dict[str, Any], errors: list[str]) -> None:
             errors.append("settings.status_stale_after_hours must be a number")
         else:
             if parsed_stale <= 0:
-                errors.append(
-                    "settings.status_stale_after_hours must be positive"
-                )
+                errors.append("settings.status_stale_after_hours must be positive")
 
     for key in DELAY_MAP_SETTINGS:
         mapping = settings.get(key)
@@ -214,9 +174,7 @@ def validate_settings(settings: dict[str, Any], errors: list[str]) -> None:
         if not isinstance(value, str) or not value:
             errors.append(f"settings.{key} must be a non-empty string")
         elif not safe_relative_path(value):
-            errors.append(
-                f"settings.{key} must be a safe repository-relative path"
-            )
+            errors.append(f"settings.{key} must be a safe repository-relative path")
 
     try:
         ZoneInfo(str(settings.get("report_timezone")))
@@ -244,11 +202,7 @@ def validate_settings(settings: dict[str, Any], errors: list[str]) -> None:
         for platform, value in cadence.items():
             if platform not in PLATFORMS:
                 errors.append(f"unknown cadence platform: {platform}")
-            parsed = safe_int(
-                value,
-                f"platform_cadence_minutes.{platform}",
-                errors,
-            )
+            parsed = safe_int(value, f"platform_cadence_minutes.{platform}", errors)
             if parsed is not None and parsed < 1:
                 errors.append(
                     f"platform_cadence_minutes.{platform} must be at least 1"
@@ -318,16 +272,12 @@ def validate_registry(
 
         expected = expected_platform_suffix(source_id)
         if expected is not None and platform != expected:
-            errors.append(
-                f"{source_id}: id suffix expects platform {expected}"
-            )
+            errors.append(f"{source_id}: id suffix expects platform {expected}")
         if source.get("trust") not in TRUST_LEVELS:
             errors.append(f"{source_id}: invalid trust level")
         if source.get("perspective") not in PERSPECTIVES:
             errors.append(f"{source_id}: invalid perspective")
-        priority = safe_int(
-            source.get("priority"), f"{source_id}.priority", errors
-        )
+        priority = safe_int(source.get("priority"), f"{source_id}.priority", errors)
         if priority is not None and not 0 <= priority <= 100:
             errors.append(f"{source_id}: priority must be 0..100")
         if not isinstance(source.get("enabled"), bool):
@@ -338,10 +288,7 @@ def validate_registry(
         if source.get("enabled") is True:
             enabled_groups[str(source.get("group"))] += 1
 
-    for setting_name in (
-        "collection_delay_by_source",
-        "article_host_allowlist",
-    ):
+    for setting_name in ("collection_delay_by_source", "article_host_allowlist"):
         mapping = settings.get(setting_name, {})
         if isinstance(mapping, dict):
             for source_id in mapping:
@@ -370,9 +317,7 @@ def validate_registry(
     else:
         for group, raw_minimum in minimums.items():
             minimum = safe_int(
-                raw_minimum,
-                f"minimum_group_counts.{group}",
-                errors,
+                raw_minimum, f"minimum_group_counts.{group}", errors
             )
             if minimum is not None and enabled_groups[group] < minimum:
                 errors.append(
@@ -450,9 +395,7 @@ def validate_state(
             errors.append(f"{label}: invalid status {source_status}")
         checked = timestamp(row.get("checked_at"), f"{label}.checked_at", errors)
         successful = timestamp(
-            row.get("last_success_at"),
-            f"{label}.last_success_at",
-            errors,
+            row.get("last_success_at"), f"{label}.last_success_at", errors
         )
         next_due = timestamp(
             row.get("next_due_at"), f"{label}.next_due_at", errors
@@ -495,19 +438,13 @@ def validate_public_projection(
     policy = raw.get("archive_policy")
     if policy == "public_excerpt_v1":
         required = {
-            "archive_policy",
-            "content_sha256",
-            "original_text_chars",
-            "original_html_chars",
-            "text_truncated",
-            "media_count",
-            "platform",
+            "archive_policy", "content_sha256", "original_text_chars",
+            "original_html_chars", "text_truncated", "media_count", "platform",
         }
         if set(raw) != required:
             errors.append(f"{path}: invalid public_excerpt_v1 fields")
-        if not isinstance(raw.get("content_sha256"), str) or not HEX_64.fullmatch(
-            str(raw.get("content_sha256", ""))
-        ):
+        digest = raw.get("content_sha256")
+        if not isinstance(digest, str) or not HEX_64.fullmatch(digest):
             errors.append(f"{path}: invalid content_sha256")
         for key in ("original_text_chars", "original_html_chars", "media_count"):
             nonnegative_int(raw.get(key), f"{path}:{key}", errors)
@@ -554,9 +491,7 @@ def validate_archive(
             if not item_id:
                 errors.append(f"{path}: item id must not be empty")
             elif item_id in seen:
-                errors.append(
-                    f"duplicate item id {item_id}: {seen[item_id]} and {path}"
-                )
+                errors.append(f"duplicate item id {item_id}: {seen[item_id]} and {path}")
             else:
                 seen[item_id] = path
             if row.get("source") not in ids:
@@ -568,7 +503,8 @@ def validate_archive(
             if parsed_public_url(row.get("url")) is None:
                 errors.append(f"{path}: invalid item URL")
             collected = timestamp(
-                row.get("collected_at"), f"{path}:collected_at", errors, nullable=False
+                row.get("collected_at"), f"{path}:collected_at", errors,
+                nullable=False,
             )
             published = timestamp(
                 row.get("published_at"), f"{path}:published_at", errors
@@ -587,10 +523,10 @@ def validate_error_archive(
     ids: set[str],
     errors: list[str],
 ) -> None:
-    value = settings.get("error_root")
-    if not isinstance(value, str) or not safe_relative_path(value):
+    root_value = settings.get("error_root")
+    if not isinstance(root_value, str) or not safe_relative_path(root_value):
         return
-    for path in (root / value).glob("*/*/*/errors.ndjson"):
+    for path in (root / root_value).glob("*/*/*/errors.ndjson"):
         try:
             rows = read_ndjson([path])
         except ValueError as exc:
@@ -605,24 +541,25 @@ def validate_error_archive(
                 errors.append(f"{path}: invalid public error URL")
             elif parsed.query or parsed.fragment:
                 errors.append(f"{path}: error URL contains query or fragment")
-            value = row.get("error")
-            if not isinstance(value, str) or not SAFE_ERROR.fullmatch(value):
+            error_value = row.get("error")
+            if not isinstance(error_value, str) or not SAFE_ERROR.fullmatch(error_value):
                 errors.append(f"{path}: unsafe or missing public error category")
             timestamp(
-                row.get("collected_at"),
-                f"{path}:collected_at",
-                errors,
+                row.get("collected_at"), f"{path}:collected_at", errors,
                 nullable=False,
             )
 
 
 def validate_schema_files(root: Path, errors: list[str]) -> None:
+    schema_root = root / "schemas"
+    if not schema_root.exists():
+        return
     expected = {
-        "schemas/raw-item.schema.json": "War Reporter public source projection",
-        "schemas/public-status.schema.json": "War Reporter public collection status v1",
+        "raw-item.schema.json": "War Reporter public source projection",
+        "public-status.schema.json": "War Reporter public collection status v1",
     }
-    for relative, title in expected.items():
-        path = root / relative
+    for name, title in expected.items():
+        path = schema_root / name
         try:
             value = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:

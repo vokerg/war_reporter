@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260805_01_ua_official",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "review",
+  "state": "merged",
   "priority": 90,
   "created_at": "2026-08-06T05:02:00Z",
   "parent_issue": 33,
@@ -55,17 +55,11 @@
     "No final truth assessment, territorial conclusion, or report narrative was added"
   ],
   "idempotency_key": "daily_discovery_gap:2026-08-05:ua-official:ukraine-war:20260805T0500Z:20260806T0000Z",
-  "lease": {
-    "worker_run_id": "run_20260806T053500Z_uaoff01",
-    "lease_branch": "work/task_backfill_20260805_01_ua_official",
-    "base_sha": "f62fd632894044fcc19fef4c897ddf7862a3a6a2",
-    "leased_at": "2026-08-06T05:35:00Z",
-    "lease_until": "2026-08-06T07:35:00Z"
-  },
+  "lease": null,
   "result": {
     "branch": "work/task_backfill_20260805_01_ua_official",
     "pr_number": 115,
-    "completed_at": "2026-08-06T05:39:00Z",
+    "completed_at": "2026-08-06T05:42:03Z",
     "summary": "Registered six safe in-window Ukrainian official source items for the missing 05:00–24:00 UTC interval: three General Staff publications and three DSNS aftermath updates. Canonical URLs, minute-level timestamps, quote locators, attribution, revision lineage, and explicit exclusions were preserved. Live air-attack routing, precise strike targets, granular frontline and emergency-response locations, and attached media were withheld; no final assessment or report narrative was created.",
     "coverage_gaps": [
       "Telegram public previews do not provide API-grade completeness, stable content hashes, or complete edit history.",
@@ -74,6 +68,8 @@
       "DSNS casualty and damage figures remain attributable official statements and were not independently assessed in this discovery task.",
       "The SAG-U/NSATU transfer post references US and NATO statements whose primary records were not separately collected in this shard.",
       "No attached media was downloaded, hashed, or independently verified."
-    ]
+    ],
+    "merge_sha": "6313ee16801e66124e2a38ab77a1307088ca78ce",
+    "merged_at": "2026-08-06T05:42:03Z"
   }
 }

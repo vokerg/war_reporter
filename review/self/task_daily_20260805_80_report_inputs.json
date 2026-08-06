@@ -4,30 +4,64 @@
   "rounds": [
     {
       "round": 1,
-      "reviewed_at": "2026-08-06T07:19:00Z",
-      "reviewer_run_id": "run_20260806T071800Z_contloop",
-      "checks": ["scope", "provenance", "deduplication", "temporal_precision", "safety", "tests", "coverage_gaps", "claim_strength", "evidence_independence", "assessment_consistency", "editorial_status", "schema_conformance"],
-      "findings": [
-        "All outputs are within the task's declared paths.",
-        "Five claims resolve only to the five merged observations present for 5 August; no raw source item was promoted directly into report prose.",
-        "The Kyiv response statement is confirmed only as an attributable official publication, while the casualty total remains unverified because no independent compatible record is frozen.",
-        "The three support-request claims remain probable because they derive from Guardian attribution without a separately persisted primary presidential publication.",
-        "Both approved assessments declare the frozen 5 August UTC reporting period and retain the actual assessment time in as_of.",
-        "Coverage is materially sparse: most discovery shards produced no approved observations, so no broader battlefield, territorial, strike-damage, or diplomatic conclusions were approved."
+      "reviewed_at": "2026-08-06T07:29:10Z",
+      "reviewer_run_id": "run_20260806T072900Z_repair",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps",
+        "claim_strength",
+        "evidence_independence",
+        "assessment_consistency",
+        "editorial_status",
+        "schema_conformance"
       ],
-      "repairs": ["Separated the attributable Kyiv response statement from the unverified casualty figures and avoided precise operational-location detail."],
+      "findings": [
+        "All task outputs remain within the manifest's declared glob paths and mandatory receipt paths.",
+        "The 4 August 21:20 UTC municipal post was removed from approved 5 August report inputs because its observation has no event time establishing overlap with the frozen UTC window.",
+        "Four approved claims now describe only directly evidenced publication or attribution events, with event_time set to their source publication minutes inside the frozen window.",
+        "Four separate object-level claims remain in_review: the casualty totals are unverified and the three presidential statement claims are probable but lack frozen primary evidence.",
+        "Both approved assessments reference only approved reporting-event claims and explicitly exclude the unapproved object-level claims from report inputs.",
+        "Two narrow follow-up proposals record the casualty-corroboration and primary-statement coverage gaps."
+      ],
+      "repairs": [
+        "Removed the out-of-window emergency-response claim and its assessment use.",
+        "Split reporting-event propositions from object-level propositions.",
+        "Changed reporting-event outcomes to confirmed and kept unsupported object-level records unapproved.",
+        "Replaced day-wide inferred event times with exact source publication times or null.",
+        "Added targeted follow-up proposals."
+      ],
       "outcome": "pass"
     },
     {
       "round": 2,
-      "reviewed_at": "2026-08-06T07:20:00Z",
-      "reviewer_run_id": "run_20260806T071800Z_contloop",
-      "checks": ["scope", "provenance", "deduplication", "temporal_precision", "safety", "tests", "coverage_gaps", "fresh_complete_diff", "claim_strength", "evidence_independence", "assessment_consistency", "editorial_status", "definition_of_done"],
+      "reviewed_at": "2026-08-06T07:29:12Z",
+      "reviewer_run_id": "run_20260806T072900Z_repair",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps",
+        "fresh_complete_diff",
+        "claim_strength",
+        "evidence_independence",
+        "assessment_consistency",
+        "editorial_status",
+        "definition_of_done"
+      ],
       "findings": [
-        "A fresh review found five approved claims, two approved assessments, one empty proposal receipt, this review receipt, and the task manifest only.",
-        "Every evidence reference resolves to a merged observation and every assessment claim reference resolves to a claim created by this task.",
-        "No assessment exceeds the strength or independence of its frozen evidence.",
-        "The explicit coverage gap prevents the downstream report from implying comprehensive daily coverage.",
+        "A fresh complete review found eight claims: four approved reporting-event records and four unapproved object-level records.",
+        "Every evidence reference resolves to one of the four merged observations used by this task, and every approved assessment references only approved claims.",
+        "No approved claim has an event time outside the frozen 5 August UTC window.",
+        "Unsupported casualty totals and unfrozen primary presidential statements remain unapproved and are documented through assessments and follow-up proposals.",
+        "The generated and reviewed timestamps reflect this repair run and precede the commits that persist the final files.",
         "No sensitive geodata, targeting-enabling detail, unsupported causality, or forecast was introduced."
       ],
       "repairs": [],

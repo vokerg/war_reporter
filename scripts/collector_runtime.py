@@ -40,15 +40,15 @@ def append_errors(root: Path, rows: list[dict[str, Any]]) -> None:
 
 def public_error_summary(exc: Exception) -> str:
     """Return a stable public-safe category without exception details."""
-    if isinstance(exc, requests.Timeout):
+    if isinstance(exc, requests.exceptions.Timeout):
         code = "timeout"
-    elif isinstance(exc, requests.TooManyRedirects):
+    elif isinstance(exc, requests.exceptions.TooManyRedirects):
         code = "redirect_error"
-    elif isinstance(exc, requests.SSLError):
+    elif isinstance(exc, requests.exceptions.SSLError):
         code = "tls_error"
-    elif isinstance(exc, requests.ConnectionError):
+    elif isinstance(exc, requests.exceptions.ConnectionError):
         code = "connection_error"
-    elif isinstance(exc, requests.HTTPError):
+    elif isinstance(exc, requests.exceptions.HTTPError):
         response = getattr(exc, "response", None)
         status = getattr(response, "status_code", None)
         code = f"http_{status}" if isinstance(status, int) else "http_error"

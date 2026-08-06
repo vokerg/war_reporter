@@ -7,7 +7,10 @@ import argparse
 import json
 import logging
 from pathlib import Path
+from typing import Any
 
+from . import collector_adapters as _adapters
+from . import collector_runtime as _runtime
 from .common import ROOT
 from .collector_common import (
     CollectionError,
@@ -23,7 +26,6 @@ from .collector_common import (
 )
 from .collector_adapters import (
     COLLECTORS,
-    _x_pages,
     collect_rss,
     collect_telegram,
     collect_web,
@@ -37,12 +39,44 @@ from .collector_runtime import (
     item_is_storable,
     item_storage_delay_hours,
     item_storage_state,
-    run_collection,
     source_cadence_minutes,
     source_is_due,
 )
 
 LOG = logging.getLogger("war-reporter.collect")
+
+
+def _x_pages(
+    session: Any,
+    endpoint: str,
+    params: dict[str, Any],
+    max_pages: int,
+    *,
+    token_param: str,
+) -> list[dict[str, Any]]:
+    """Compatibility wrapper preserving the historical patch point."""
+    original = _adapters.x_api_get
+    _adapters.x_api_get = x_api_get
+    try:
+        return _adapters._x_pages(
+            session,
+            endpoint,
+            params,
+            max_pages,
+            token_param=token_param,
+        )
+    finally:
+        _adapters.x_api_get = original
+
+
+def run_collection(*args: Any, **kwargs: Any) -> dict[str, Any]:
+    """Compatibility wrapper preserving the historical patch point."""
+    original = _runtime.collect_one
+    _runtime.collect_one = collect_one
+    try:
+        return _runtime.run_collection(*args, **kwargs)
+    finally:
+        _runtime.collect_one = original
 
 
 def parse_set(value: str | None) -> set[str] | None:

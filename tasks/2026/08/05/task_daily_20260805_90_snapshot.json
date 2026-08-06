@@ -2,7 +2,7 @@
   "task_id": "task_daily_20260805_90_snapshot",
   "task_type": "daily_report",
   "role": "report-editor",
-  "state": "ready",
+  "state": "leased",
   "priority": 65,
   "created_at": "2026-08-06T08:41:00Z",
   "parent_issue": null,
@@ -84,5 +84,11 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "daily_report:2026-08-05:ukraine-war",
-  "lease": null
+  "lease": {
+    "worker_run_id": "run_20260806T084100Z_continuous_loop",
+    "lease_branch": "work/task_daily_20260805_90_snapshot",
+    "base_sha": "83b04414621e432ef868325cd647e7b67ffa9cfd",
+    "leased_at": "2026-08-06T08:41:00Z",
+    "lease_until": "2026-08-06T14:41:00Z"
+  }
 }

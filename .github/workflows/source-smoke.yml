@@ -1,21 +1,17 @@
 name: Source smoke test
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
-      platforms:
-        description: Comma-separated platforms
-        required: false
-        default: telegram,rss,web
-      groups:
-        description: Optional comma-separated groups
-        required: false
-        default: ""
       sources:
         description: Comma-separated source ids
         required: false
         default: "ua-general-staff-tg,bellingcat-rss,ua-president-web"
 permissions:
   contents: read
+concurrency:
+  group: source-smoke-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   smoke:
     runs-on: ubuntu-latest
@@ -32,11 +28,45 @@ jobs:
         env:
           X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
         run: |
-          args=(--force --lookback-hours 168 --workers 3)
-          if [ -n "${{ inputs.platforms }}" ]; then args+=(--platforms "${{ inputs.platforms }}"); fi
-          if [ -n "${{ inputs.groups }}" ]; then args+=(--groups "${{ inputs.groups }}"); fi
-          if [ -n "${{ inputs.sources }}" ]; then args+=(--sources "${{ inputs.sources }}"); fi
-          python -m scripts.collect "${args[@]}"
+          sources="${{ inputs.sources }}"
+          if [ -z "$sources" ]; then
+            sources="ua-general-staff-tg,bellingcat-rss,ua-president-web"
+          fi
+          python -m scripts.collect \
+            --force \
+            --lookback-hours 168 \
+            --workers 3 \
+            --sources "$sources"
+      - name: Verify non-empty adapter results
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          state = json.loads(Path("data/state.json").read_text(encoding="utf-8"))
+          expected = {
+              value.strip()
+              for value in "${{ inputs.sources }}".split(",")
+              if value.strip()
+          } or {
+              "ua-general-staff-tg",
+              "bellingcat-rss",
+              "ua-president-web",
+          }
+          failures = []
+          for source_id in sorted(expected):
+              row = state.get("per_source", {}).get(source_id, {})
+              if row.get("status") != "ok":
+                  failures.append(f"{source_id}: status={row.get('status')!r}")
+              if int(row.get("fetched", 0)) < 1:
+                  failures.append(f"{source_id}: fetched={row.get('fetched', 0)!r}")
+          if state.get("status") != "ok":
+              failures.append(f"run status={state.get('status')!r}")
+          if failures:
+              raise SystemExit("; ".join(failures))
+          print(json.dumps(state, ensure_ascii=False, indent=2))
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -45,6 +75,6 @@ jobs:
             data/state.json
             data/errors
           if-no-files-found: warn
-      - name: Require complete smoke result
+      - name: Require collector success
         if: steps.collect.outcome != 'success'
         run: exit 1

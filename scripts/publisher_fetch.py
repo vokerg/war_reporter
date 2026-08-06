@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 from urllib.parse import urljoin, urlparse
 
@@ -22,11 +23,19 @@ except ImportError:
 
 
 _SERVICE_PREFIXES = {"www", "rss", "feed", "feeds", "api"}
+_DOMAIN = re.compile(
+    r"^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+"
+    r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$"
+)
 
 
 def _host(value: Any) -> str | None:
     parsed = urlparse(str(value or "").strip())
     return parsed.hostname.rstrip(".").lower() if parsed.hostname else None
+
+
+def _domain_list(value: Any) -> list[Any]:
+    return value if isinstance(value, list) else []
 
 
 def _publisher_domains(
@@ -40,15 +49,16 @@ def _publisher_domains(
         if len(labels) >= 3 and labels[0] in _SERVICE_PREFIXES:
             domains.add(".".join(labels[1:]))
 
-    configured = settings.get("article_host_allowlist", {})
-    if isinstance(configured, dict):
-        configured = configured.get(str(source.get("id", "")), [])
-    else:
-        configured = []
+    mapping = settings.get("article_host_allowlist", {})
+    configured = (
+        mapping.get(str(source.get("id", "")), [])
+        if isinstance(mapping, dict)
+        else []
+    )
     source_hosts = source.get("article_hosts", [])
-    for raw in list(configured or []) + list(source_hosts or []):
+    for raw in _domain_list(configured) + _domain_list(source_hosts):
         candidate = str(raw).strip().rstrip(".").lower()
-        if candidate and "/" not in candidate and ":" not in candidate:
+        if _DOMAIN.fullmatch(candidate):
             domains.add(candidate)
     return domains
 

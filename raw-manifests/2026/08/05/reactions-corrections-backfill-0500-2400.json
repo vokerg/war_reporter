@@ -1,0 +1,56 @@
+{
+  "task_id": "task_backfill_20260805_10_reactions_corrections",
+  "worker_run_id": "run_20260806T064500Z_reac10",
+  "window": {"from": "2026-08-05T05:00:00Z", "to": "2026-08-06T00:00:00Z"},
+  "searched_at": "2026-08-06T06:47:00Z",
+  "method": "Bounded public-web search of outlet correction indexes, fact-check surfaces, same-day reaction reporting, official rebuttals, and repository-wide canonical identities. No authentication, access-control bypass, timestamp inference, mutable-page rewrite, full-text capture, binary download, or operational geodata retention was used.",
+  "source_checks": [],
+  "sources_checked": [
+    {"target": "Guardian corrections and clarifications", "access_url": "https://www.theguardian.com/theguardian/series/corrections-and-clarifications", "status": "searched_no_in_window_ukraine_notice", "result": "The accessible index exposed notices through late July 2026 but no stable 5 August Ukraine correction, clarification, or retraction."},
+    {"target": "Reuters corrections and fact-check surfaces", "access_url": "https://www.reuters.com/fact-check/", "status": "searched_no_in_window_notice", "result": "Search results exposed July correction material but no stable Ukraine-war correction or retraction in the assigned interval."},
+    {"target": "Associated Press Ukraine and fact-check coverage", "access_url": "https://apnews.com/hub/russia-ukraine", "status": "searched_no_timestamp_verified_new_item", "result": "A relevant same-day reaction article remained visible without exact publication time; it was not admitted by date or crawl inference."},
+    {"target": "EUvsDisinfo and official rebuttal searches", "access_url": "https://euvsdisinfo.eu/", "status": "searched_no_in_window_primary_notice", "result": "No stable 5 August primary rebuttal, correction, or retraction matching the task scope was resolved."},
+    {"source_entity_id": "src_the_guardian", "access_url": "https://www.theguardian.com/world/2026/aug/05/russia-kyiv-attack-kills-at-least-14-people-ukraine-authorities", "status": "existing_identity_metadata_drift", "result": "The canonical page is already represented by item_20260805_guardian_air_defence_criticism. Current first-publication metadata differs from the stored timestamp, but no immutable earlier page version or formal correction notice resolves the discrepancy."},
+    {"target": "Guardian Europe live blog and Leipzig analysis", "access_url": "https://www.theguardian.com/world/live/2026/aug/05/europe-ukraine-russia-kyiv-zelenskyy-heatwave-austria-hungary-poland-czech-republic-latest-news-updates", "status": "searched_existing_or_overlapping_lineage", "result": "The rolling blog and Leipzig analysis contain reactions and attribution but are already represented or excluded in international-media discovery and do not constitute formal corrections."}
+  ],
+  "search_queries": [
+    "Ukraine war correction retraction August 5 2026 Reuters AP Guardian",
+    "site:reuters.com/fact-check Ukraine August 5 2026",
+    "site:apnews.com/article Ukraine fact check August 5 2026",
+    "site:euvsdisinfo.eu August 5 2026 Ukraine",
+    "site:theguardian.com/theguardian corrections clarifications 5 August 2026 Ukraine",
+    "Ukraine official rebuttal correction clarification 5 August 2026"
+  ],
+  "included_items": [],
+  "excluded_candidates": [
+    {"source": "Guardian Kyiv air-defence article", "reason": "Already represented by item_20260805_guardian_air_defence_criticism. Conflicting current-page and stored publication times remain unresolved metadata drift, not a second identity or formal correction."},
+    {"source": "Guardian Europe live blog and Leipzig analysis", "reason": "Already represented or explicitly handled in international-media lineage; reaction language does not create a correction or retraction identity."},
+    {"source": "Associated Press Kyiv reaction article", "reason": "Stable article URL and same-day dateline were visible, but exact publication time was unavailable; no crawl or event time was substituted."},
+    {"source": "Reuters Connect correction on Russian shipping accusations", "reason": "Published in July 2026 and concerns earlier footage; outside the assigned interval."},
+    {"source": "Guardian corrections index entries through late July", "reason": "Stable correction notices outside the assigned interval and unrelated to the 5 August Ukraine coverage."},
+    {"source": "Official and diplomatic reactions already represented in Guardian, Reuters, Ukrainian-official, or diplomacy shards", "reason": "Cross-shard reaction overlap was not duplicated without a distinct correction, rebuttal, or retraction publication."}
+  ],
+  "formal_correction_search": {"result": "no_verified_in_window_notice", "notes": "No separate formal correction, clarification, retraction, or primary rebuttal concerning the 5 August Ukraine-war coverage was verified with a stable canonical URL and publication time inside the assigned interval."},
+  "access_failures": [
+    {"target": "Immutable Guardian Kyiv page history", "detail": "The current page's publication line differs from the existing record, but no immutable first-published page bytes or complete revision history was available."},
+    {"target": "AP exact publication timestamp", "detail": "The parsed public page did not expose a timestamp sufficient for exact-window admission."},
+    {"target": "Correction and platform-native indexes", "detail": "Indexes may lag, omit social-first rebuttals, or expose notices without stable exact publication metadata."}
+  ],
+  "artifact_capture": {"captured": false, "reason": "No qualifying new source item or immutable correction artifact was resolved; no full text, image, video, page bytes, or binary was stored."},
+  "coverage_gaps": [
+    "The result is a bounded zero-item discovery outcome, not evidence that no reaction, correction, rebuttal, or retraction was published during the interval.",
+    "The Guardian Kyiv canonical identity remains unique, while conflicting publication-time metadata could not be resolved without immutable revision evidence.",
+    "AP's relevant same-day article remained excluded because exact publication time was unavailable.",
+    "Formal correction indexes and platform-native statements may lag or omit exact timestamp metadata.",
+    "Reaction material already represented in media, official, and diplomacy shards was not duplicated as correction evidence.",
+    "No full text, images, video, webpage bytes, or immutable artifacts were captured.",
+    "No reaction, criticism, correction, rebuttal, or retraction assertion was independently assessed or converted into a claim, observation, policy conclusion, or report narrative."
+  ],
+  "follow_up_task_proposals": [],
+  "safety_notes": [
+    "No precise current positions, movement routes, active-unit locations, target coordinates, vulnerable-facility details, or map geometry were persisted.",
+    "No authenticated platform data, private material, access-control bypass, timestamp inference, or cross-shard rewrite was used.",
+    "A zero-result receipt was preferred over duplicate identity or unsupported correction semantics."
+  ],
+  "retrieved_at": "2026-08-06T06:47:00Z"
+}

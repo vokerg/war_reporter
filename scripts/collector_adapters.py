@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from .collector_common import *  # noqa: F401,F403
+from .collector_common import _article_fields
 
 
 def collect_rss(

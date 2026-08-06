@@ -86,6 +86,11 @@ class PublicErrorTests(unittest.TestCase):
         self.assertEqual(public_error_summary(exc), "HTTPError: http_403")
         self.assertNotIn("super-secret", public_error_summary(exc))
 
+    def test_tls_error_has_distinct_public_category(self) -> None:
+        exc = requests.SSLError("certificate contains super-secret detail")
+        self.assertEqual(public_error_summary(exc), "SSLError: tls_error")
+        self.assertNotIn("super-secret", public_error_summary(exc))
+
     def test_x_response_body_is_not_persisted(self) -> None:
         exc = CollectionError("X API 401: bearer token super-secret")
         self.assertEqual(

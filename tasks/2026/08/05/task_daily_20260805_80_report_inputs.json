@@ -1,0 +1,76 @@
+{
+  "task_id": "task_daily_20260805_80_report_inputs",
+  "task_type": "investigate_claim",
+  "role": "corroborator",
+  "state": "ready",
+  "priority": 75,
+  "created_at": "2026-08-06T06:54:28.175896Z",
+  "parent_issue": null,
+  "issue_number": null,
+  "depends_on_task_ids": [
+    "task_20260805_01_ua_official",
+    "task_20260805_02_ru_official",
+    "task_20260805_03_ua_analysis_media",
+    "task_20260805_04_ru_milbloggers",
+    "task_20260805_05_international_media",
+    "task_20260805_06_military_analysts",
+    "task_20260805_07_strikes_infrastructure",
+    "task_20260805_08_visual_osint_maps",
+    "task_20260805_09_diplomacy_support_sanctions",
+    "task_20260805_10_reactions_corrections",
+    "task_auto_12ce9e2a1b9f4926",
+    "task_auto_1d3a947706bff4ee",
+    "task_auto_5ba69fbdf442930f",
+    "task_auto_bb110619963930f9",
+    "task_backfill_20260805_01_ua_official",
+    "task_backfill_20260805_02_ru_official",
+    "task_backfill_20260805_03_ua_analysis_media",
+    "task_backfill_20260805_04_ru_milbloggers",
+    "task_backfill_20260805_05_international_media",
+    "task_backfill_20260805_06_military_analysts",
+    "task_backfill_20260805_07_strikes_infrastructure",
+    "task_backfill_20260805_08_visual_osint_maps",
+    "task_backfill_20260805_09_diplomacy_support_sanctions",
+    "task_backfill_20260805_10_reactions_corrections"
+  ],
+  "window": {
+    "from": "2026-08-05T00:00:00Z",
+    "to": "2026-08-06T00:00:00Z"
+  },
+  "scope": {
+    "source_ids": [],
+    "source_groups": [],
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "daily-report-readiness",
+      "claim-assessment"
+    ],
+    "content_types": [
+      "claim",
+      "assessment"
+    ]
+  },
+  "exclusions": [
+    "Do not convert raw source items or observations directly into report prose",
+    "Do not approve a claim without explicit evidence lineage and adversarial corroboration",
+    "Do not add precise current operational locations or targeting-enabling detail"
+  ],
+  "allowed_output_paths": [
+    "data/claims/2026/08/05/**",
+    "data/assessments/2026/08/05/**",
+    "queue/proposals/task_daily_20260805_80_report_inputs.json",
+    "review/self/task_daily_20260805_80_report_inputs.json"
+  ],
+  "definition_of_done": [
+    "Merged evidence overlapping the frozen UTC window was reviewed for reportable claims",
+    "Any created claim or assessment has explicit provenance, uncertainty, and approved or non-approved editorial status",
+    "Every approved assessment intended as a daily-report input declares a reporting_period overlapping the frozen UTC window while as_of remains the actual assessment time",
+    "Unsupported or insufficiently corroborated material remains unapproved and is documented as a coverage gap",
+    "A queue proposal file records any narrower follow-up duties or an explicit empty proposals list",
+    "Two separate self-review rounds passed and a receipt was persisted"
+  ],
+  "idempotency_key": "daily_report_inputs:2026-08-05:ukraine-war",
+  "lease": null
+}

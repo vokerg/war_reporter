@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260805_07_strikes_infrastructure",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "pr_open",
+  "state": "review",
   "priority": 80,
   "created_at": "2026-08-06T05:02:00Z",
   "parent_issue": 33,
@@ -49,6 +49,17 @@
   },
   "result": {
     "branch": "work/task_backfill_20260805_07_strikes_infrastructure",
-    "pr_number": 122
+    "pr_number": 122,
+    "completed_at": "2026-08-06T06:35:00Z",
+    "summary": "Completed a bounded public-web recovery scan of official emergency, municipal, transport, energy, air-defence, and regional-administration surfaces for the missing 05:00–24:00 UTC interval. No new source item was admitted because material DSNS and international-media publications were already represented by canonical identities in other shards, exact-date transport and energy searches did not resolve stable in-window metadata, a prominent rail-infrastructure candidate belonged to the 4 July 2025 Kyiv attack, and granular port, target, route, direction, or active-warning material was excluded. The raw manifest records source surfaces, exact-date queries, cross-shard duplicates, historical collision, access limitations, and safety boundaries. No artifact, truth assessment, observation, claim, territorial conclusion, or report narrative was created.",
+    "coverage_gaps": [
+      "The zero-item result is not evidence that no strikes or infrastructure damage occurred during the interval.",
+      "Material DSNS aftermath and international-media publications are represented in other repository shards and were excluded here by global canonical identity rather than re-counted.",
+      "Transport, energy, municipal, and regional search indexes may lag live publisher systems or expose snippets without stable date-bearing metadata.",
+      "A prominent rail-infrastructure candidate was a 4 July 2025 historical collision, demonstrating that matching text and clock time alone are insufficient for date assignment.",
+      "Live air-defence routes, directions, targets, vulnerable facilities, named infrastructure, and granular impact detail were intentionally excluded.",
+      "No full text, images, video, maps, page bytes, or immutable artifacts were captured.",
+      "No strike, casualty, damage, interception, responsibility, or attribution assertion was independently assessed or converted into a claim, observation, territorial conclusion, or report narrative."
+    ]
   }
 }

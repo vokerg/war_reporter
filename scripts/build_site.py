@@ -1,78 +1,377 @@
 #!/usr/bin/env python3
-"""Render reports and full raw items into a small readable static site."""
+"""Render reports and delayed raw items into a readable static site."""
 
 from __future__ import annotations
 
 import argparse
 import html
 import json
+from datetime import datetime
 from pathlib import Path
+from typing import Any
+from urllib.parse import urlparse
+
+import markdown
 
 try:
-    from .common import ROOT, load_json, read_ndjson
+    from .build_report import is_permanently_redacted, is_sensitive
+    from .common import (
+        ROOT,
+        load_json,
+        parse_time,
+        read_ndjson,
+        utc_now,
+    )
 except ImportError:
-    from common import ROOT, load_json, read_ndjson
+    from build_report import is_permanently_redacted, is_sensitive
+    from common import (
+        ROOT,
+        load_json,
+        parse_time,
+        read_ndjson,
+        utc_now,
+    )
 
 CSS = """
-body{font-family:system-ui,sans-serif;max-width:1100px;margin:0 auto;padding:24px;line-height:1.5;background:#f6f7f9;color:#18191b}
+body{font-family:system-ui,sans-serif;max-width:1180px;margin:0 auto;padding:24px;line-height:1.55;background:#f6f7f9;color:#18191b}
 a{color:#1659a7}.card{background:white;border:1px solid #ddd;border-radius:10px;padding:16px;margin:14px 0}
 .meta{font-size:.86rem;color:#60646c}.text{white-space:pre-wrap}.tag{display:inline-block;background:#eef1f5;border-radius:12px;padding:2px 8px;margin:2px}
-nav{display:flex;gap:14px;flex-wrap:wrap}.wide{overflow-wrap:anywhere}img{max-width:100%;height:auto}
+nav{display:flex;gap:14px;flex-wrap:wrap}.wide{overflow-wrap:anywhere}img{max-width:100%;height:auto;border-radius:8px}
+.controls{position:sticky;top:0;background:#f6f7f9;padding:10px 0;display:flex;gap:8px;flex-wrap:wrap;z-index:2}
+.controls input,.controls select{font:inherit;padding:8px;min-width:180px}.notice{background:#fff8d8;border:1px solid #e6cf65;padding:12px;border-radius:8px}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:6px;text-align:left}
+code,pre{white-space:pre-wrap;overflow-wrap:anywhere}.report{background:#fff;border:1px solid #ddd;border-radius:10px;padding:20px}
+"""
+
+FILTER_SCRIPT = """
+<script>
+const q=document.getElementById('q');
+const platform=document.getElementById('platform');
+const group=document.getElementById('group');
+function applyFilters(){
+  const needle=(q.value||'').toLowerCase();
+  document.querySelectorAll('[data-card]').forEach(card=>{
+    const matchesText=!needle||card.dataset.search.includes(needle);
+    const matchesPlatform=!platform.value||card.dataset.platform===platform.value;
+    const matchesGroup=!group.value||card.dataset.group===group.value;
+    card.hidden=!(matchesText&&matchesPlatform&&matchesGroup);
+  });
+}
+[q,platform,group].forEach(node=>node.addEventListener('input',applyFilters));
+</script>
 """
 
 
-def page(title: str, body: str) -> str:
-    return f"<!doctype html><html lang='ru'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>{html.escape(title)}</title><style>{CSS}</style><body><nav><a href='/'>Отчёты</a><a href='/raw/'>Сырые материалы</a></nav><h1>{html.escape(title)}</h1>{body}</body></html>"
-
-
-def render_item(item: dict) -> str:
-    media = "".join(
-        f"<p><a href='{html.escape(url, quote=True)}'>media</a></p>"
-        for url in item.get("media", [])
+def page(
+    title: str, body: str, *, prefix: str
+) -> str:
+    nav = (
+        f"<a href='{prefix}index.html'>Отчёты</a>"
+        f"<a href='{prefix}raw/index.html'>Сырые материалы</a>"
+        f"<a href='{prefix}maps/index.html'>Карты из источников</a>"
     )
-    tags = "".join(f"<span class='tag'>{html.escape(str(tag))}</span>" for tag in item.get("tags", []))
     return (
-        "<article class='card'>"
-        f"<h2>{html.escape(item.get('title') or item.get('source_name') or item.get('source',''))}</h2>"
+        "<!doctype html><html lang='ru'><head>"
+        "<meta charset='utf-8'>"
+        "<meta name='viewport' content='width=device-width,initial-scale=1'>"
+        f"<title>{html.escape(title)}</title>"
+        f"<style>{CSS}</style></head><body>"
+        f"<nav>{nav}</nav><h1>{html.escape(title)}</h1>"
+        f"{body}</body></html>"
+    )
+
+
+def item_age_hours(
+    item: dict[str, Any], now: datetime
+) -> float | None:
+    stamp = parse_time(item.get("collected_at")) or parse_time(
+        item.get("published_at")
+    )
+    if stamp is None:
+        return None
+    return max(0.0, (now - stamp).total_seconds() / 3600)
+
+
+def publication_mode(
+    item: dict[str, Any],
+    settings: dict[str, Any],
+    now: datetime,
+) -> str:
+    age = item_age_hours(item, now)
+    general_delay = float(
+        settings.get("site_publication_delay_hours", 24)
+    )
+    sensitive_delay = float(
+        settings.get("site_sensitive_delay_hours", 72)
+    )
+    if age is None or age < general_delay:
+        return "delayed"
+    if is_permanently_redacted(item, settings):
+        return "redacted"
+    if is_sensitive(item, settings) and age < sensitive_delay:
+        return "redacted"
+    return "full"
+
+
+def public_href(value: Any) -> str | None:
+    url = str(value or "")
+    parsed = urlparse(url)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        return None
+    return html.escape(url, quote=True)
+
+
+def media_html(urls: list[str]) -> str:
+    rows: list[str] = []
+    for raw_url in urls:
+        url = public_href(raw_url)
+        if url is None:
+            continue
+        rows.append(
+            f"<p><a href='{url}' rel='noopener noreferrer'>"
+            "Медиа из источника</a></p>"
+        )
+    return "".join(rows)
+
+
+def original_link(item: dict[str, Any]) -> str:
+    url = public_href(item.get("url"))
+    if url is None:
+        return "<p class='wide'>Оригинал недоступен · "
+    return f"<p class='wide'><a href='{url}'>Оригинал</a> · "
+
+
+def render_item(
+    item: dict[str, Any],
+    settings: dict[str, Any],
+    now: datetime,
+) -> str:
+    mode = publication_mode(item, settings, now)
+    tags = "".join(
+        f"<span class='tag'>{html.escape(str(tag))}</span>"
+        for tag in item.get("tags", [])
+    )
+    source = str(
+        item.get("title")
+        or item.get("source_name")
+        or item.get("source", "")
+    )
+    if mode == "full":
+        text = html.escape(item.get("text") or "")
+        media = media_html(item.get("media", []))
+        notice = ""
+    elif mode == "redacted":
+        text = (
+            "Текст и медиа временно скрыты: запись может содержать "
+            "актуальные оперативные детали."
+        )
+        media = ""
+        notice = "<p class='notice'>Оперативная задержка публикации.</p>"
+    else:
+        text = (
+            "Полный текст появится после минимальной задержки "
+            "публичной публикации."
+        )
+        media = ""
+        notice = "<p class='notice'>Запись ещё находится в задержке публикации.</p>"
+
+    platform = str(item.get("platform", ""))
+    group = str(item.get("group", ""))
+    public_search_text = str(item.get("text", "")) if mode == "full" else ""
+    searchable = " ".join(
+        [
+            source,
+            str(item.get("source_name", "")),
+            public_search_text,
+            " ".join(str(tag) for tag in item.get("tags", [])),
+        ]
+    ).lower()
+    return (
+        "<article class='card' data-card "
+        f"data-search='{html.escape(searchable, quote=True)}' "
+        f"data-platform='{html.escape(platform, quote=True)}' "
+        f"data-group='{html.escape(group, quote=True)}'>"
+        f"<h2>{html.escape(source)}</h2>"
         f"<div class='meta'>{html.escape(str(item.get('published_at') or ''))} · "
-        f"{html.escape(str(item.get('platform','')))} · {html.escape(str(item.get('perspective','')))} · "
+        f"{html.escape(platform)} · {html.escape(group)} · "
+        f"{html.escape(str(item.get('perspective','')))} · "
         f"trust {html.escape(str(item.get('trust','')))}</div>"
-        f"<p>{tags}</p><div class='text'>{html.escape(item.get('text') or '')}</div>{media}"
-        f"<p class='wide'><a href='{html.escape(item.get('url',''), quote=True)}'>Оригинал</a> · "
+        f"<p>{tags}</p>{notice}<div class='text'>{text}</div>{media}"
+        f"{original_link(item)}"
         f"<code>{html.escape(item.get('id',''))}</code></p>"
         "</article>"
     )
 
 
+def controls(items: list[dict[str, Any]]) -> str:
+    platforms = sorted(
+        {str(item.get("platform", "")) for item in items}
+    )
+    groups = sorted({str(item.get("group", "")) for item in items})
+    platform_options = "".join(
+        f"<option value='{html.escape(value, quote=True)}'>"
+        f"{html.escape(value)}</option>"
+        for value in platforms
+        if value
+    )
+    group_options = "".join(
+        f"<option value='{html.escape(value, quote=True)}'>"
+        f"{html.escape(value)}</option>"
+        for value in groups
+        if value
+    )
+    return (
+        "<div class='controls'>"
+        "<input id='q' type='search' placeholder='Поиск по тексту, источнику, тегам'>"
+        f"<select id='platform'><option value=''>Все платформы</option>{platform_options}</select>"
+        f"<select id='group'><option value=''>Все группы</option>{group_options}</select>"
+        "</div>"
+    )
+
+
+def read_day_items(raw_root: Path, day: str) -> list[dict[str, Any]]:
+    path = raw_root / day.replace("-", "/") / "items.ndjson"
+    items = read_ndjson([path])
+    items.sort(
+        key=lambda item: (
+            item.get("published_at")
+            or item.get("collected_at")
+            or ""
+        ),
+        reverse=True,
+    )
+    return items
+
+
 def build_site(root: Path) -> Path:
     settings = load_json(root / "config/settings.json")
+    if not isinstance(settings, dict):
+        raise ValueError("missing config/settings.json")
     site = root / settings["site_root"]
     site.mkdir(parents=True, exist_ok=True)
     report_root = root / settings["report_root"]
-    reports = sorted(report_root.glob("*.md"), reverse=True) if report_root.exists() else []
-    links = "".join(
-        f"<li><a href='/reports/{path.stem}.html'>{path.stem}</a></li>" for path in reports
+    reports = (
+        sorted(report_root.glob("*.md"), reverse=True)
+        if report_root.exists()
+        else []
     )
-    (site / "index.html").write_text(page("War Reporter", f"<ul>{links}</ul>"), encoding="utf-8")
+    links = "".join(
+        f"<li><a href='reports/{path.stem}.html'>{path.stem}</a></li>"
+        for path in reports
+    )
+    (site / "index.html").write_text(
+        page("War Reporter", f"<ul>{links}</ul>", prefix=""),
+        encoding="utf-8",
+    )
 
     report_site = site / "reports"
     report_site.mkdir(exist_ok=True)
     for path in reports:
         text = path.read_text(encoding="utf-8")
-        body = f"<pre class='card wide'>{html.escape(text)}</pre>"
-        (report_site / f"{path.stem}.html").write_text(page(path.stem, body), encoding="utf-8")
+        rendered = markdown.markdown(
+            text,
+            extensions=["tables", "sane_lists"],
+            output_format="html5",
+        )
+        body = f"<main class='report'>{rendered}</main>"
+        (report_site / f"{path.stem}.html").write_text(
+            page(path.stem, body, prefix="../"),
+            encoding="utf-8",
+        )
 
     raw_root = root / settings["raw_root"]
-    days = sorted({p.parent.relative_to(raw_root).as_posix().replace("/", "-") for p in raw_root.glob("*/*/*/items.ndjson")}, reverse=True)
+    days = sorted(
+        {
+            path.parent.relative_to(raw_root)
+            .as_posix()
+            .replace("/", "-")
+            for path in raw_root.glob("*/*/*/items.ndjson")
+        },
+        reverse=True,
+    )
+    now = utc_now()
+
     raw_site = site / "raw"
     raw_site.mkdir(exist_ok=True)
-    day_links = "".join(f"<li><a href='/raw/{day}.html'>{day}</a></li>" for day in days)
-    (raw_site / "index.html").write_text(page("Сырые материалы", f"<ul>{day_links}</ul>"), encoding="utf-8")
+    day_links = "".join(
+        f"<li><a href='{day}.html'>{day}</a></li>"
+        for day in days
+    )
+    (raw_site / "index.html").write_text(
+        page(
+            "Сырые материалы",
+            (
+                "<p>Текст и медиа публикуются с задержкой; "
+                "оперативно-чувствительные записи задерживаются дольше.</p>"
+                f"<ul>{day_links}</ul>"
+            ),
+            prefix="../",
+        ),
+        encoding="utf-8",
+    )
     for day in days:
-        path = raw_root / day.replace("-", "/") / "items.ndjson"
-        items = read_ndjson([path])
-        body = f"<p>Материалов: {len(items)}</p>" + "".join(render_item(item) for item in items)
-        (raw_site / f"{day}.html").write_text(page(f"Сырые материалы — {day}", body), encoding="utf-8")
+        items = read_day_items(raw_root, day)
+        body = (
+            f"<p>Материалов: {len(items)}</p>"
+            + controls(items)
+            + "".join(
+                render_item(item, settings, now) for item in items
+            )
+            + FILTER_SCRIPT
+        )
+        (raw_site / f"{day}.html").write_text(
+            page(
+                f"Сырые материалы — {day}",
+                body,
+                prefix="../",
+            ),
+            encoding="utf-8",
+        )
+
+    map_site = site / "maps"
+    map_site.mkdir(exist_ok=True)
+    map_days: list[str] = []
+    map_items_by_day: dict[str, list[dict[str, Any]]] = {}
+    for day in days:
+        map_items = [
+            item
+            for item in read_day_items(raw_root, day)
+            if set(item.get("tags") or []).intersection(
+                {"map", "maps"}
+            )
+        ]
+        if map_items:
+            map_days.append(day)
+            map_items_by_day[day] = map_items
+    map_links = "".join(
+        f"<li><a href='{day}.html'>{day}</a></li>"
+        for day in map_days
+    )
+    (map_site / "index.html").write_text(
+        page(
+            "Карты из источников",
+            (
+                "<p>Это сохранённые картографические материалы "
+                "источников, а не единая подтверждённая карта контроля. "
+                "Медиа публикуются с оперативной задержкой.</p>"
+                f"<ul>{map_links}</ul>"
+            ),
+            prefix="../",
+        ),
+        encoding="utf-8",
+    )
+    for day, items in map_items_by_day.items():
+        body = controls(items) + "".join(
+            render_item(item, settings, now) for item in items
+        ) + FILTER_SCRIPT
+        (map_site / f"{day}.html").write_text(
+            page(
+                f"Карты из источников — {day}",
+                body,
+                prefix="../",
+            ),
+            encoding="utf-8",
+        )
     return site
 
 

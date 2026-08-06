@@ -20,7 +20,6 @@ from .collector_common import (
     extract_publication_time,
     json_safe,
     make_item,
-    public_projection as _base_public_projection,
     safe_get,
     session_for,
 )
@@ -35,6 +34,7 @@ from .collector_adapters import (
 )
 from .collector_runtime import (
     append_errors,
+    archive_projection,
     collect_one,
     item_is_storable,
     item_storage_delay_hours,
@@ -42,7 +42,6 @@ from .collector_runtime import (
     source_cadence_minutes,
     source_is_due,
 )
-from .public_archive import harden_public_projection
 
 LOG = logging.getLogger("war-reporter.collect")
 
@@ -50,10 +49,8 @@ LOG = logging.getLogger("war-reporter.collect")
 def public_projection(
     item: dict[str, Any], settings: dict[str, Any]
 ) -> dict[str, Any]:
-    """Return the final record permitted to enter the public archive."""
-    return harden_public_projection(
-        _base_public_projection(item, settings), item, settings
-    )
+    """Compatibility wrapper for the mandatory archive projection."""
+    return archive_projection(item, settings)
 
 
 def _x_pages(
@@ -80,16 +77,13 @@ def _x_pages(
 
 
 def run_collection(*args: Any, **kwargs: Any) -> dict[str, Any]:
-    """Compatibility wrapper preserving the historical patch points."""
-    original_collect_one = _runtime.collect_one
-    original_projection = _runtime.public_projection
+    """Compatibility wrapper preserving the historical collect patch point."""
+    original = _runtime.collect_one
     _runtime.collect_one = collect_one
-    _runtime.public_projection = public_projection
     try:
         return _runtime.run_collection(*args, **kwargs)
     finally:
-        _runtime.collect_one = original_collect_one
-        _runtime.public_projection = original_projection
+        _runtime.collect_one = original
 
 
 def parse_set(value: str | None) -> set[str] | None:

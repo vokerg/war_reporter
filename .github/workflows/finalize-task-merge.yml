@@ -24,6 +24,7 @@ on:
         type: string
 
 permissions:
+  actions: write
   contents: write
   issues: write
   pull-requests: write
@@ -131,3 +132,9 @@ jobs:
         env:
           ISSUE_NUMBER: ${{ steps.finalize.outputs.issue_number }}
         run: gh issue close "$ISSUE_NUMBER" --reason completed || true
+
+      - name: Dispatch repository reconciliation
+        run: gh workflow run reconcile-queue.yml --ref main
+
+      - name: Dispatch publication deployment
+        run: gh workflow run deploy-pages.yml --ref main

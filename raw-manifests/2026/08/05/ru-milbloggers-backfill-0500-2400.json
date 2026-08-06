@@ -1,0 +1,113 @@
+{
+  "task_id": "task_backfill_20260805_04_ru_milbloggers",
+  "worker_run_id": "run_20260806T060200Z_rumb04",
+  "window": {
+    "from": "2026-08-05T05:00:00Z",
+    "to": "2026-08-06T00:00:00Z"
+  },
+  "searched_at": "2026-08-06T06:04:00Z",
+  "method": "Bounded public-web review of the established Rybar, Dva Majors, RVvoenkor, and Colonelcassad Telegram previews, supplemented by exact-date domain searches. No authentication, platform API, access-control bypass, inferred sequential identifier, map capture, media download, or precise operational-location retention was used.",
+  "source_checks": [],
+  "sources_checked": [
+    {
+      "source_entity_id": "src_rybar",
+      "access_url": "https://t.me/s/rybar",
+      "status": "candidate_found_time_uncertain",
+      "result": "The public preview exposed canonical post 82240, explicitly headed as the chronicle for 5 August 2026 and displayed at 19:49. Telegram did not expose a timezone-bearing datetime, so the item is retained with day precision and uncertain exact UTC inclusion."
+    },
+    {
+      "source_entity_id": "src_dva_majors",
+      "access_url": "https://t.me/s/dva_majors",
+      "status": "searched_no_new_candidate_admitted",
+      "result": "Visible in-day posts were out of topic, fundraising, detailed infrastructure reporting, operational travel-warning relays, launch or strike media, or pure relays of official statements. None was admitted."
+    },
+    {
+      "source_entity_id": "src_rvvoenkor",
+      "access_url": "https://t.me/s/RVvoenkor",
+      "status": "searched_no_new_candidate_admitted",
+      "result": "Visible posts focused on individual strikes, vessels, named commercial and infrastructure damage, and relayed claims already represented by official or strike-focused shards. Granular and overlapping items were not admitted."
+    },
+    {
+      "source_entity_id": "src_colonelcassad",
+      "access_url": "https://t.me/s/boris_rozhin",
+      "status": "searched_no_new_candidate_admitted",
+      "result": "Visible posts included broad relays, animated strike geometry, impact video, and tactical or equipment footage. Broad relays were duplicate or low-information lineage, while visual and tactical material was excluded."
+    }
+  ],
+  "search_queries": [
+    "site:t.me/rybar 5 августа 2026 Украина",
+    "site:t.me/RVvoenkor 5 августа 2026",
+    "site:t.me/boris_rozhin 5 августа 2026 Украина",
+    "site:t.me/dva_majors 5 августа 2026"
+  ],
+  "included_items": [
+    {
+      "source_item_id": "item_20260805_rybar_82240_backfill",
+      "short_excerpt_original": "Хроника специальной военной операции. За 5 августа 2026 года",
+      "quote_locator": "Telegram message 82240, heading.",
+      "summary": "Rybar published a daily digest aggregating claims about strikes and operations. Only the dated digest identity and broad aggregation role were retained; named targets, locality-level frontline claims, map links, and media were omitted.",
+      "publication_time_basis": "The heading explicitly states 5 August 2026 and the public preview displayed 19:49, but no timezone-bearing datetime was exposed.",
+      "window_status": "candidate_time_uncertain",
+      "lineage_note": "Aggregator publication with multiple linked and unnamed upstreams. No individual claim was extracted and no upstream item was promoted through this discovery task."
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "source": "Rybar Telegram message 82238",
+      "reason": "The video digest substantially overlaps the later dated daily chronicle and points to external video; it was not duplicated as a separate source item."
+    },
+    {
+      "source": "Dva Majors Telegram message 97099",
+      "reason": "The city-day greeting was outside the task topics of operations and claims."
+    },
+    {
+      "source": "Dva Majors posts on infrastructure, route radio frequencies, launches, and strike media",
+      "reason": "The posts contained vulnerable-facility, travel-route, deployment-support, launch, or targeting-adjacent detail and were withheld under the safety exclusion."
+    },
+    {
+      "source": "RVvoenkor posts on individual vessel and infrastructure strikes",
+      "reason": "The visible posts contained granular impact and named-target detail and overlapped official or strike-focused shards."
+    },
+    {
+      "source": "Colonelcassad Telegram message 221058 and adjacent visible posts",
+      "reason": "The broad relay duplicated strike aftermath lineage, while adjacent animated strike schemes, impact footage, and tactical media were excluded for provenance and safety reasons."
+    },
+    {
+      "source": "Previously registered Telegram messages 82206, 120685, 120697, and 220938",
+      "reason": "Already represented by canonical URLs in the earlier 00:00–05:00 UTC campaign and not duplicated."
+    }
+  ],
+  "access_failures": [
+    {
+      "target": "Telegram publication datetimes",
+      "detail": "Public previews displayed clock times but not timezone-bearing datetime metadata, so exact UTC inclusion for message 82240 remains unresolved."
+    },
+    {
+      "target": "Rolling channel completeness",
+      "detail": "Public previews are rolling windows and do not guarantee exhaustive recovery of every in-window post or complete edit history."
+    },
+    {
+      "target": "Upstream lineage",
+      "detail": "The retained digest aggregates multiple linked and unnamed reports; no complete set of stable upstream canonical item URLs was established in this shard."
+    }
+  ],
+  "artifact_capture": {
+    "captured": false,
+    "reason": "No media, page bytes, maps, video, or other immutable artifacts were downloaded, hashed, or stored."
+  },
+  "coverage_gaps": [
+    "The one admitted record has day precision; exact inclusion after the 05:00 UTC boundary remains uncertain because Telegram did not expose timezone-bearing metadata.",
+    "The bounded four-channel scan is not exhaustive across Russian milblogger publishing.",
+    "Rolling Telegram previews may omit posts, edits, deletions, and original publication metadata.",
+    "The retained digest aggregates multiple upstream reports whose complete canonical lineage was not resolved.",
+    "Granular frontline claims, named vulnerable facilities, movement and route detail, strike geometry, maps, and attached media were intentionally excluded.",
+    "No milblogger assertion was independently assessed or converted into a claim, observation, territorial conclusion, or report narrative."
+  ],
+  "follow_up_task_proposals": [],
+  "safety_notes": [
+    "No precise current positions, movement routes, active-unit locations, target coordinates, vulnerable-facility details, or map geometry were persisted.",
+    "No authenticated platform data, private material, or access-control bypass was used.",
+    "The record preserves uncertainty and aggregation lineage rather than treating the digest as verified fact."
+  ],
+  "retrieved_at": "2026-08-06T06:04:00Z"
+}

@@ -1,0 +1,44 @@
+{
+  "task_id": "task_auto_3513c536bd8c0a01",
+  "pr_number": 133,
+  "rounds": [
+    {
+      "round": 1,
+      "reviewed_at": "2026-08-06T07:42:45Z",
+      "reviewer_run_id": "run_20260806T074245Z_casualty_review_1",
+      "checks": [
+        "Verified the changed paths remain within the immutable task contract",
+        "Compared Telegram post 7134 wording with Kyiv official portal chronology and independent same-day reporting",
+        "Confirmed the prior object-level casualty claim is superseded rather than upgraded",
+        "Confirmed no medical identifiers, precise impact locations, or targeting-enabling detail were added",
+        "Confirmed repository contract validation run 499 passed all substantive checks"
+      ],
+      "findings": [
+        "The exact nine-of-fifteen hospital wording is assigned by Kyiv's official portal to 09:26 local time on 19 July 2026, while the repository source item assigns Telegram post 7134 to 5 August.",
+        "The source item, observation, and raw-manifest correction paths are outside this task's immutable scope."
+      ],
+      "repairs": [
+        "Added an approved correction claim with July 19 event time that supersedes the misleading 5 August object-level casualty claim.",
+        "Added an approved negative assessment excluding the casualty figure from 5 August report use.",
+        "Added a priority-95 correction proposal covering the affected source-item, observation, raw-manifest, claim, and assessment paths."
+      ],
+      "outcome": "pass"
+    },
+    {
+      "round": 2,
+      "reviewed_at": "2026-08-06T07:42:55Z",
+      "reviewer_run_id": "run_20260806T074255Z_casualty_review_2",
+      "checks": [
+        "Rechecked proposition and outcome alignment independently of round 1",
+        "Verified the corrective claim event time is outside the frozen 5 August window and cannot qualify as positive 5 August event evidence",
+        "Verified the approved assessment outcome is misleading and explicitly excludes the object-level casualty claim from report inputs",
+        "Verified no independent compatible 4/5 August casualty evidence was falsely inferred from municipal repetitions",
+        "Verified the downstream correction proposal preserves canonical identity and global lineage constraints"
+      ],
+      "findings": [],
+      "repairs": [],
+      "outcome": "pass"
+    }
+  ],
+  "exceptional_condition": false
+}

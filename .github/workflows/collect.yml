@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: "7,27,47 * * * *"
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: war-reporter-collector
   cancel-in-progress: false
@@ -12,10 +12,14 @@ jobs:
   collect:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -28,8 +32,47 @@ jobs:
           X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
           WAR_REPORTER_WORKERS: "32"
         run: python -m scripts.continuous_loop --once
-      - name: Persist successful and partial results
+      - id: upload
+        name: Upload generated public projection
         if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: collected-osint-${{ github.run_id }}
+          path: |
+            data
+            reports
+          if-no-files-found: error
+          retention-days: 2
+      - name: Fail visibly on incomplete collection
+        if: steps.collect.outcome != 'success'
+        run: exit 1
+
+  persist:
+    needs: collect
+    if: ${{ always() && needs.collect.outputs.artifact_id != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: collected-osint-${{ github.run_id }}
+          path: .
+      - name: Validate artifact boundary
+        run: |
+          test -f data/state.json
+          if find data reports -type l -print -quit | grep -q .; then
+            echo "collector artifact must not contain symlinks" >&2
+            exit 1
+          fi
+      - name: Persist successful and partial results
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "war-reporter-bot"
           git config user.email "war-reporter-bot@users.noreply.github.com"
@@ -38,8 +81,10 @@ jobs:
             exit 0
           fi
           git commit -m "data: collect OSINT $(date -u +%FT%TZ)"
+          auth_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
           for attempt in 1 2 3; do
-            if git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"; then
+            if git -c http.extraheader="$auth_header" pull --rebase origin "${GITHUB_REF_NAME}" \
+              && git -c http.extraheader="$auth_header" push origin "HEAD:${GITHUB_REF_NAME}"; then
               exit 0
             fi
             git rebase --abort || true
@@ -47,6 +92,3 @@ jobs:
           done
           echo "failed to persist collector results after three attempts" >&2
           exit 1
-      - name: Fail visibly on incomplete collection
-        if: steps.collect.outcome != 'success'
-        run: exit 1

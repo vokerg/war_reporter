@@ -1,6 +1,5 @@
 name: Source smoke test
 on:
-  pull_request:
   workflow_dispatch:
     inputs:
       sources:
@@ -10,7 +9,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: source-smoke-${{ github.event.pull_request.number || github.ref }}
+  group: source-smoke-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   smoke:

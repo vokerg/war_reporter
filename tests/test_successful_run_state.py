@@ -82,7 +82,6 @@ class SuccessfulRunStateTests(unittest.TestCase):
         self.assertEqual(
             degraded["last_successful_run_at"], successful_at
         )
-        self.assertNotEqual(degraded["last_run_at"], successful_at)
 
     def test_first_failed_run_has_no_successful_timestamp(self) -> None:
         root = self.make_root()

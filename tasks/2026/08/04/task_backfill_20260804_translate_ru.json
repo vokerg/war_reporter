@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260804_translate_ru",
   "task_type": "translate_report",
   "role": "translator",
-  "state": "pr_open",
+  "state": "review",
   "priority": 55,
   "created_at": "2026-08-05T17:22:00Z",
   "parent_issue": 81,
@@ -60,6 +60,13 @@
   },
   "result": {
     "branch": "work/task_backfill_20260804_translate_ru",
-    "pr_number": 109
+    "pr_number": 109,
+    "completed_at": "2026-08-06T04:03:38Z",
+    "summary": "Produced the approved Russian translation of rpt_daily_20260804_en from the exact merged English source commit. The translation preserves the frozen claim and assessment sets, claim-set hash, dates, figures, outcomes, confidence terms, attribution, uncertainty, lineage caveats, and safety exclusions without adding evidence or analysis.",
+    "coverage_gaps": [
+      "The Russian report inherits every evidentiary and analytical limitation of the locked English source report.",
+      "No new browsing, source verification, factual update, correction, or ambiguity resolution was performed during translation.",
+      "The translation does not provide independent review of the underlying claims or assessments."
+    ]
   }
 }

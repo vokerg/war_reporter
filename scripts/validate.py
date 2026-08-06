@@ -32,9 +32,12 @@ REQUIRED_ITEM = {
     "platform",
     "url",
     "collected_at",
+    "title",
     "text",
+    "html",
     "media",
     "tags",
+    "raw",
 }
 PLATFORMS = {"telegram", "x", "rss", "web"}
 TRUST_LEVELS = {"primary", "high", "medium", "low", "unknown"}
@@ -116,6 +119,83 @@ def expected_platform_suffix(source_id: str) -> str | None:
         if source_id.endswith(suffix):
             return platform
     return None
+
+
+def validate_public_projection(
+    row: dict[str, Any], path: Path, errors: list[str]
+) -> None:
+    if not isinstance(row.get("title"), str):
+        errors.append(f"{path}: title must be a string")
+    if not isinstance(row.get("text"), str):
+        errors.append(f"{path}: text must be a string")
+    if row.get("html") != "":
+        errors.append(f"{path}: public html must be empty")
+    media = row.get("media")
+    if not isinstance(media, list):
+        errors.append(f"{path}: media must be an array")
+    else:
+        for value in media:
+            if parsed_public_url(value) is None:
+                errors.append(f"{path}: invalid public media URL")
+    if not isinstance(row.get("tags"), list):
+        errors.append(f"{path}: tags must be an array")
+
+    raw = row.get("raw")
+    if not isinstance(raw, dict):
+        errors.append(f"{path}: raw must be an object")
+        return
+    policy = raw.get("archive_policy")
+    if policy == "public_excerpt_v1":
+        required = {
+            "archive_policy",
+            "content_sha256",
+            "original_text_chars",
+            "original_html_chars",
+            "text_truncated",
+            "media_count",
+            "platform",
+        }
+        if set(raw) != required:
+            errors.append(f"{path}: invalid public_excerpt_v1 fields")
+        digest = raw.get("content_sha256")
+        if (
+            not isinstance(digest, str)
+            or len(digest) != 64
+            or any(char not in "0123456789abcdef" for char in digest)
+        ):
+            errors.append(f"{path}: invalid content_sha256")
+        for key in (
+            "original_text_chars",
+            "original_html_chars",
+            "media_count",
+        ):
+            value = raw.get(key)
+            if (
+                not isinstance(value, int)
+                or isinstance(value, bool)
+                or value < 0
+            ):
+                errors.append(
+                    f"{path}: {key} must be a nonnegative integer"
+                )
+        if not isinstance(raw.get("text_truncated"), bool):
+            errors.append(f"{path}: text_truncated must be boolean")
+        if not isinstance(raw.get("platform"), dict):
+            errors.append(f"{path}: raw.platform must be an object")
+    elif policy == "public_redacted_v1":
+        required = {"archive_policy", "redacted", "platform"}
+        if set(raw) != required:
+            errors.append(f"{path}: invalid public_redacted_v1 fields")
+        if raw.get("redacted") is not True:
+            errors.append(f"{path}: redacted must be true")
+        if not isinstance(raw.get("platform"), dict):
+            errors.append(f"{path}: raw.platform must be an object")
+        if row.get("title") or row.get("text") or row.get("html") or media:
+            errors.append(
+                f"{path}: redacted projection contains public content"
+            )
+    else:
+        errors.append(f"{path}: unsupported archive policy {policy}")
 
 
 def validate(root: Path = ROOT) -> list[str]:
@@ -405,12 +485,7 @@ def validate(root: Path = ROOT) -> list[str]:
                         errors.append(
                             f"{path}: item belongs in {expected}"
                         )
-                if not isinstance(row.get("text"), str):
-                    errors.append(f"{path}: text must be a string")
-                if not isinstance(row.get("media"), list):
-                    errors.append(f"{path}: media must be an array")
-                if not isinstance(row.get("tags"), list):
-                    errors.append(f"{path}: tags must be an array")
+                validate_public_projection(row, path, errors)
 
     error_root_value = settings.get("error_root")
     if isinstance(error_root_value, str) and safe_relative_path(error_root_value):

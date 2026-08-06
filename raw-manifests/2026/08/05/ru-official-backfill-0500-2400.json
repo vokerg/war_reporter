@@ -1,0 +1,99 @@
+{
+  "task_id": "task_backfill_20260805_02_ru_official",
+  "worker_run_id": "run_20260806T055000Z_ruoff02",
+  "window": {
+    "from": "2026-08-05T05:00:00Z",
+    "to": "2026-08-06T00:00:00Z"
+  },
+  "searched_at": "2026-08-06T05:55:00Z",
+  "method": "Bounded public-web search of Russian federal official surfaces and indexed public previews. No authentication, platform API, access-control bypass, inferred sequential post identifiers, bulk capture, binary download, or precise operational-location retention was used.",
+  "source_checks": [],
+  "sources_checked": [
+    {
+      "target": "Ministry of Defence of the Russian Federation Telegram channel",
+      "access_url": "https://t.me/s/mod_russia",
+      "status": "searched_no_canonical_item",
+      "result": "The public channel and indexed previews were searched for the assigned interval. Search results exposed older publications, including records from 2022–2024 and the already collected pre-05:00 UTC identifiers 66272 and 66273, but did not expose a stable in-window post page with a verifiable publication timestamp. Sequential identifiers were not guessed or registered."
+    },
+    {
+      "target": "Ministry of Defence of the Russian Federation MAX channel",
+      "access_url": "https://max.ru/morf",
+      "status": "searched_no_in_window_result",
+      "result": "The official MAX surface and indexed results were searched by exact date and daily-summary phrasing. Stable July 2026 publications were indexed, confirming the official surface, but no 5 August 2026 publication was returned during the bounded pass."
+    },
+    {
+      "target": "Ministry of Foreign Affairs of the Russian Federation Telegram channel",
+      "access_url": "https://t.me/s/MID_Russia",
+      "status": "searched_no_in_scope_result",
+      "result": "Exact-date and Ukraine-related searches did not return a stable, clearly in-window official frontline or strike statement."
+    },
+    {
+      "target": "Kremlin public Telegram and official website surfaces",
+      "access_url": "https://t.me/s/news_kremlin",
+      "status": "searched_no_in_scope_result",
+      "result": "Exact-date searches did not return a stable, clearly in-window Kremlin frontline or strike publication."
+    },
+    {
+      "target": "Russian federal official websites",
+      "access_url": "https://mil.ru",
+      "status": "searched_no_stable_match",
+      "result": "Bounded exact-date searches across mil.ru, mid.ru, and kremlin.ru did not surface a stable official page matching the task topics and interval."
+    }
+  ],
+  "search_queries": [
+    "site:t.me/mod_russia 5 августа 2026 Минобороны",
+    "site:t.me/mod_russia 05.08.2026",
+    "site:max.ru/morf 5 августа 2026 сводка",
+    "site:t.me/MID_Russia 5 августа 2026 Украина",
+    "site:kremlin.ru 5 августа 2026 Украина",
+    "site:mil.ru 5 августа 2026 Украина Минобороны"
+  ],
+  "included_items": [],
+  "excluded_candidates": [
+    {
+      "source": "Ministry of Defence Telegram messages 66272 and 66273",
+      "reason": "Already represented by canonical URLs and collected for the prior 00:00–05:00 UTC interval; excluded as explicit duplicates and out-of-window records."
+    },
+    {
+      "source": "Historical Ministry of Defence search results for 5 August in 2022, 2023, and 2024",
+      "reason": "The calendar day matched but the publication years were outside the assigned 2026 interval."
+    },
+    {
+      "source": "Unresolved current-channel entries adjacent to previously known identifiers",
+      "reason": "No stable public result established both canonical identifier and publication time; inferred sequential identifiers are not admissible evidence."
+    }
+  ],
+  "access_failures": [
+    {
+      "target": "Current Ministry of Defence Telegram interval",
+      "detail": "Public search indexing did not expose exact in-window post pages. The channel preview could not be deterministically positioned at the target interval through approved public-web discovery."
+    },
+    {
+      "target": "Current Ministry of Defence MAX interval",
+      "detail": "The official channel was discoverable and older July 2026 posts were indexed, but exact-date searches returned no stable 5 August record during the pass."
+    },
+    {
+      "target": "Official federal web mirrors",
+      "detail": "Exact-date searches did not resolve a stable mil.ru, mid.ru, or kremlin.ru page corresponding to a qualifying in-window statement."
+    }
+  ],
+  "artifact_capture": {
+    "captured": false,
+    "reason": "No qualifying canonical source item was resolved, and no immutable permitted artifact was available for capture."
+  },
+  "coverage_gaps": [
+    "The result is a bounded zero-item discovery outcome, not evidence that Russian official institutions published nothing during the interval.",
+    "Telegram public previews and search indexes may omit, delay, edit, or delete posts and do not provide API-grade completeness or complete edit history.",
+    "MAX search indexing exposed older official posts but no exact-date result, so cross-platform completeness could not be established.",
+    "No sequential Telegram identifier was guessed, and no item lacking both a stable canonical URL and verifiable in-window timestamp was registered.",
+    "No attached media was downloaded, hashed, or independently verified.",
+    "No Russian official assertion was independently assessed or converted into a claim, observation, territorial conclusion, or report narrative."
+  ],
+  "follow_up_task_proposals": [],
+  "safety_notes": [
+    "No precise current positions, movement routes, active-unit locations, target coordinates, or vulnerable-facility details were persisted.",
+    "No non-public material, authenticated platform data, or access-control bypass was used.",
+    "A zero-result receipt was preferred over registering uncertain identifiers or timestamps."
+  ],
+  "retrieved_at": "2026-08-06T05:55:00Z"
+}

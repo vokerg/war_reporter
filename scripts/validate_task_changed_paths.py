@@ -16,6 +16,7 @@ from pathlib import Path, PurePosixPath
 from typing import Iterable
 
 WORK_PREFIX = "work/"
+GLOB_CHARS = frozenset("*?[")
 
 
 class ValidationError(Exception):
@@ -50,6 +51,19 @@ def normalize_path(value: str, *, field: str) -> str:
     return normalized
 
 
+def path_matches(path: str, allowed_pattern: str) -> bool:
+    """Return whether a repository path is authorized by one manifest entry."""
+
+    if not any(char in allowed_pattern for char in GLOB_CHARS):
+        return path == allowed_pattern
+
+    if allowed_pattern.endswith("/**"):
+        prefix = allowed_pattern[:-3].rstrip("/")
+        return bool(prefix) and (path == prefix or path.startswith(f"{prefix}/"))
+
+    return PurePosixPath(path).match(allowed_pattern)
+
+
 def task_id_from_head_ref(head_ref: str) -> str | None:
     if not head_ref.startswith(WORK_PREFIX):
         return None
@@ -79,7 +93,13 @@ def load_manifest(repo: Path, head: str, manifest_path: str) -> dict:
 
 
 def changed_paths(repo: Path, base: str, head: str) -> list[str]:
-    output = run_git("diff", "--name-only", "--diff-filter=ACMRDTUXB", f"{base}...{head}", cwd=repo)
+    output = run_git(
+        "diff",
+        "--name-only",
+        "--diff-filter=ACMRDTUXB",
+        f"{base}...{head}",
+        cwd=repo,
+    )
     return [
         normalize_path(line, field="git diff")
         for line in output.splitlines()
@@ -129,7 +149,11 @@ def validate(
     )
 
     changed = changed_paths(repo, base, head)
-    violations = sorted(path for path in changed if path not in allowed)
+    violations = sorted(
+        path
+        for path in changed
+        if not any(path_matches(path, pattern) for pattern in allowed)
+    )
     return manifest_path, changed, violations
 
 
@@ -168,9 +192,7 @@ def main(argv: Iterable[str] | None = None) -> int:
             print(f"  - {path}", file=sys.stderr)
         return 1
 
-    print(
-        f"Validated {len(changed)} changed path(s) against {manifest_path}."
-    )
+    print(f"Validated {len(changed)} changed path(s) against {manifest_path}.")
     return 0
 
 

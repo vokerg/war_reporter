@@ -19,6 +19,7 @@ REQUIRED_ITEM = {"id", "source", "platform", "url", "collected_at", "text", "med
 def validate(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     registry = json.loads((root / "config/sources.json").read_text(encoding="utf-8"))
+    settings = json.loads((root / "config/settings.json").read_text(encoding="utf-8"))
     sources = registry.get("sources", [])
     ids: set[str] = set()
     for index, source in enumerate(sources):
@@ -35,6 +36,11 @@ def validate(root: Path = ROOT) -> list[str]:
             errors.append(f"{source_id}: invalid URL")
         if not 0 <= int(source.get("priority", -1)) <= 100:
             errors.append(f"{source_id}: priority must be 0..100")
+
+    for index, query in enumerate(settings.get("x_search_queries", []), 1):
+        if not isinstance(query, str) or not query.strip():
+            errors.append(f"x_search_queries[{index - 1}] must be a non-empty string")
+        ids.add(f"x-discovery-{index}")
 
     for path in (root / "data/raw").glob("*/*/*/items.ndjson"):
         for row in read_ndjson([path]):

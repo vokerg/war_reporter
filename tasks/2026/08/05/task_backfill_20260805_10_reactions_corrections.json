@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260805_10_reactions_corrections",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "pr_open",
+  "state": "review",
   "priority": 70,
   "created_at": "2026-08-06T05:02:00Z",
   "parent_issue": 33,
@@ -15,5 +15,19 @@
   "definition_of_done": ["The assigned public-web discovery shard was searched for the missing 05:00–24:00 UTC interval on 5 August 2026", "Primary publications were preferred and upstream lineage was recorded", "Canonical URLs, timestamps, language, quote locators, and access failures were recorded", "Candidate source profiles and follow-up task proposals were persisted when justified", "No item from the already completed 00:00–05:00 UTC interval was duplicated", "No final truth assessment, territorial conclusion, or report narrative was added"],
   "idempotency_key": "daily_discovery_gap:2026-08-05:reactions-corrections:ukraine-war:20260805T0500Z:20260806T0000Z",
   "lease": {"worker_run_id": "run_20260806T064500Z_reac10", "lease_branch": "work/task_backfill_20260805_10_reactions_corrections", "base_sha": "bb9d07fbc95394de65d88e81aa498d83558a4445", "leased_at": "2026-08-06T06:45:00Z", "lease_until": "2026-08-06T08:45:00Z"},
-  "result": {"branch": "work/task_backfill_20260805_10_reactions_corrections", "pr_number": 125}
+  "result": {
+    "branch": "work/task_backfill_20260805_10_reactions_corrections",
+    "pr_number": 125,
+    "completed_at": "2026-08-06T06:51:00Z",
+    "summary": "Completed a bounded public-web recovery scan of correction indexes, fact-check surfaces, same-day reaction reporting, official rebuttal searches, and existing repository identities for the missing 05:00–24:00 UTC interval. No new source item was admitted because no stable in-window formal correction, clarification, retraction, rebuttal, or distinct non-duplicative reaction identity was verified. The Guardian Kyiv article remains a single existing canonical identity; conflicting current-page and stored publication timestamps remain unresolved without immutable revision evidence. AP remained excluded because exact publication time was unavailable, while live-blog, Leipzig, official, diplomatic, and media reaction material was already represented elsewhere. No artifact, adjudication, claim, observation, policy conclusion, assessment, or report narrative was created.",
+    "coverage_gaps": [
+      "The zero-item result is not evidence that no reaction, correction, rebuttal, or retraction was published during the interval.",
+      "The Guardian Kyiv canonical identity remains unique, while conflicting publication-time metadata could not be resolved without immutable revision evidence.",
+      "AP's relevant same-day article remained excluded because exact publication time was unavailable.",
+      "Formal correction indexes and platform-native statements may lag or omit exact timestamp metadata.",
+      "Reaction material already represented in media, official, and diplomacy shards was not duplicated as correction evidence.",
+      "No full text, images, video, webpage bytes, or immutable artifacts were captured.",
+      "No reaction, criticism, correction, rebuttal, or retraction assertion was independently assessed or converted into a claim, observation, policy conclusion, or report narrative."
+    ]
+  }
 }

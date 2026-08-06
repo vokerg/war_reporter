@@ -2,7 +2,7 @@
   "task_id": "task_auto_bc004b743767ecf1",
   "task_type": "correction",
   "role": "correction-editor",
-  "state": "validating",
+  "state": "review",
   "priority": 95,
   "created_at": "2026-08-06T09:06:00Z",
   "parent_issue": null,
@@ -63,7 +63,7 @@
   "result": {
     "branch": "work/task_auto_bc004b743767ecf1",
     "pr_number": 138,
-    "completed_at": null,
+    "completed_at": "2026-08-06T09:12:00Z",
     "summary": "Added explicit post-finalization workflow dispatch for repository reconciliation and GitHub Pages deployment, backed by regression tests for Actions permission, dispatch targets, ordering, and non-recursion.",
     "coverage_gaps": [
       "The correction relies on GitHub workflow_dispatch semantics and repository-token Actions write permission.",

@@ -96,7 +96,7 @@ Successful sources are retained during a partial run, but the run remains visibl
 python -m scripts.collect \
   --force \
   --lookback-hours 168 \
-  --sources ua-general-staff-tg,cit-rss,ua-president-web
+  --sources ua-general-staff-tg,bellingcat-rss,ua-president-web
 ```
 
 The `Source smoke test` workflow runs the same bounded adapters without committing its archive. X timelines and discovery require `X_BEARER_TOKEN`; absence of the token is reported as degraded coverage rather than one error per X source.

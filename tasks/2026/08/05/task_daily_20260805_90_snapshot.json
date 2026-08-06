@@ -1,0 +1,88 @@
+{
+  "task_id": "task_daily_20260805_90_snapshot",
+  "task_type": "daily_report",
+  "role": "report-editor",
+  "state": "ready",
+  "priority": 65,
+  "created_at": "2026-08-06T08:41:00Z",
+  "parent_issue": null,
+  "issue_number": null,
+  "depends_on_task_ids": [
+    "task_20260805_01_ua_official",
+    "task_20260805_02_ru_official",
+    "task_20260805_03_ua_analysis_media",
+    "task_20260805_04_ru_milbloggers",
+    "task_20260805_05_international_media",
+    "task_20260805_06_military_analysts",
+    "task_20260805_07_strikes_infrastructure",
+    "task_20260805_08_visual_osint_maps",
+    "task_20260805_09_diplomacy_support_sanctions",
+    "task_20260805_10_reactions_corrections",
+    "task_auto_12ce9e2a1b9f4926",
+    "task_auto_1d3a947706bff4ee",
+    "task_auto_3513c536bd8c0a01",
+    "task_auto_5ba69fbdf442930f",
+    "task_auto_b3f0b5dc016eb465",
+    "task_auto_bb110619963930f9",
+    "task_auto_fa8bc1c2447a3555",
+    "task_backfill_20260805_01_ua_official",
+    "task_backfill_20260805_02_ru_official",
+    "task_backfill_20260805_03_ua_analysis_media",
+    "task_backfill_20260805_04_ru_milbloggers",
+    "task_backfill_20260805_05_international_media",
+    "task_backfill_20260805_06_military_analysts",
+    "task_backfill_20260805_07_strikes_infrastructure",
+    "task_backfill_20260805_08_visual_osint_maps",
+    "task_backfill_20260805_09_diplomacy_support_sanctions",
+    "task_backfill_20260805_10_reactions_corrections",
+    "task_daily_20260805_80_report_inputs"
+  ],
+  "window": {
+    "from": "2026-08-05T00:00:00Z",
+    "to": "2026-08-06T00:00:00Z"
+  },
+  "scope": {
+    "source_ids": [],
+    "source_groups": [],
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "daily-snapshot"
+    ],
+    "content_types": [
+      "report"
+    ]
+  },
+  "report_inputs": {
+    "claim_ids": [
+      "clm_20260805_guardian_attributed_additional_sanctions_request",
+      "clm_20260805_guardian_attributed_air_defence_delay_criticism",
+      "clm_20260805_guardian_attributed_more_air_defence_request"
+    ],
+    "assessment_ids": [
+      "asm_20260805_guardian_support_request_attributions"
+    ],
+    "claim_set_sha256": "331a1434a9983e0cad38747806c62466b0c995189695e2b2d4e7276be678aa75"
+  },
+  "exclusions": [
+    "Unmerged or unreviewed evidence",
+    "New web browsing by the report editor",
+    "Precise current operational locations or targeting-enabling detail"
+  ],
+  "allowed_output_paths": [
+    "data/reports/2026/08/05/daily.json",
+    "reports/daily/2026-08-05.md",
+    "queue/proposals/task_daily_20260805_90_snapshot.json",
+    "review/self/task_daily_20260805_90_snapshot.json"
+  ],
+  "definition_of_done": [
+    "Only the exact approved claim and assessment IDs frozen in report_inputs were used",
+    "The produced report manifest repeats the frozen claim IDs, assessment IDs, and claim-set SHA-256",
+    "Material changes, confidence changes, contested claims, corrections, unresolved questions, and coverage gaps were represented",
+    "No new evidence was introduced during editing",
+    "Two separate self-review rounds passed and a receipt was persisted"
+  ],
+  "idempotency_key": "daily_report:2026-08-05:ukraine-war",
+  "lease": null
+}

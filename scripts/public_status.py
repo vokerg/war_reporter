@@ -126,7 +126,10 @@ def build_public_status(
     registry = load_json(root / "config/sources.json", default={})
     if not isinstance(settings, dict) or not isinstance(registry, dict):
         raise ValueError("missing config/settings.json or config/sources.json")
-    state = load_json(root / settings["state_file"], default={})
+    state_file = str(settings.get("state_file", "data/state.json"))
+    raw_root = str(settings.get("raw_root", "data/raw"))
+    report_root = str(settings.get("report_root", "reports/daily"))
+    state = load_json(root / state_file, default={})
     if not isinstance(state, dict):
         state = {}
     per_source = state.get("per_source", {})
@@ -161,9 +164,11 @@ def build_public_status(
         stale = True
     else:
         last_run = parse_time(last_run_at)
-        age_hours = max(
-            0.0, (current - last_run).total_seconds() / 3600
-        ) if last_run else None
+        age_hours = (
+            max(0.0, (current - last_run).total_seconds() / 3600)
+            if last_run
+            else None
+        )
         stale = age_hours is None or age_hours > stale_after_hours
 
     run_status = state.get("status")
@@ -210,12 +215,8 @@ def build_public_status(
             "latest_source_success_at": _latest_time(
                 latest_success_values
             ),
-            "latest_archive_day": _latest_archive_day(
-                root, settings["raw_root"]
-            ),
-            "latest_digest_day": _latest_report_day(
-                root, settings["report_root"]
-            ),
+            "latest_archive_day": _latest_archive_day(root, raw_root),
+            "latest_digest_day": _latest_report_day(root, report_root),
         },
         "degradation": {
             "configuration_skips": int(
@@ -245,14 +246,22 @@ def _aggregate_table(
     title: str, rows: dict[str, dict[str, int]]
 ) -> str:
     statuses = [
-        "configured", "ok", "error", "skipped_config",
-        "skipped_cadence", "unknown",
+        "configured",
+        "ok",
+        "error",
+        "skipped_config",
+        "skipped_cadence",
+        "unknown",
     ]
-    header = "".join(f"<th>{html.escape(value)}</th>" for value in statuses)
+    header = "".join(
+        f"<th>{html.escape(value)}</th>" for value in statuses
+    )
     body = "".join(
         "<tr>"
         f"<td>{html.escape(name)}</td>"
-        + "".join(f"<td>{counts.get(status, 0)}</td>" for status in statuses)
+        + "".join(
+            f"<td>{counts.get(status, 0)}</td>" for status in statuses
+        )
         + "</tr>"
         for name, counts in rows.items()
     )
@@ -286,7 +295,8 @@ def render_public_status(status: dict[str, Any]) -> str:
         "<table><tbody>"
         f"<tr><th>Последний запуск</th><td>{_fmt(run['last_run_at'])}</td></tr>"
         f"<tr><th>Устарело</th><td>{_fmt(freshness['stale'])}</td></tr>"
-        f"<tr><th>Возраст состояния, часы</th><td>{_fmt(freshness['last_run_age_hours'])}</td></tr>"
+        f"<tr><th>Возраст состояния, часы</th><td>"
+        f"{_fmt(freshness['last_run_age_hours'])}</td></tr>"
         f"<tr><th>Выбрано / попыток / успешно / пропущено</th><td>"
         f"{run['selected_sources']} / {run['attempted']} / "
         f"{run['succeeded']} / {run['skipped']}</td></tr>"

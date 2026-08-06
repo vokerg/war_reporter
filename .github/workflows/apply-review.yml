@@ -1,19 +1,19 @@
-name: Apply audited self-review fixes
+name: Apply final self-review fixes
 on:
   push:
     branches: [refactor/raw-first-osint-loop]
     paths:
-      - ".review/**"
+      - ".review/final.part-*"
       - ".github/workflows/apply-review.yml"
 permissions:
   contents: write
 concurrency:
-  group: apply-audited-self-review
+  group: apply-final-self-review
   cancel-in-progress: false
 jobs:
   apply:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,24 +21,26 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Verify and extract reviewed payload
+      - name: Verify and extract final payload
         run: |
-          cat .review/v2.fixes.b64.* | base64 --decode > /tmp/review-payload.tar.gz
-          echo "9a27160373b130534a44b87f608c0c037f7536ad8be5a76c242620964484b223  /tmp/review-payload.tar.gz" | sha256sum --check --strict
-          tar -xzf /tmp/review-payload.tar.gz -C .
+          cat .review/final.part-* | base64 --decode > /tmp/final-review.tar.gz
+          echo "20ed9114c84d7fc5e2b863e5ccc53368f65a018035aaf77e37b9872e44851244  /tmp/final-review.tar.gz" | sha256sum --check --strict
+          tar -xzf /tmp/final-review.tar.gz -C .
           rm -f data/raw/2026/08/05/items.ndjson
           rm -f reports/daily/2026-08-05.md
           rm -rf site .review .github/workflows/apply-review.yml
-      - name: Validate reviewed tree before committing
+      - name: Validate final tree
         run: |
           pip install -r requirements.txt
           python -m compileall -q scripts tests
           python -m scripts.validate
           python -m unittest discover -s tests -v
-      - name: Commit reviewed tree
+          python -m scripts.build_report 2026-08-05
+          python -m scripts.build_site
+      - name: Commit final tree
         run: |
           git config user.name "war-reporter-review-bot"
           git config user.email "war-reporter-review-bot@users.noreply.github.com"
           git add -A
-          git commit -m "fix: address adversarial self-review findings"
+          git commit -m "fix: complete adversarial self-review remediation"
           git push origin "HEAD:${GITHUB_REF_NAME}"

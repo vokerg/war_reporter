@@ -9,5 +9,12 @@
   "state_file": "data/state.json",
   "report_root": "reports/daily",
   "site_root": "site",
-  "default_lookback_hours": 48
+  "default_lookback_hours": 48,
+  "telegram_max_pages": 50,
+  "x_max_pages": 20,
+  "x_search_queries": [
+    "(Ukraine OR Ukrainian OR Україна OR Украина) (frontline OR фронт OR наступ OR advance OR retreat) -is:retweet",
+    "(Ukraine OR Україна OR Украина) (missile OR ракета OR drone OR БПЛА OR strike OR удар) -is:retweet",
+    "(Russia OR Россия) (Kursk OR Курск OR Belgorod OR Белгород OR Crimea OR Крым) (drone OR БПЛА OR explosion OR взрыв OR attack OR атака) -is:retweet"
+  ]
 }

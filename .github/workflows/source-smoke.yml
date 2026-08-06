@@ -13,7 +13,7 @@ on:
       sources:
         description: Comma-separated source ids
         required: false
-        default: "ua-general-staff-tg,cit-rss,ua-president-web"
+        default: "ua-general-staff-tg,bellingcat-rss,ua-president-web"
 permissions:
   contents: read
 jobs:
@@ -32,7 +32,7 @@ jobs:
         env:
           X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
         run: |
-          args=(--force --lookback-hours 2 --workers 16)
+          args=(--force --lookback-hours 168 --workers 3)
           if [ -n "${{ inputs.platforms }}" ]; then args+=(--platforms "${{ inputs.platforms }}"); fi
           if [ -n "${{ inputs.groups }}" ]; then args+=(--groups "${{ inputs.groups }}"); fi
           if [ -n "${{ inputs.sources }}" ]; then args+=(--sources "${{ inputs.sources }}"); fi

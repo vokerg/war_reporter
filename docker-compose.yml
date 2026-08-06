@@ -1,9 +1,18 @@
 services:
   collector:
     build: .
-    restart: always
+    restart: unless-stopped
+    init: true
+    read_only: true
+    user: "${WAR_REPORTER_UID:-1000}:${WAR_REPORTER_GID:-1000}"
     env_file:
       - .env
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp
     volumes:
       - ./data:/app/data
       - ./reports:/app/reports

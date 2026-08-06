@@ -14,7 +14,6 @@ from zoneinfo import ZoneInfo
 try:
     from .reconcile_repository import plan_duties, task_index
     from .worker_queue import (
-        DOWNSTREAM_TASK_TYPES,
         canonicalization_complete,
         deterministic_branch,
         ready_tasks,
@@ -23,7 +22,6 @@ try:
 except ImportError:
     from reconcile_repository import plan_duties, task_index
     from worker_queue import (
-        DOWNSTREAM_TASK_TYPES,
         canonicalization_complete,
         deterministic_branch,
         ready_tasks,
@@ -33,7 +31,6 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 ACTIVE_STATES = {"leased", "collecting", "pr_open", "validating", "review"}
 TERMINAL_STATES = {"merged", "rejected", "cancelled", "duplicate"}
-RETIRED_HUMAN_REVIEW_PREFIX = "HUMAN_REVIEW_REQUIRED:"
 
 
 def load(path: Path) -> Any:
@@ -85,11 +82,9 @@ def _candidate_payload(
     task: dict[str, Any],
     path: Path,
     root: Path,
-    *,
-    retired_human_gate: bool = False,
 ) -> dict[str, Any]:
     task_type = str(task.get("task_type"))
-    payload = {
+    return {
         "task_id": task_id,
         "task_type": task_type,
         "role": role_for_task(task_type, root / "config/worker-routing.json"),
@@ -98,52 +93,9 @@ def _candidate_payload(
         "path": path.relative_to(root).as_posix(),
         "_created_at": str(task.get("created_at", "9999-12-31T23:59:59Z")),
     }
-    if retired_human_gate:
-        payload["retired_human_gate"] = True
-        payload["claim_transition"] = "blocked_to_leased"
-    return payload
 
 
-def _retired_human_gate_candidates(
-    root: Path,
-    tasks: dict[str, tuple[Path, dict[str, Any]]],
-) -> list[dict[str, Any]]:
-    """Treat legacy human-gated tasks as pickable without stopping the loop."""
-
-    gate_complete = canonicalization_complete(root)
-    candidates: list[dict[str, Any]] = []
-    for task_id, (path, task) in tasks.items():
-        if task.get("state") != "blocked":
-            continue
-        if not str(task.get("blocked_reason", "")).startswith(RETIRED_HUMAN_REVIEW_PREFIX):
-            continue
-        task_type = str(task.get("task_type"))
-        if task_type in DOWNSTREAM_TASK_TYPES and not gate_complete:
-            continue
-        dependencies = task.get("depends_on_task_ids", [])
-        if not isinstance(dependencies, list):
-            continue
-        if any(
-            dependency not in tasks or tasks[dependency][1].get("state") != "merged"
-            for dependency in dependencies
-        ):
-            continue
-        candidates.append(
-            _candidate_payload(
-                task_id,
-                task,
-                path,
-                root,
-                retired_human_gate=True,
-            )
-        )
-    return candidates
-
-
-def _eligible_candidates(
-    root: Path,
-    tasks: dict[str, tuple[Path, dict[str, Any]]],
-) -> list[dict[str, Any]]:
+def _eligible_candidates(root: Path) -> list[dict[str, Any]]:
     candidates = [
         _candidate_payload(task.task_id, task.value, task.path, root)
         for task in ready_tasks(
@@ -151,7 +103,6 @@ def _eligible_candidates(
             canonicalization_is_complete=canonicalization_complete(root),
         )
     ]
-    candidates.extend(_retired_human_gate_candidates(root, tasks))
     return sorted(
         candidates,
         key=lambda item: (
@@ -174,8 +125,8 @@ def evaluate_loop(
 ) -> dict[str, Any]:
     """Choose the supervisor's next action from repository and runtime state.
 
-    ``exceptional_prs`` is retained as backward-compatible telemetry. It no
-    longer changes the supervisor action and therefore cannot halt the loop.
+    ``exceptional_prs`` is retained as backward-compatible telemetry. It does
+    not change task selection, waiting, or quiescence.
     """
 
     root = root.resolve()
@@ -188,15 +139,9 @@ def evaluate_loop(
     plan = plan_duties(root, now)
     tasks = task_index(root)
     state_counts: dict[str, int] = {}
-    retired_human_gate_task_ids: list[str] = []
-    for task_id, (_, task) in tasks.items():
+    for _, task in tasks.values():
         state = str(task.get("state"))
         state_counts[state] = state_counts.get(state, 0) + 1
-        if (
-            state == "blocked"
-            and str(task.get("blocked_reason", "")).startswith(RETIRED_HUMAN_REVIEW_PREFIX)
-        ):
-            retired_human_gate_task_ids.append(task_id)
 
     nonterminal_tasks = sum(
         count for state, count in state_counts.items() if state not in TERMINAL_STATES
@@ -207,7 +152,6 @@ def evaluate_loop(
         "open_worker_prs": open_worker_prs,
         "active_work_branches": active_work_branches,
         "exceptional_prs": exceptional_prs,
-        "retired_human_gate_task_ids": sorted(retired_human_gate_task_ids),
         "states": dict(sorted(state_counts.items())),
     }
     common = {
@@ -226,7 +170,7 @@ def evaluate_loop(
             "task": None,
         }
 
-    eligible = _eligible_candidates(root, tasks)
+    eligible = _eligible_candidates(root)
     if eligible:
         task = dict(eligible[0])
         task.pop("_created_at", None)
@@ -330,7 +274,7 @@ def main(argv: list[str] | None = None) -> int:
         "--exceptional-prs",
         type=int,
         default=0,
-        help="Deprecated telemetry; exceptional PRs no longer halt Continuous Loop.",
+        help="Deprecated telemetry; this counter does not affect decisions.",
     )
     parser.add_argument("--idle-sweeps", type=int, default=0)
     parser.add_argument("--idle-since")

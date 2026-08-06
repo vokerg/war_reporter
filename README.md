@@ -22,18 +22,17 @@ Aliases are `continuous-loop`, `копай непрерывно`, and `непр�
 
 - `tasks/**/*.json` on `main` is the canonical queue.
 - `work/<task_id>` is the atomic worker lock.
-- `control/reconcile/<UTC-hour>` is the duty-controller lock.
 - `queue/proposals/<task_id>.json` reproduces downstream work after merges.
 - `review/self/<task_id>.json` records two separate self-review rounds.
 - `scripts/continuous_loop.py` provides a deterministic supervisor decision engine.
-- `reconcile-queue.yml` runs hourly and after merges.
+- `reconcile-queue.yml` runs hourly and after successful task finalization; it validates and pushes task-only queue transitions directly to `main`.
 - `auto-merge-reviewed.yml` squash-merges exact CI-green reviewed worker heads.
-- `finalize-task-merge.yml` records actual merge metadata and closes tasks.
+- `finalize-task-merge.yml` records actual merge metadata directly on `main` and triggers downstream reconciliation.
 - Workers ignore Connector branch-deletion limitations; cleanup is controller-owned and non-blocking.
 
-The supervisor returns only `reconcile`, `claim`, `wait`, or `quiescent`. The former `human_gate` action is retired. Non-worker architecture/hardening PRs are outside loop scheduling, and legacy `HUMAN_REVIEW_REQUIRED:` task blockers are treated as pickable after dependency checks.
+The supervisor returns only `reconcile`, `claim`, `wait`, or `quiescent`. There is no operator-stop action. Blocked tasks do not preempt unrelated ready work.
 
-Daily discovery is automatic across ten configured source shards. Daily snapshots are automatic when their full window is complete. Weekly and monthly snapshots are on-demand.
+Daily discovery is automatic across ten configured source shards. Daily snapshots are automatic when their full window is complete. Russian daily translations are automatic after the English report merges. Weekly and monthly snapshots are on-demand.
 
 ## Automatic withholding
 

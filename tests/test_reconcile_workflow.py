@@ -20,6 +20,16 @@ class ReconcileWorkflowTests(unittest.TestCase):
         self.assertLess(workflow.index(stage), workflow.index(empty_check))
         self.assertLess(workflow.index(empty_check), workflow.index(commit))
 
+    def test_reconciliation_pushes_validated_commit_directly_to_main(self) -> None:
+        workflow = (REPO_ROOT / ".github/workflows/reconcile-queue.yml").read_text(encoding="utf-8")
+
+        self.assertIn('workflows: ["Finalize merged worker task"]', workflow)
+        self.assertIn("git rebase origin/main", workflow)
+        self.assertIn("git push origin HEAD:main", workflow)
+        self.assertNotIn("gh pr create", workflow)
+        self.assertNotIn("control/reconcile/", workflow)
+        self.assertNotIn("git push origin \"HEAD:$branch\"", workflow)
+
 
 if __name__ == "__main__":
     unittest.main()

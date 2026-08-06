@@ -2,33 +2,35 @@
 
 ## Objective
 
-A repository-authorized agent should be able to receive `копай` without knowing internal roles or queue stages. The invocation checks duties, triggers control-plane work, claims one task, completes it, self-reviews twice, and hands it to an exact-head merge controller.
+A repository-authorized agent should be able to receive `копай` without knowing internal roles or queue stages. The invocation checks duties, performs deterministic control-plane updates, claims one task, completes it, self-reviews twice, and hands it to an exact-head merge controller.
 
 `continuous loop` composes this atomic lifecycle into a long-running supervisor. Its detailed contract is defined in [`11-continuous-loop.md`](11-continuous-loop.md).
 
 ## Control loop
 
 ```text
-operator invocation / hourly schedule / merged PR
+operator invocation / hourly schedule / successful finalization
   -> reconcile repository duties
+  -> validate task-only control-plane change twice
+  -> rebase and push reconciliation directly to main
   -> promote dependencies and materialize proposals
   -> create due daily discovery or snapshot tasks
-  -> select a pickable task
+  -> select a ready task
   -> create deterministic work branch
   -> bounded execution with automatic withholding
   -> self-review round 1 -> repairs
   -> self-review round 2 -> repairs
   -> CI + exact scope gate
   -> administrative squash merge
-  -> actual merge metadata finalization
-  -> issue closure + reconciliation + cleanup retry
+  -> actual merge metadata finalization directly on main
+  -> trigger reconciliation + cleanup retry
 ```
 
-In Continuous Loop mode, the supervisor refreshes `main` after the finalization barrier and starts the control loop again instead of reporting after one task.
+In Continuous Loop mode, the supervisor refreshes `main` after the finalization and reconciliation barriers and starts the control loop again instead of reporting after one task.
 
 ## Queue reproduction
 
-The system does not rely on an operator to create the next layer. Every task writes `queue/proposals/<task_id>.json`. After the producer merges, the reconciler validates each proposal, enforces dependency linkage and allowed task types, deduplicates by idempotency key, and creates `ready` or `planned` manifests.
+The system does not rely on an operator to create the next layer. Every task writes `queue/proposals/<task_id>.json`. After the producer merges, the finalizer records canonical completion on `main`; the resulting successful workflow triggers reconciliation. The reconciler validates each proposal, enforces dependency linkage and allowed task types, deduplicates by idempotency key, and creates `ready` or `planned` manifests.
 
 Proposal-generated task permissions are restricted to data-plane roots: `catalogs/`, `data/`, `maps/`, `raw-manifests/`, and `reports/`. A worker cannot use a proposal to grant access to workflows, schemas, scripts, tasks, review receipts, tests, or other control-plane files.
 
@@ -36,7 +38,7 @@ An empty proposal list is meaningful: it records that the worker considered down
 
 ## Daily obligations
 
-The reconciler runs hourly and after every merge. After the configured Copenhagen local hour, it creates ten source-sharded tasks for the previous UTC day if the complete UTC day began at or after the autonomy activation boundary and backlog limits allow. A day that started before `activation_not_before` is not backfilled automatically. The reconciler creates a daily snapshot task only after all related tasks and materialized proposals for the day are complete and at least one input merged.
+The reconciler runs hourly and after successful task finalization. After the configured Copenhagen local hour, it creates ten source-sharded tasks for the previous UTC day if the complete UTC day began at or after the autonomy activation boundary and backlog limits allow. A day that started before `activation_not_before` is not backfilled automatically. The reconciler creates a daily snapshot task only after all related tasks and materialized proposals for the day are complete and at least one input merged. A merged English report unlocks the configured Russian translation task through the same direct reconciliation path.
 
 Weekly and monthly snapshots are on-demand.
 
@@ -56,15 +58,13 @@ Worker permissions are taken from the base task manifest on `main`, not from the
 
 Hardening and other control-plane PRs are excluded from the worker auto-merge path and are also excluded from Continuous Loop scheduling decisions.
 
-## Retired human gate
+## No operator-stop state
 
-`human_gate` is no longer part of the supervisor state machine. Open architecture/hardening PRs and the compatibility `exceptional_prs` counter cannot stop task selection or quiescence.
-
-Legacy task manifests with `state: blocked` and a `blocked_reason` beginning with `HUMAN_REVIEW_REQUIRED:` are treated as pickable after the normal dependency and canonicalization checks. The claimant transitions the task directly to `leased`, clears the retired blocker, and preserves its substance as a withholding note or coverage gap.
+The supervisor state machine contains only `reconcile`, `claim`, `wait`, and `quiescent`. A blocked task remains ordinary non-claimable queue state and cannot stop unrelated ready work. Resolution happens through deterministic task updates, replacement, cancellation, or supersession—not through a repository-wide operator gate.
 
 ## Automatic withholding
 
-The configured `automatic_withhold_for` classes are handled without operator review:
+The configured `automatic_withhold_for` classes are handled without pausing the queue:
 
 - source identity ambiguity: do not attribute or publish the ambiguous material;
 - legal or rights uncertainty: do not copy or release the disputed content;
@@ -78,7 +78,7 @@ The safe bounded remainder of the task continues. The worker records the omissio
 
 Continuous Loop is a control-plane supervisor, not a wider worker permission set. It cannot combine several tasks in one work branch, bypass exact-head CI, or merge directly.
 
-The supervisor waits for both squash merge and finalization before selecting the next task. This makes proposal creation and dependency promotion visible before the next selection.
+The supervisor waits for both squash merge, canonical finalization, and resulting reconciliation before selecting the next task. This makes proposal creation and dependency promotion visible before the next selection.
 
 ## Cleanup boundary
 

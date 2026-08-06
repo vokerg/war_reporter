@@ -29,49 +29,46 @@ The user is not required to understand campaigns, roles, task layers, queue prom
 - `config/worker-routing.json`: task-type-to-role routing.
 - `.github/agents/*.agent.md`: role-specific constraints.
 - `work/<task_id>`: atomic task mutex.
-- `control/reconcile/<UTC-hour>`: repository-duty mutex.
 - `review/self/<task_id>.json`: two-round self-review attestation.
 - `queue/proposals/<task_id>.json`: machine-readable downstream task proposals.
 - `scripts/continuous_loop.py`: deterministic supervisor decision engine.
 
-Issue labels and Project memory are advisory. Successful deterministic branch creation decides ownership.
+Issue labels and Project memory are advisory. Successful deterministic branch creation decides worker ownership. Reconciliation itself is serialized by the workflow concurrency group and writes validated task-only transitions directly to `main`.
 
 ## State machine for `копай`
 
 1. Read `AGENTS.md`, this file, autonomy/routing config, methodology, and safety policy from current `main`.
 2. Inspect tasks, open worker PRs, deterministic branches, proposal files, and recent reconciliation state.
 3. Check due repository duties: previous UTC-day discovery, dependency promotion, merged-task proposals, daily snapshots, and cleanup debt.
-4. When duties exist, complete only deterministic control-plane reconciliation and refresh `main`.
-5. Select the highest-priority eligible task by priority descending, creation time ascending, task ID ascending.
-6. A normal task is eligible only in `ready` with satisfied dependencies. A legacy task in `blocked` whose `blocked_reason` begins with `HUMAN_REVIEW_REQUIRED:` is also eligible; this marker is retired and no longer requires operator action.
-7. Create `work/<task_id>` from the exact current `main` SHA. On conflict, try the next task; never use a random fallback branch.
-8. For a legacy retired-gate task, transition the manifest directly from `blocked` to `leased`, clear `blocked_reason`, and preserve the former reason as a coverage gap or withholding note.
-9. Commit lease metadata and open a draft PR immediately.
-10. Resolve the role and perform only the bounded task.
-11. Apply automatic withholding for identity ambiguity, rights uncertainty, sensitive geodata, released corrections, and security-boundary changes. Omit, coarsen, or defer unsafe material; do not stop for human review.
-12. Persist legitimate outputs, the task manifest, coverage gaps, and `queue/proposals/<task_id>.json`.
-13. Run repository tests and validation.
-14. Perform self-review round 1, repair findings, then perform a fresh round 2 and repair any new findings.
-15. Persist `review/self/<task_id>.json` with both passed rounds and any withholding notes.
-16. Set the task to `review`, attach result metadata, update the issue/campaign dashboard, and mark the PR ready.
-17. Do not approve, directly merge, or attempt connector branch deletion. The controller handles those operations.
-18. Return task, role, material result, coverage gaps, and PR URL.
+4. When duties exist, complete only deterministic control-plane reconciliation and refresh `main`. Reconciliation validates twice and pushes the resulting task-only commit directly to `main`; it does not depend on creating a PR.
+5. Select the highest-priority eligible `ready` task by priority descending, creation time ascending, task ID ascending.
+6. Create `work/<task_id>` from the exact current `main` SHA. On conflict, try the next task; never use a random fallback branch.
+7. Commit lease metadata and open a draft PR immediately.
+8. Resolve the role and perform only the bounded task.
+9. Apply automatic withholding for identity ambiguity, rights uncertainty, sensitive geodata, released corrections, and security-boundary changes. Omit, coarsen, or defer unsafe material without stopping unrelated work.
+10. Persist legitimate outputs, the task manifest, coverage gaps, and `queue/proposals/<task_id>.json`.
+11. Run repository tests and validation.
+12. Perform self-review round 1, repair findings, then perform a fresh round 2 and repair any new findings.
+13. Persist `review/self/<task_id>.json` with both passed rounds and any withholding notes.
+14. Set the task to `review`, attach result metadata, update the issue/campaign dashboard, and mark the PR ready.
+15. Do not approve, directly merge, or attempt connector branch deletion. The controller handles those operations.
+16. Return task, role, material result, coverage gaps, and PR URL.
 
 ## State machine for `continuous loop`
 
 1. Read the same current-`main` contract as `копай`, including `continuous_loop` configuration.
 2. Evaluate the repository with `scripts/continuous_loop.py` semantics.
-3. On `reconcile`, complete only deterministic control-plane reconciliation, wait for its result on `main`, refresh, and evaluate again.
-4. On `claim`, execute one complete `копай` task lifecycle. The claim payload can include `retired_human_gate: true`; in that case perform the `blocked` to `leased` transition described above.
+3. On `reconcile`, complete only deterministic control-plane reconciliation, wait for its direct result on `main`, refresh, and evaluate again.
+4. On `claim`, execute one complete `копай` task lifecycle.
 5. After the task reaches a ready exact-head PR, do not report completion and do not claim another task.
 6. Poll until the controller has squash-merged the exact reviewed head and post-merge finalization is visible on `main`.
-7. Refresh `main`; allow post-merge reconciliation to materialize proposals; evaluate again.
+7. Refresh `main`; post-finalization reconciliation materializes dependency promotions and proposals; evaluate again.
 8. Treat every transitively spawned task as part of the same loop.
 9. On `wait`, remain in supervisor mode and recheck at the configured merge or idle cadence.
 10. On `quiescent`, return one final aggregate report covering all tasks completed in the loop.
 11. If runtime or tools force termination before `quiescent`, report `continuation_required`; do not claim that the loop completed.
 
-`human_gate` is not a valid action. The backward-compatible `exceptional_prs` input is telemetry only and cannot change the decision. Architecture, hardening, or other non-worker PRs therefore cannot stop the research loop.
+The supervisor decision set contains only `reconcile`, `claim`, `wait`, and `quiescent`. There is no operator-stop state. Architecture, hardening, or other non-worker PRs cannot stop task selection.
 
 ## Automatic merge controller
 
@@ -85,20 +82,21 @@ Issue labels and Project memory are advisory. Successful deterministic branch cr
 - two ordered review rounds passed and include every configured check;
 - unsafe material identified during review has been removed, withheld, or coarsened before handoff.
 
-It then squash-merges the exact head. This is administrative automation, not independent human review. Direct worker merge remains prohibited.
+It then squash-merges the exact head. This is administrative automation, not independent editorial judgment. Direct worker merge remains prohibited.
 
 ## Post-merge completion
 
-`finalize-task-merge.yml` records the real merge SHA and timestamp, clears the lease, transitions the canonical task to `merged`, closes the issue, and performs deterministic control-plane review before merging its finalization PR. It also attempts branch cleanup without blocking completion.
+`finalize-task-merge.yml` records the real merge SHA and timestamp, clears the lease, transitions the canonical task to `merged`, closes the issue, validates twice, rebases on current `main`, and pushes the trusted task-only finalization directly to `main`.
 
-Every merged PR also triggers `reconcile-queue.yml`, which promotes dependencies, materializes validated proposals, creates due campaigns/snapshots, and retries cleanup.
+A successful finalizer run triggers `reconcile-queue.yml`. Reconciliation promotes dependency-complete tasks, materializes validated proposals, creates due campaigns and snapshots, retries cleanup, validates twice, rebases, and pushes the trusted task-only reconciliation directly to `main`.
 
-For Continuous Loop, post-merge completion is a synchronization barrier. The next task may be claimed only after this state is visible on refreshed `main`.
+For Continuous Loop, post-merge completion is a synchronization barrier. The next task may be claimed only after finalization and any resulting reconciliation are visible on refreshed `main`.
 
 ## Daily, weekly, and monthly duties
 
 - **Daily discovery:** automatic for ten mutually exclusive source shards covering the previous UTC day after the configured Copenhagen local-hour threshold.
 - **Daily snapshot:** automatic when all work for that UTC day is complete and at least one merged input exists.
+- **Russian daily translation:** automatic after the English daily report is merged.
 - **Weekly snapshot:** on-demand.
 - **Monthly snapshot:** on-demand.
 
@@ -118,7 +116,7 @@ Non-worker and architecture PRs are outside this calculation. The reference deci
 
 ## Blocked work and withholding
 
-Ordinary access failures remain `blocked` or are recorded as coverage gaps according to the task contract. Retired `HUMAN_REVIEW_REQUIRED:` tasks are pickable. Safety/governance uncertainty does not become an operator queue: withhold the unsafe portion, preserve the reason, and complete the safe bounded remainder without inventing evidence.
+An operationally blocked task remains non-claimable until a deterministic task update resolves, replaces, cancels, or supersedes it. It does not preempt unrelated ready work. Safety or governance uncertainty is handled by withholding the unsafe portion, preserving the reason, and completing the safe bounded remainder without inventing evidence.
 
 ## Connector limitation: branch deletion
 

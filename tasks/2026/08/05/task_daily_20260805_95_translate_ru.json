@@ -2,7 +2,7 @@
   "task_id": "task_daily_20260805_95_translate_ru",
   "task_type": "translate_report",
   "role": "translator",
-  "state": "ready",
+  "state": "review",
   "priority": 55,
   "created_at": "2026-08-06T08:59:00Z",
   "parent_issue": null,
@@ -51,5 +51,22 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "daily_translate:2026-08-05:ukraine-war:ru:v1",
-  "lease": null
+  "lease": {
+    "worker_run_id": "run_20260806T090000Z_continuous_loop",
+    "lease_branch": "work/task_daily_20260805_95_translate_ru",
+    "base_sha": "b36372b709765d7dda16f46bb6002108acd87923",
+    "leased_at": "2026-08-06T09:00:00Z",
+    "lease_until": "2026-08-06T15:00:00Z"
+  },
+  "result": {
+    "branch": "work/task_daily_20260805_95_translate_ru",
+    "pr_number": 137,
+    "completed_at": "2026-08-06T09:04:00Z",
+    "summary": "Produced the Russian translation of rpt_daily_20260805_en from the exact merged English source commit while preserving the report structure, attribution, uncertainty, claim and assessment sets, and deterministic hash without adding evidence or analysis.",
+    "coverage_gaps": [
+      "The Russian report inherits every evidentiary and analytical limitation of the English source report.",
+      "No new source verification, factual update, correction, or ambiguity resolution was performed during translation.",
+      "The translation does not independently assess the underlying claims or assessment."
+    ]
+  }
 }

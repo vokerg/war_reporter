@@ -6,6 +6,9 @@ from .collector_common import *  # noqa: F401,F403
 from .collector_adapters import *  # noqa: F401,F403
 
 
+_TRANSIENT_SOURCE_STATE_KEYS = {"error", "reason", "next_due_at"}
+
+
 def collect_one(
     source: dict[str, Any],
     settings: dict[str, Any],
@@ -71,6 +74,40 @@ def public_error_summary(exc: Exception) -> str:
     else:
         code = "unexpected_error"
     return f"{type(exc).__name__}: {code}"
+
+
+def public_source_url(value: Any) -> str:
+    """Remove userinfo, query and fragment from persisted source metadata."""
+    parsed = urlparse(str(value or ""))
+    if not parsed.scheme or not parsed.hostname:
+        return ""
+    host = parsed.hostname
+    if ":" in host and not host.startswith("["):
+        host = f"[{host}]"
+    try:
+        port = parsed.port
+    except ValueError:
+        port = None
+    netloc = host if port is None else f"{host}:{port}"
+    return parsed._replace(
+        netloc=netloc,
+        params="",
+        query="",
+        fragment="",
+    ).geturl()
+
+
+def next_source_state(
+    previous: dict[str, Any], **updates: Any
+) -> dict[str, Any]:
+    """Preserve durable health fields while clearing stale transient details."""
+    state = {
+        key: value
+        for key, value in previous.items()
+        if key not in _TRANSIENT_SOURCE_STATE_KEYS
+    }
+    state.update(updates)
+    return state
 
 
 def item_storage_delay_hours(
@@ -227,24 +264,24 @@ def run_collection(
             message = "X_BEARER_TOKEN is not configured"
             if message not in configuration_errors:
                 configuration_errors.append(message)
-            per_source[source_id] = {
-                **previous,
-                "status": "skipped_config",
-                "checked_at": iso(now),
-                "reason": message,
-            }
+            per_source[source_id] = next_source_state(
+                previous,
+                status="skipped_config",
+                checked_at=iso(now),
+                reason=message,
+            )
             skipped += 1
             continue
         is_due, next_due_at = source_is_due(
             source, previous, settings, now, force=force
         )
         if not is_due:
-            per_source[source_id] = {
-                **previous,
-                "status": "skipped_cadence",
-                "checked_at": iso(now),
-                "next_due_at": next_due_at,
-            }
+            per_source[source_id] = next_source_state(
+                previous,
+                status="skipped_cadence",
+                checked_at=iso(now),
+                next_due_at=next_due_at,
+            )
             skipped += 1
             continue
         due.append(source)
@@ -318,17 +355,17 @@ def run_collection(
                 row = {
                     "source": source_id,
                     "platform": source.get("platform"),
-                    "url": source.get("url"),
+                    "url": public_source_url(source.get("url")),
                     "collected_at": iso(),
                     "error": public_error,
                 }
                 errors.append(row)
-                per_source[source_id] = {
-                    **previous,
-                    "status": "error",
-                    "checked_at": row["collected_at"],
-                    "error": public_error,
-                }
+                per_source[source_id] = next_source_state(
+                    previous,
+                    status="error",
+                    checked_at=row["collected_at"],
+                    error=public_error,
+                )
                 LOG.warning("%s: %s", source_id, public_error)
 
     append_errors(root / settings["error_root"], errors)

@@ -17,7 +17,7 @@ Do not bypass `public_projection()` by calling `append_unique()` directly from a
 1. work on a dedicated branch;
 2. run `python -m scripts.validate`;
 3. run a targeted source smoke first, for example:
-   `python -m scripts.collect --force --lookback-hours 168 --sources ua-general-staff-tg,cit-rss,ua-president-web`;
+   `python -m scripts.collect --force --lookback-hours 168 --sources ua-general-staff-tg,bellingcat-rss,ua-president-web`;
 4. inspect `data/state.json` and `data/errors/`;
 5. run `python -m scripts.continuous_loop --once` only after the targeted smoke is understood;
 6. inspect the generated digest and site output;

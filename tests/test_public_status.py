@@ -96,7 +96,9 @@ class PublicStatusTests(unittest.TestCase):
         self.assertEqual(status["schema"], STATUS_SCHEMA)
         self.assertEqual(status["scope"], "current-state-only")
         self.assertFalse(status["freshness"]["stale"])
-        self.assertEqual(status["registry"]["configured_enabled"], 3)
+        self.assertEqual(status["registry"]["configured_entries"], 2)
+        self.assertEqual(status["registry"]["virtual_query_sources"], 1)
+        self.assertEqual(status["registry"]["configured_total"], 3)
         self.assertEqual(status["source_status_counts"]["ok"], 1)
         self.assertEqual(
             status["source_status_counts"]["skipped_config"], 1

@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from .collector_common import *  # noqa: F401,F403
 from .collector_common import _article_fields
-from .publisher_fetch import extract_publisher_article, publisher_get
+from .publisher_fetch import (
+    extract_publisher_article,
+    publisher_get,
+    publisher_url_allowed,
+)
 
 
 def collect_rss(
@@ -31,7 +35,12 @@ def collect_rss(
             published = datetime(*entry.updated_parsed[:6], tzinfo=UTC)
         if published and published < since:
             continue
-        url = entry.get("link") or source["url"]
+
+        entry_url = entry.get("link") or source["url"]
+        article_allowed = publisher_url_allowed(
+            source, settings, entry_url
+        )
+        url = entry_url if article_allowed else source["url"]
         summary_html = entry.get("summary", "")
         content_blocks = entry.get("content") or []
         supplied_html = (
@@ -43,29 +52,32 @@ def collect_rss(
         )
         title = entry.get("title", "")
         article_html, article_text, media = "", supplied_text, []
-        try:
-            (
-                fetched_title,
-                fetched_text,
-                article_html,
-                media,
-                fetched_published_at,
-                fetched_url,
-            ) = extract_publisher_article(
-                session,
-                source,
-                settings,
-                url,
-                settings["request_timeout_seconds"],
-            )
-            url = fetched_url
-            title = title or fetched_title
-            if published is None and fetched_published_at:
-                published = parse_time(fetched_published_at)
-            if len(fetched_text) > len(article_text):
-                article_text = fetched_text
-        except (requests.RequestException, CollectionError):
-            pass
+        if article_allowed:
+            try:
+                (
+                    fetched_title,
+                    fetched_text,
+                    article_html,
+                    media,
+                    fetched_published_at,
+                    fetched_url,
+                ) = extract_publisher_article(
+                    session,
+                    source,
+                    settings,
+                    entry_url,
+                    settings["request_timeout_seconds"],
+                )
+                url = fetched_url
+                title = title or fetched_title
+                if published is None and fetched_published_at:
+                    published = parse_time(fetched_published_at)
+                if len(fetched_text) > len(article_text):
+                    article_text = fetched_text
+            except (requests.RequestException, CollectionError):
+                pass
+        raw_entry = dict(entry)
+        raw_entry["link"] = url
         items.append(
             make_item(
                 source,
@@ -76,7 +88,7 @@ def collect_rss(
                 html=article_html or supplied_html,
                 media=media,
                 author=entry.get("author", ""),
-                raw=dict(entry),
+                raw=raw_entry,
             )
         )
     return items

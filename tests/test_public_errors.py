@@ -40,7 +40,10 @@ class PublicErrorTests(unittest.TestCase):
                     "id": "source-a",
                     "name": "Source A",
                     "platform": "web",
-                    "url": "https://example.com/news",
+                    "url": (
+                        "https://user:password@example.com/news"
+                        "?token=source-secret#fragment"
+                    ),
                     "group": "media",
                     "perspective": "mixed",
                     "trust": "high",
@@ -71,10 +74,41 @@ class PublicErrorTests(unittest.TestCase):
         error_text = next((root / "data/errors").rglob("errors.ndjson")).read_text(
             encoding="utf-8"
         )
-        self.assertNotIn(secret, state_text)
-        self.assertNotIn(secret, error_text)
+        for forbidden in (secret, "source-secret", "password"):
+            self.assertNotIn(forbidden, state_text)
+            self.assertNotIn(forbidden, error_text)
         self.assertIn("RuntimeError: unexpected_error", state_text)
         self.assertIn("RuntimeError: unexpected_error", error_text)
+        self.assertIn("https://example.com/news", error_text)
+
+    def test_cadence_skip_clears_stale_transient_error_fields(self) -> None:
+        root = self.make_root()
+        state_path = root / "data/state.json"
+        state_path.parent.mkdir(parents=True)
+        state_path.write_text(
+            json.dumps(
+                {
+                    "per_source": {
+                        "source-a": {
+                            "status": "error",
+                            "error": "RuntimeError: old_error",
+                            "reason": "old reason",
+                            "last_success_at": "2999-01-01T00:00:00Z",
+                        }
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        state = run_collection(root)
+        row = state["per_source"]["source-a"]
+        self.assertEqual(state["status"], "idle")
+        self.assertEqual(row["status"], "skipped_cadence")
+        self.assertNotIn("error", row)
+        self.assertNotIn("reason", row)
+        self.assertIn("last_success_at", row)
+        self.assertIn("next_due_at", row)
 
     def test_http_status_is_retained_without_exception_message(self) -> None:
         response = requests.Response()

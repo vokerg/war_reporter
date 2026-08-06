@@ -9,12 +9,76 @@
   "state_file": "data/state.json",
   "report_root": "reports/daily",
   "site_root": "site",
-  "default_lookback_hours": 48,
+  "default_lookback_hours": 168,
   "telegram_max_pages": 50,
   "x_max_pages": 20,
+  "platform_cadence_minutes": {
+    "telegram": 15,
+    "x": 15,
+    "rss": 60,
+    "web": 1440
+  },
+  "site_publication_delay_hours": 0,
+  "site_sensitive_delay_hours": 0,
+  "sensitive_tags": [
+    "frontline",
+    "operations",
+    "operational-position",
+    "precise-location",
+    "map",
+    "maps",
+    "deep-strikes"
+  ],
+  "minimum_group_counts": {
+    "official-ua": 30,
+    "official-ru": 10,
+    "osint": 25,
+    "analysts": 10,
+    "ua-media-bloggers": 10,
+    "ru-milbloggers": 15,
+    "international-media": 15
+  },
   "x_search_queries": [
     "(Ukraine OR Ukrainian OR Україна OR Украина) (frontline OR фронт OR наступ OR advance OR retreat) -is:retweet",
     "(Ukraine OR Україна OR Украина) (missile OR ракета OR drone OR БПЛА OR strike OR удар) -is:retweet",
     "(Russia OR Россия) (Kursk OR Курск OR Belgorod OR Белгород OR Crimea OR Крым) (drone OR БПЛА OR explosion OR взрыв OR attack OR атака) -is:retweet"
+  ],
+  "collection_delay_hours": 0,
+  "collection_delay_by_group": {
+    "official-ua": 24,
+    "official-ru": 24,
+    "ru-milbloggers": 72,
+    "x-discovery": 72
+  },
+  "collection_delay_by_tag": {
+    "frontline": 72,
+    "operations": 72,
+    "operational-position": 72,
+    "precise-location": 72,
+    "map": 72,
+    "maps": 72,
+    "deep-strikes": 72,
+    "strikes": 24
+  },
+  "collection_delay_by_source": {
+    "deepstate-map": 72,
+    "liveuamap-web": 72,
+    "warspotting-web": 72,
+    "geoconfirmed-x": 72,
+    "black-bird-x": 72,
+    "frontelligence-x": 72,
+    "defmon-x": 72,
+    "andrew-perpetua-x": 72,
+    "tatarigami-x": 72,
+    "special-kherson-cat-x": 72,
+    "brady-africk-x": 72,
+    "pasi-paroinen-x": 72
+  },
+  "web_max_links": 12,
+  "public_excerpt_chars": 1200,
+  "public_media_limit": 8,
+  "public_redact_tags": [
+    "operational-position",
+    "precise-location"
   ]
 }

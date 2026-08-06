@@ -1,0 +1,97 @@
+{
+  "task_id": "task_backfill_20260805_03_ua_analysis_media",
+  "worker_run_id": "run_20260806T055300Z_uaam03",
+  "window": {
+    "from": "2026-08-05T05:00:00Z",
+    "to": "2026-08-06T00:00:00Z"
+  },
+  "searched_at": "2026-08-06T05:56:00Z",
+  "method": "Bounded public-web search of Ukrainian national and public-service media archives, indexed article pages, and war/frontline topic surfaces. No authentication, paywall bypass, inferred article identifiers, bulk capture, binary download, or precise operational-location retention was used.",
+  "source_checks": [],
+  "sources_checked": [
+    {
+      "target": "Suspilne national archive and war coverage",
+      "access_url": "https://suspilne.media/archive/",
+      "status": "searched_no_new_canonical_item",
+      "result": "Exact-date and war/frontline searches returned the archive surface, historical calendar matches, and previously represented rolling coverage, but did not expose a stable newly published in-window article page during the bounded pass."
+    },
+    {
+      "target": "Ukrainska Pravda dated news archive",
+      "access_url": "https://www.pravda.com.ua/news/",
+      "status": "searched_no_exact_date_archive",
+      "result": "The expected 5 August 2026 dated archive was queried directly by URL form and search terms. Search indexing returned other 2026 dates but not a stable exact-date archive or qualifying in-window article page."
+    },
+    {
+      "target": "LB.ua war and society coverage",
+      "access_url": "https://lb.ua/",
+      "status": "searched_no_in_window_result",
+      "result": "Exact-date frontline and General Staff searches returned older June coverage but no stable qualifying 5 August publication."
+    },
+    {
+      "target": "Hromadske war coverage",
+      "access_url": "https://hromadske.ua/",
+      "status": "searched_no_in_window_result",
+      "result": "Exact-date frontline searches did not return a stable qualifying article page during the bounded pass."
+    }
+  ],
+  "search_queries": [
+    "site:suspilne.media 5 серпня 2026 війна фронт операції",
+    "site:suspilne.media/archive/2026/8/5 війна",
+    "site:pravda.com.ua/news/date_05082026 5 серпня 2026",
+    "site:pravda.com.ua/news/2026/08/05 війна фронт Генштаб",
+    "site:lb.ua 5 серпня 2026 війна фронт Україна",
+    "site:hromadske.ua 5 серпня 2026 війна фронт Україна"
+  ],
+  "included_items": [],
+  "excluded_candidates": [
+    {
+      "source": "Suspilne items 1368948, 1371680, and 1371716",
+      "reason": "Already represented by canonical URLs in the completed 00:00–05:00 UTC discovery shard; rolling-page updates were not assigned new source-item identities without a stable revision timestamp and immutable version boundary."
+    },
+    {
+      "source": "Ukrainska Pravda item 8047285",
+      "reason": "Already represented by canonical URL in the earlier discovery interval and primarily relays the same General Staff lineage captured by official-source work."
+    },
+    {
+      "source": "Suspilne Donbas August chronicle returned by search",
+      "reason": "The indexed page was published in 2025, not 2026; matching calendar-day references inside a historical rolling page do not satisfy the assigned publication window."
+    },
+    {
+      "source": "Suspilne archive results for 5 August 2024 and Ukrainska Pravda archives for other 2026 dates",
+      "reason": "Search results were outside the assigned date and publication window."
+    }
+  ],
+  "access_failures": [
+    {
+      "target": "Suspilne exact 5 August 2026 archive",
+      "detail": "The exact dated archive URL was not exposed as a safe indexed result, while the parsed archive surface remained on an earlier crawled date."
+    },
+    {
+      "target": "Ukrainska Pravda exact 5 August 2026 archive",
+      "detail": "The expected dated archive URL was not returned by search indexing; other dated archive pages were available but were not substituted."
+    },
+    {
+      "target": "Recent media search indexes",
+      "detail": "Recency-bounded domain searches for Suspilne, Ukrainska Pravda, LB.ua, and Hromadske returned no qualifying exact-window results, consistent with indexing delay or incomplete crawl coverage."
+    }
+  ],
+  "artifact_capture": {
+    "captured": false,
+    "reason": "No new qualifying canonical source item was resolved, and no immutable permitted artifact or stable rolling-page revision was available for capture."
+  },
+  "coverage_gaps": [
+    "The result is a bounded zero-item discovery outcome, not evidence that Ukrainian media published no relevant material during the interval.",
+    "Search indexes and parsed archives may lag live publisher systems, omit pages, or expose rolling pages without stable revision timestamps.",
+    "Previously registered live and digest pages may contain later updates, but those updates were not duplicated as independent publications without a stable version boundary.",
+    "Direct broadcast, unit, social-media, and official upstream statements were outside this media recovery shard and were not exhaustively re-collected.",
+    "No maps, images, video, full-text articles, or other binaries were downloaded or hashed.",
+    "No media statement was independently assessed or converted into a claim, observation, territorial conclusion, or report narrative."
+  ],
+  "follow_up_task_proposals": [],
+  "safety_notes": [
+    "No precise current positions, movement routes, active-unit locations, target coordinates, or vulnerable-facility details were persisted.",
+    "No paywall, authentication, private source, or access-control bypass was used.",
+    "A zero-result receipt was preferred over inferred article identifiers, timestamp substitution, or duplicate rolling-page lineage."
+  ],
+  "retrieved_at": "2026-08-06T05:56:00Z"
+}

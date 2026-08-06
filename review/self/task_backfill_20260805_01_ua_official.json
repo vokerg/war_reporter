@@ -1,0 +1,60 @@
+{
+  "task_id": "task_backfill_20260805_01_ua_official",
+  "pr_number": 115,
+  "rounds": [
+    {
+      "round": 1,
+      "reviewed_at": "2026-08-06T05:37:00Z",
+      "reviewer_run_id": "run_20260806T053700Z_uaoff01_review1",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps"
+      ],
+      "findings": [
+        "The material result is limited to the task manifest, four discovery outputs, the proposal receipt, and this self-review receipt.",
+        "All six retained records have canonical HTTPS URLs, platform IDs, minute-level publication timestamps, retrieval timestamps, original language, access method, and explicit artifact or rights limitations.",
+        "The six canonical message IDs are outside the previously completed 00:00–05:00 UTC collection interval; the later Kyiv DSNS update is linked to the earlier casualty update rather than treated as an independent incident.",
+        "Every retained publication falls within 2026-08-05T05:00:00Z through 2026-08-06T00:00:00Z; publication time and report-as-of time are not conflated.",
+        "Live air-attack routing and active-status detail plus the precise strike-target publication were withheld; granular frontline, district, facility, and attached-media detail was not persisted.",
+        "Validation run 31074507849 exposed that the initial recovery manifest did not authorize the required proposal receipt path even though the worker protocol required the file.",
+        "Coverage gaps explicitly preserve Telegram preview incompleteness, absent immutable artifacts, unresolved edit history and upstream records, non-exhaustive institutional coverage, and the attributable-only status of official casualty and damage figures."
+      ],
+      "repairs": [
+        "Added queue/proposals/task_backfill_20260805_01_ua_official.json and review/self/task_backfill_20260805_01_ua_official.json to allowed_output_paths, then reran the full contract workflow.",
+        "Validation run 31074555998 passed all repository tests and validators after the scope repair."
+      ],
+      "outcome": "pass"
+    },
+    {
+      "round": 2,
+      "reviewed_at": "2026-08-06T05:38:00Z",
+      "reviewer_run_id": "run_20260806T053800Z_uaoff01_review2",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps"
+      ],
+      "findings": [
+        "A fresh review after the scope repair confirmed that every changed path is declared by the task manifest and no control-plane, report, claim, assessment, observation, or map output was added.",
+        "Source-item records and raw-manifest entries agree on all six IDs, canonical URLs, publication times, quote locators, source identities, and revision lineage.",
+        "No canonical URL, platform ID, or source-item ID duplicates the earlier Ukrainian official pilot records; the only cross-window relationship is the explicit Kyiv DSNS revision link.",
+        "The earliest retained item is 05:46 UTC and the latest is 19:03 UTC on 5 August 2026, both inside the assigned recovery window.",
+        "The final retained excerpts contain aggregate or aftermath-level information only and do not reproduce current routes, precise targets, active-unit locations, target coordinates, or vulnerable-facility details.",
+        "Validation run 31074555998 passed the 83-test suite and every repository contract step on the reviewed material head.",
+        "The empty source-profile catalog, empty artifact stream, and empty proposal receipt are consistent with reusing canonical source identities, declining binary capture, and avoiding duplicate downstream tasks already represented by the recovery campaign."
+      ],
+      "repairs": [],
+      "outcome": "pass"
+    }
+  ],
+  "exceptional_condition": false
+}

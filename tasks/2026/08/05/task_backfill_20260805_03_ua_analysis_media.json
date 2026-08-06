@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260805_03_ua_analysis_media",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "review",
+  "state": "merged",
   "priority": 85,
   "created_at": "2026-08-06T05:02:00Z",
   "parent_issue": 33,
@@ -55,17 +55,11 @@
     "No final truth assessment, territorial conclusion, or report narrative was added"
   ],
   "idempotency_key": "daily_discovery_gap:2026-08-05:ua-analysis-media:ukraine-war:20260805T0500Z:20260806T0000Z",
-  "lease": {
-    "worker_run_id": "run_20260806T055300Z_uaam03",
-    "lease_branch": "work/task_backfill_20260805_03_ua_analysis_media",
-    "base_sha": "c55abfc59972a385c537d8677963fc08f6ffb2fd",
-    "leased_at": "2026-08-06T05:53:00Z",
-    "lease_until": "2026-08-06T07:53:00Z"
-  },
+  "lease": null,
   "result": {
     "branch": "work/task_backfill_20260805_03_ua_analysis_media",
     "pr_number": 118,
-    "completed_at": "2026-08-06T05:59:00Z",
+    "completed_at": "2026-08-06T05:59:18Z",
     "summary": "Completed a bounded public-web recovery scan of Ukrainian media and analysis surfaces for the missing 05:00–24:00 UTC interval. No new source item was admitted because exact-date publisher archives and search indexes did not resolve a stable qualifying article page, while visible candidates were historical date collisions or already registered rolling-page and digest lineage. The raw manifest records Suspilne, Ukrainska Pravda, LB.ua, and Hromadske surfaces, exact-date queries, duplicates, archive failures, and safety boundaries. No article identifier or revision timestamp was inferred, no artifact was captured, and no truth assessment or report narrative was created.",
     "coverage_gaps": [
       "The zero-item result is not evidence that Ukrainian media published no relevant material during the interval.",
@@ -74,6 +68,8 @@
       "Direct broadcast, unit, social-media, and official upstream statements were outside this media recovery shard and were not exhaustively re-collected.",
       "No maps, images, video, full-text articles, or other binaries were downloaded or hashed.",
       "No media statement was independently assessed or converted into a claim, observation, territorial conclusion, or report narrative."
-    ]
+    ],
+    "merge_sha": "e4f47f4d3576850234592a66af6c1e56194d0c8d",
+    "merged_at": "2026-08-06T05:59:18Z"
   }
 }

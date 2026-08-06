@@ -24,9 +24,11 @@ This repository is public. Collectors may temporarily hold fuller source respons
 - a configurable text excerpt (1,200 characters by default);
 - a limited list of public media links;
 - tags and handling metadata;
-- a SHA-256 fingerprint and minimal platform identifiers.
+- minimal platform identifiers and, for ordinary excerpt records, a SHA-256 content fingerprint.
 
-Captured HTML and full platform payloads are **not** persisted. The path name `data/raw/` is retained for compatibility; its records are public source projections, not a private full-text archive. A private durable capture backend is outside this PR.
+Captured HTML and full platform payloads are **not** persisted. Records tagged `operational-position` or `precise-location` use the stricter `public_redacted_v1` projection: title, text, HTML, media, content lengths and content fingerprint are omitted. This avoids turning the public archive into a confirmation oracle for guessed sensitive content.
+
+The path name `data/raw/` is retained for compatibility; its records are public source projections, not a private full-text archive. A private durable capture backend is outside this PR.
 
 ## Implemented
 
@@ -40,8 +42,9 @@ Captured HTML and full platform payloads are **not** persisted. The path name `d
 - publication-time extraction from metadata, JSON-LD and `<time>` elements;
 - `Europe/Kyiv` daily boundaries;
 - 24/72-hour storage embargoes for configured operational source groups/tags;
-- permanent excerpt suppression for `operational-position` and `precise-location` records;
+- permanent content suppression for `operational-position` and `precise-location` records;
 - searchable static source cards and delayed map-publication cards;
+- sanitized report HTML, hash-based Content Security Policy and no-referrer outbound links;
 - explicit `ok`, `idle`, `partial`, `blocked` and `failed` states.
 
 The map section displays delayed map publications from sources. It is not a territorial-control map and does not derive geometry.
@@ -54,19 +57,21 @@ SAFETY.md                         publication policy
 METHODOLOGY.md                    evidence semantics
 config/sources.json               configured source registry
 config/settings.json              cadence, timezone and publication policy
-data/raw/YYYY/MM/DD/items.ndjson  public excerpt records
-data/errors/YYYY/MM/DD/errors.ndjson source-specific failures
+data/raw/YYYY/MM/DD/items.ndjson  public excerpt/redacted records
+data/errors/YYYY/MM/DD/errors.ndjson source-specific safe error categories
 data/state.json                   latest run and per-source health
 reports/daily/YYYY-MM-DD.md       automatic source digest
 scripts/collect.py                collector facade and CLI
-scripts/collector_common.py       URL safety, extraction, public projection
+scripts/collector_common.py       URL safety, extraction, base projection
+scripts/public_archive.py         final fail-closed archive hardening
 scripts/collector_adapters.py     Telegram, X, RSS and web adapters
 scripts/collector_runtime.py      cadence, embargo, state and persistence
 scripts/continuous_loop.py        one-shot/service runner
 scripts/build_report.py           source digest renderer
 scripts/build_site.py             static source reader
-scripts/validate.py               structural validation
-tests/test_pipeline.py            regression suite
+scripts/html_safety.py            rendered-report allowlist sanitizer
+scripts/validate.py               structural and safety validation
+tests/                            regression and repository contract tests
 ```
 
 ## Run once
@@ -99,15 +104,20 @@ python -m scripts.collect \
   --sources ua-general-staff-tg,bellingcat-rss,ua-president-web
 ```
 
-The `Source smoke test` workflow runs the same bounded adapters without committing its archive. X timelines and discovery require `X_BEARER_TOKEN`; absence of the token is reported as degraded coverage rather than one error per X source.
+PR CI runs the same bounded Telegram/RSS/web adapters and requires each to return `status=ok` with at least one fetched item. The separate `Source smoke test` workflow supports manual reruns and alternate source IDs without committing its archive. X timelines and discovery require `X_BEARER_TOKEN`; absence of the token is reported as degraded coverage rather than one error per X source.
 
 ## Continuous service
 
 ```bash
+mkdir -p data reports site
 cp .env.example .env
 # Add X_BEARER_TOKEN when X coverage is required.
+export WAR_REPORTER_UID="$(id -u)"
+export WAR_REPORTER_GID="$(id -g)"
 docker compose up -d --build
 ```
+
+The image excludes `.env`, Git metadata and generated/runtime data from the build context. The collector runs as a non-root user in a read-only container with no Linux capabilities; only `data/`, `reports/`, `site/` and `/tmp` are writable. The bind-mount directories must be writable by `WAR_REPORTER_UID:WAR_REPORTER_GID`.
 
 One source failure never terminates service mode. Scheduled GitHub collection persists successful and partial public projections, then leaves incomplete runs red.
 
@@ -130,4 +140,6 @@ python -m scripts.build_report 2026-08-05
 python -m scripts.build_site
 ```
 
-Merge readiness additionally requires a reviewed network smoke run on representative Telegram, RSS and web sources, plus X when X coverage is claimed.
+The validator rejects absolute/traversing repository paths, credentialed source URLs, source ID/platform mismatches, unsafe persisted error records and public archive rows that do not match `public_excerpt_v1` or `public_redacted_v1`.
+
+Merge readiness additionally requires a reviewed current-head GitHub-hosted run, a successful representative network smoke artifact, plus X smoke evidence when X coverage is claimed.

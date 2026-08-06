@@ -28,15 +28,27 @@ def append_errors(root: Path, rows: list[dict[str, Any]]) -> None:
         return
     day = utc_now().strftime("%Y/%m/%d")
     path = root / day / "errors.ndjson"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as handle:
-        for row in rows:
-            handle.write(
-                json.dumps(
-                    row, ensure_ascii=False, separators=(",", ":")
+    existing_lines: list[str] = []
+    if path.exists():
+        for line_number, line in enumerate(
+            path.read_text(encoding="utf-8").splitlines(), 1
+        ):
+            if not line.strip():
+                continue
+            try:
+                value = json.loads(line)
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"{path}:{line_number}: {exc}") from exc
+            if not isinstance(value, dict):
+                raise ValueError(
+                    f"{path}:{line_number}: NDJSON row must be an object"
                 )
-                + "\n"
-            )
+            existing_lines.append(line)
+    new_lines = [
+        json.dumps(row, ensure_ascii=False, separators=(",", ":"))
+        for row in rows
+    ]
+    atomic_text(path, "\n".join(existing_lines + new_lines) + "\n")
 
 
 def public_error_summary(exc: Exception) -> str:
@@ -191,6 +203,14 @@ def archive_projection(
     )
 
 
+def _previous_successful_run(state: dict[str, Any]) -> str | None:
+    try:
+        stamp = parse_time(state.get("last_successful_run_at"))
+    except (TypeError, ValueError):
+        return None
+    return iso(stamp) if stamp is not None else None
+
+
 def run_collection(
     root: Path = ROOT,
     *,
@@ -341,8 +361,8 @@ def run_collection(
                         item["collected_at"],
                     )
                     grouped.setdefault(path, []).append(item)
-                for path, rows in grouped.items():
-                    added += append_unique(path, rows)
+                for path, grouped_rows in grouped.items():
+                    added += append_unique(path, grouped_rows)
                 total_added += added
                 succeeded += 1
                 per_source[source_id] = {
@@ -396,8 +416,15 @@ def run_collection(
     else:
         status = "ok"
 
+    completed_at = iso()
+    last_successful_run_at = (
+        completed_at
+        if status in {"ok", "idle"}
+        else _previous_successful_run(previous_state)
+    )
     state = {
-        "last_run_at": iso(),
+        "last_run_at": completed_at,
+        "last_successful_run_at": last_successful_run_at,
         "since": iso(since),
         "status": status,
         "sources_configured": len(selected),

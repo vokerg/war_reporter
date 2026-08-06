@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from .collector_common import *  # noqa: F401,F403
 from .collector_adapters import *  # noqa: F401,F403
+from .public_archive import harden_public_projection
 
 
 _TRANSIENT_SOURCE_STATE_KEYS = {"error", "reason", "next_due_at"}
@@ -181,6 +182,15 @@ def source_is_due(
     return now >= next_due, iso(next_due)
 
 
+def archive_projection(
+    item: dict[str, Any], settings: dict[str, Any]
+) -> dict[str, Any]:
+    """Apply the mandatory final public-archive boundary."""
+    return harden_public_projection(
+        public_projection(item, settings), item, settings
+    )
+
+
 def run_collection(
     root: Path = ROOT,
     *,
@@ -315,7 +325,8 @@ def run_collection(
                     if storage_state == "storable"
                 ]
                 items = [
-                    public_projection(item, settings) for item in eligible_items
+                    archive_projection(item, settings)
+                    for item in eligible_items
                 ]
                 withheld_recent = storage_states.count("withheld_recent")
                 withheld_undated = storage_states.count("withheld_undated")

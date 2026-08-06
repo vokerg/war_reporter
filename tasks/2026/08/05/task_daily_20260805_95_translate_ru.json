@@ -1,0 +1,55 @@
+{
+  "task_id": "task_daily_20260805_95_translate_ru",
+  "task_type": "translate_report",
+  "role": "translator",
+  "state": "ready",
+  "priority": 55,
+  "created_at": "2026-08-06T08:59:00Z",
+  "parent_issue": null,
+  "issue_number": null,
+  "depends_on_task_ids": [
+    "task_daily_20260805_90_snapshot"
+  ],
+  "window": {
+    "from": "2026-08-05T00:00:00Z",
+    "to": "2026-08-06T00:00:00Z"
+  },
+  "scope": {
+    "source_ids": [],
+    "source_item_ids": [],
+    "source_groups": [],
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "daily-snapshot",
+      "translation",
+      "russian"
+    ],
+    "content_types": [
+      "report"
+    ]
+  },
+  "exclusions": [
+    "Any factual or analytical change relative to rpt_daily_20260805_en",
+    "New web browsing, new evidence, changed claim outcomes, changed confidence, or resolved ambiguity",
+    "Translation before the English source task is merged and its exact merge SHA is available"
+  ],
+  "allowed_output_paths": [
+    "data/reports/2026/08/05/daily-ru.json",
+    "reports/ru/daily/2026-08-05.md",
+    "queue/proposals/task_daily_20260805_95_translate_ru.json",
+    "review/self/task_daily_20260805_95_translate_ru.json"
+  ],
+  "definition_of_done": [
+    "The source report rpt_daily_20260805_en, its exact merged source commit, and claim-set hash were verified before translation",
+    "The exact report_id is rpt_daily_20260805_ru, language is ru, and translation_of_report_id is rpt_daily_20260805_en",
+    "claim_ids, assessment_ids, claim_set_sha256, dates, attribution, uncertainty, and safety qualifiers were preserved exactly",
+    "source_commit equals the English report task merge SHA recorded on main",
+    "The Russian manifest and Markdown content were written to the declared paths with record_status approved",
+    "A queue proposal receipt was persisted",
+    "Two separate self-review rounds passed and a receipt was persisted"
+  ],
+  "idempotency_key": "daily_translate:2026-08-05:ukraine-war:ru:v1",
+  "lease": null
+}

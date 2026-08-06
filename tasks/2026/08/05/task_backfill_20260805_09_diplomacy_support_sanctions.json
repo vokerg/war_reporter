@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260805_09_diplomacy_support_sanctions",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "review",
+  "state": "merged",
   "priority": 70,
   "created_at": "2026-08-06T05:02:00Z",
   "parent_issue": 33,
@@ -15,9 +15,24 @@
   "scope": {
     "source_ids": [],
     "source_groups": [],
-    "regions": ["ukraine-war"],
-    "topics": ["diplomacy", "military-support", "sanctions"],
-    "content_types": ["post", "article", "report", "briefing", "document", "image", "video", "map"]
+    "regions": [
+      "ukraine-war"
+    ],
+    "topics": [
+      "diplomacy",
+      "military-support",
+      "sanctions"
+    ],
+    "content_types": [
+      "post",
+      "article",
+      "report",
+      "briefing",
+      "document",
+      "image",
+      "video",
+      "map"
+    ]
   },
   "exclusions": [
     "Items already represented by canonical URL, platform ID, or content hash",
@@ -40,17 +55,11 @@
     "No final truth assessment, territorial conclusion, or report narrative was added"
   ],
   "idempotency_key": "daily_discovery_gap:2026-08-05:diplomacy-support-sanctions:ukraine-war:20260805T0500Z:20260806T0000Z",
-  "lease": {
-    "worker_run_id": "run_20260806T064000Z_dipl09",
-    "lease_branch": "work/task_backfill_20260805_09_diplomacy_support_sanctions",
-    "base_sha": "ace88c03987938f843df5ffcc7ea6de38e979fb4",
-    "leased_at": "2026-08-06T06:40:00Z",
-    "lease_until": "2026-08-06T08:40:00Z"
-  },
+  "lease": null,
   "result": {
     "branch": "work/task_backfill_20260805_09_diplomacy_support_sanctions",
     "pr_number": 124,
-    "completed_at": "2026-08-06T06:46:00Z",
+    "completed_at": "2026-08-06T06:42:26Z",
     "summary": "Completed a bounded public-web recovery scan of selected Ukrainian, EU, NATO, US, UK, and Canadian official diplomacy, military-support, and sanctions surfaces for the missing 05:00–24:00 UTC interval. No new source item was admitted because the known Reuters EUR 1.4 billion frozen-assets publication is already represented in the international-media shard, while the European Commission primary statement it relays could not be resolved to a distinct stable official URL with verifiable publication time. Other official searches returned out-of-window releases or no qualifying exact-date record. No secondary timestamp was promoted to primary provenance, no artifact was captured, and no policy assessment, claim, observation, or report narrative was created.",
     "coverage_gaps": [
       "The zero-item result is not evidence that no diplomatic, support, or sanctions statement was issued during the interval.",
@@ -60,6 +69,8 @@
       "The scan covered selected Ukrainian, EU, NATO, US, UK, and Canadian official surfaces and is not exhaustive across all governments or languages.",
       "No full text, documents, images, video, webpage bytes, or immutable artifacts were captured.",
       "No diplomatic, sanctions, or support assertion was independently assessed or converted into a claim, observation, policy conclusion, or report narrative."
-    ]
+    ],
+    "merge_sha": "6a85380acd48f98fc011cd1524a7430e59313e6f",
+    "merged_at": "2026-08-06T06:42:26Z"
   }
 }

@@ -23,8 +23,8 @@ jobs:
           python-version: "3.12"
       - name: Verify and extract reviewed payload
         run: |
-          cat .review/fixes.b64.* | base64 --decode > /tmp/review-payload.tar.gz
-          echo "771f0bf1f2aceb5b1a0f3579ea4d1a4e1012d605510d78e8a7b2f91db3d2fa60  /tmp/review-payload.tar.gz" | sha256sum --check --strict
+          cat .review/v2.fixes.b64.* | base64 --decode > /tmp/review-payload.tar.gz
+          echo "9a27160373b130534a44b87f608c0c037f7536ad8be5a76c242620964484b223  /tmp/review-payload.tar.gz" | sha256sum --check --strict
           tar -xzf /tmp/review-payload.tar.gz -C .
           rm -f data/raw/2026/08/05/items.ndjson
           rm -f reports/daily/2026-08-05.md

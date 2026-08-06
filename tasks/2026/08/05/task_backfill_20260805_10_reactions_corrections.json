@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260805_10_reactions_corrections",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "leased",
+  "state": "pr_open",
   "priority": 70,
   "created_at": "2026-08-06T05:02:00Z",
   "parent_issue": 33,
@@ -14,5 +14,6 @@
   "allowed_output_paths": ["catalogs/sources/2026/08/05/reactions-corrections-backfill-0500-2400.json", "data/source-items/2026/08/05/reactions-corrections-backfill-0500-2400.ndjson", "data/artifacts/2026/08/05/reactions-corrections-backfill-0500-2400.ndjson", "raw-manifests/2026/08/05/reactions-corrections-backfill-0500-2400.json"],
   "definition_of_done": ["The assigned public-web discovery shard was searched for the missing 05:00–24:00 UTC interval on 5 August 2026", "Primary publications were preferred and upstream lineage was recorded", "Canonical URLs, timestamps, language, quote locators, and access failures were recorded", "Candidate source profiles and follow-up task proposals were persisted when justified", "No item from the already completed 00:00–05:00 UTC interval was duplicated", "No final truth assessment, territorial conclusion, or report narrative was added"],
   "idempotency_key": "daily_discovery_gap:2026-08-05:reactions-corrections:ukraine-war:20260805T0500Z:20260806T0000Z",
-  "lease": {"worker_run_id": "run_20260806T064500Z_reac10", "lease_branch": "work/task_backfill_20260805_10_reactions_corrections", "base_sha": "bb9d07fbc95394de65d88e81aa498d83558a4445", "leased_at": "2026-08-06T06:45:00Z", "lease_until": "2026-08-06T08:45:00Z"}
+  "lease": {"worker_run_id": "run_20260806T064500Z_reac10", "lease_branch": "work/task_backfill_20260805_10_reactions_corrections", "base_sha": "bb9d07fbc95394de65d88e81aa498d83558a4445", "leased_at": "2026-08-06T06:45:00Z", "lease_until": "2026-08-06T08:45:00Z"},
+  "result": {"branch": "work/task_backfill_20260805_10_reactions_corrections", "pr_number": 125}
 }

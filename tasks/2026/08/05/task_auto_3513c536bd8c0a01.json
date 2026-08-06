@@ -2,7 +2,7 @@
   "task_id": "task_auto_3513c536bd8c0a01",
   "task_type": "investigate_claim",
   "role": "corroborator",
-  "state": "leased",
+  "state": "validating",
   "priority": 80,
   "created_at": "2026-08-06T07:35:05.919111Z",
   "parent_issue": null,
@@ -58,5 +58,17 @@
     "base_sha": "9e93156452c2ffb96805d14f4a95702e0f12408d",
     "leased_at": "2026-08-06T07:39:29Z",
     "lease_until": "2026-08-06T08:39:29Z"
+  },
+  "result": {
+    "branch": "work/task_auto_3513c536bd8c0a01",
+    "pr_number": 133,
+    "completed_at": null,
+    "summary": "Reassessed the 15 injured / 9 hospitalized object-level claim and found a high-confidence date-lineage collision. Telegram post 7134 contains the frozen wording, but Kyiv's official portal and independent same-day reporting assign that wording to the 19 July 2026 attack. The 5 August casualty claim is therefore marked misleading and excluded from report use; a priority-95 correction task is proposed for source-item, observation, raw-manifest, claim, and assessment repair.",
+    "coverage_gaps": [
+      "The canonical Telegram message page exposes the platform ID and wording but not a parsed publication date in the retrieved representation.",
+      "The source item, observation, and raw-manifest paths requiring correction are outside this task's immutable output scope.",
+      "No independent compatible casualty evidence for the overnight 4/5 August attack was located in this bounded pass.",
+      "Until the correction task completes, the repository retains a misdated source item and derived observation that downstream consumers must not treat as valid 5 August evidence."
+    ]
   }
 }

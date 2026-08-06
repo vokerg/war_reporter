@@ -78,6 +78,9 @@ jobs:
       - name: Validate repository records and raw manifests
         run: python scripts/validate_data.py
 
+      - name: Validate lineage graphs
+        run: python scripts/validate_lineage_cycles.py
+
       - name: Validate daily report input eligibility
         run: python scripts/validate_report_input_eligibility.py
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "War Reporter raw item",
+  "title": "War Reporter public source projection",
   "type": "object",
   "required": [
     "id",
@@ -9,8 +9,10 @@
     "url",
     "collected_at",
     "text",
+    "html",
     "media",
-    "tags"
+    "tags",
+    "raw"
   ],
   "properties": {
     "id": {"type": "string", "minLength": 1},
@@ -22,15 +24,42 @@
     "collected_at": {"type": "string", "format": "date-time"},
     "title": {"type": "string"},
     "text": {"type": "string"},
-    "html": {"type": "string"},
-    "media": {"type": "array", "items": {"type": "string"}},
+    "html": {"const": ""},
+    "media": {
+      "type": "array",
+      "items": {"type": "string", "format": "uri"}
+    },
     "author": {"type": "string"},
     "language": {"type": "string"},
     "group": {"type": "string"},
     "perspective": {"type": "string"},
     "trust": {"enum": ["primary", "high", "medium", "low", "unknown"]},
     "tags": {"type": "array", "items": {"type": "string"}},
-    "raw": {}
+    "raw": {
+      "type": "object",
+      "required": [
+        "archive_policy",
+        "content_sha256",
+        "original_text_chars",
+        "original_html_chars",
+        "text_truncated",
+        "media_count",
+        "platform"
+      ],
+      "properties": {
+        "archive_policy": {"const": "public_excerpt_v1"},
+        "content_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "original_text_chars": {"type": "integer", "minimum": 0},
+        "original_html_chars": {"type": "integer", "minimum": 0},
+        "text_truncated": {"type": "boolean"},
+        "media_count": {"type": "integer", "minimum": 0},
+        "platform": {"type": "object"}
+      },
+      "additionalProperties": false
+    }
   },
   "additionalProperties": true
 }

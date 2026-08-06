@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths:
       - "data/raw/**"
+      - "data/errors/**"
+      - "data/state.json"
       - "reports/**"
       - "config/settings.json"
       - "config/sources.json"
@@ -12,6 +14,7 @@ on:
       - "scripts/build_report.py"
       - "scripts/build_site.py"
       - "scripts/html_safety.py"
+      - "scripts/public_status.py"
       - "SAFETY.md"
       - ".github/workflows/pages.yml"
   workflow_dispatch:

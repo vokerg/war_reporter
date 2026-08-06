@@ -76,6 +76,44 @@ class TaskChangedPathsTests(unittest.TestCase):
         )
         self.assertEqual(violations, [])
 
+    def test_allows_mandatory_derived_receipts_without_contract_mutation(self) -> None:
+        task_id = "task_example"
+        manifest_path = f"tasks/2026/08/06/{task_id}.json"
+        self.write(
+            manifest_path,
+            json.dumps(
+                {
+                    "task_id": task_id,
+                    "allowed_output_paths": ["data/results/example.ndjson"],
+                }
+            ),
+        )
+        self.write("data/results/example.ndjson", "result\n")
+        self.write(f"review/self/{task_id}.json", "{}\n")
+        self.write(f"queue/proposals/{task_id}.json", "{}\n")
+        self.git("add", ".")
+        self.git("commit", "-m", "task work with derived receipts")
+        head = self.git("rev-parse", "HEAD").strip()
+
+        manifest, changed, violations = MODULE.validate(
+            repo=self.repo,
+            base=self.base,
+            head=head,
+            head_ref=f"work/{task_id}",
+        )
+
+        self.assertEqual(manifest, manifest_path)
+        self.assertEqual(
+            set(changed),
+            {
+                manifest_path,
+                "data/results/example.ndjson",
+                f"review/self/{task_id}.json",
+                f"queue/proposals/{task_id}.json",
+            },
+        )
+        self.assertEqual(violations, [])
+
     def test_rejects_undeclared_output(self) -> None:
         head = self.add_task_commit(
             changed_path="reports/unauthorized.md",

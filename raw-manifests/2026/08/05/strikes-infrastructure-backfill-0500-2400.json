@@ -1,0 +1,124 @@
+{
+  "task_id": "task_backfill_20260805_07_strikes_infrastructure",
+  "worker_run_id": "run_20260806T063000Z_strk07",
+  "window": {
+    "from": "2026-08-05T05:00:00Z",
+    "to": "2026-08-06T00:00:00Z"
+  },
+  "searched_at": "2026-08-06T06:31:00Z",
+  "method": "Bounded public-web search of official emergency, municipal, transport, energy, air-defence, and regional-administration surfaces, followed by repository-wide canonical URL and lineage screening against the earlier strike shard plus Ukrainian-official and international-media recovery outputs. No authentication, access-control bypass, inferred date or identifier, live-warning retention, route or target detail, map capture, binary download, or full-text capture was used.",
+  "source_checks": [],
+  "sources_checked": [
+    {
+      "target": "State Emergency Service public Telegram",
+      "access_url": "https://t.me/s/dsns_telegram",
+      "status": "searched_existing_identities_only",
+      "result": "The material in-window aftermath updates resolved by the bounded pass were already represented in the Ukrainian-official recovery shard as Telegram messages 70829, 70833, and 70838. They were not duplicated as strike-infrastructure identities."
+    },
+    {
+      "target": "Ukrzaliznytsia public Telegram and official web surfaces",
+      "access_url": "https://t.me/s/UkrzalInfo",
+      "status": "searched_no_verified_exact_date_item",
+      "result": "Exact-date searches did not resolve a stable publication that could be verified as 5 August 2026. Search results exposed infrastructure-attack posts without date-bearing metadata and historical material from 2025 or other 2026 dates; none was admitted by context inference."
+    },
+    {
+      "target": "Kyiv City Administration public Telegram",
+      "access_url": "https://t.me/s/KyivCityOfficial",
+      "status": "historical_collision_excluded",
+      "result": "A search result for message 14152 described rail-infrastructure damage and restoration but belongs to the 4 July 2025 Kyiv attack. It was excluded after exact-phrase and surrounding-context verification."
+    },
+    {
+      "target": "Ukrenergo and energy-sector public surfaces",
+      "access_url": "https://t.me/s/Ukrenergo",
+      "status": "searched_no_new_canonical_item",
+      "result": "Exact-date searches did not resolve a stable, distinct 5 August 2026 strike or infrastructure publication with verifiable canonical identity and publication time."
+    },
+    {
+      "target": "Odesa regional administration public Telegram",
+      "access_url": "https://t.me/s/odeskaODA",
+      "status": "candidate_date_unresolved_and_detail_excluded",
+      "result": "Search indexing exposed port and vessel strike reports, but the visible results did not establish the assigned date and included named infrastructure and impact detail. No item was admitted."
+    },
+    {
+      "target": "Ukrainian Air Force public reporting",
+      "access_url": "https://t.me/s/kpszsu",
+      "status": "searched_no_safe_distinct_retrospective_item",
+      "result": "Live warning, route, direction, and active-target material was excluded. No distinct safe retrospective publication with stable in-window metadata was resolved beyond official identities already represented elsewhere."
+    }
+  ],
+  "search_queries": [
+    "site:t.me/kpszsu 5 серпня 2026 ракетна атака Київ",
+    "site:t.me/KyivCityOfficial 5 серпня 2026 обстріл інфраструктура",
+    "site:t.me/Ukrenergo 5 серпня 2026 обстріл",
+    "site:t.me/UkrzalInfo 5 серпня 2026 обстріл інфраструктура",
+    "site:t.me/odeskaODA 5 серпня 2026 порт інфраструктура",
+    "site:t.me/dsns_telegram 5 серпня 2026 інфраструктура обстріл",
+    "KyivCityOfficial/14152 5 серпня 2026",
+    "В результаті ворожого обстрілу Києва маємо пошкодження залізничної інфраструктури 5 серпня 2026"
+  ],
+  "included_items": [],
+  "excluded_candidates": [
+    {
+      "source": "DSNS Telegram messages 70829, 70833, and 70838",
+      "reason": "Already represented by canonical URLs and revision lineage in the merged Ukrainian-official recovery shard."
+    },
+    {
+      "source": "Reuters and Guardian Kyiv strike coverage",
+      "reason": "The relevant canonical article identities are already represented in international-media or reactions-corrections data. Cross-shard duplication was not used as independent strike evidence."
+    },
+    {
+      "source": "Kyiv City Administration Telegram message 14152 and forwarded Ukrzaliznytsia text",
+      "reason": "Exact-phrase and surrounding-context results establish that the rail damage occurred during the 4 July 2025 Kyiv attack, not the assigned 5 August 2026 interval."
+    },
+    {
+      "source": "Ukrzaliznytsia indexed posts describing attacks on rail infrastructure",
+      "reason": "The search results did not expose date-bearing canonical metadata tying the posts to 5 August 2026. Posts from other dates and historical memorial or recovery pages were not substituted."
+    },
+    {
+      "source": "Odesa regional-administration port and vessel strike results",
+      "reason": "The visible indexed results did not verify the assigned date and contained named infrastructure, vessel, and impact detail."
+    },
+    {
+      "source": "General Staff operational strike-target updates",
+      "reason": "Already represented or explicitly withheld by the Ukrainian-official recovery shard because precise target, crossing, command-point, and locality detail could be targeting-enabling."
+    },
+    {
+      "source": "Air Force live alerts and direction notices",
+      "reason": "Live routes, directions, active-target status, and movement detail were excluded for operational safety."
+    }
+  ],
+  "access_failures": [
+    {
+      "target": "Exact-date official transport and energy records",
+      "detail": "Search indexes exposed rolling channel pages or snippets without timezone-bearing publication dates and did not resolve stable exact-window records during the bounded pass."
+    },
+    {
+      "target": "Rolling Telegram completeness",
+      "detail": "Public previews do not guarantee exhaustive post recovery, immutable page versions, stable content hashes, complete edit histories, or timezone-bearing datetime metadata."
+    },
+    {
+      "target": "Safe Air Force retrospective summary",
+      "detail": "Approved public-web search did not resolve a distinct retrospective record that could be retained without live warning or targeting-adjacent detail."
+    }
+  ],
+  "artifact_capture": {
+    "captured": false,
+    "reason": "No new qualifying canonical source item was resolved, and no page bytes, map, photograph, video, or other immutable permitted artifact was downloaded, hashed, or stored."
+  },
+  "coverage_gaps": [
+    "The result is a bounded zero-item discovery outcome, not evidence that no strikes or infrastructure damage occurred during the interval.",
+    "Material DSNS aftermath and international-media publications are represented in other repository shards and were excluded here by global canonical identity rather than re-counted.",
+    "Transport, energy, municipal, and regional search indexes may lag live publisher systems or expose snippets without stable date-bearing metadata.",
+    "A prominent rail-infrastructure candidate was a 4 July 2025 historical collision, demonstrating that matching text and clock time alone are insufficient for date assignment.",
+    "Live air-defence routes, directions, targets, vulnerable facilities, named infrastructure, and granular impact detail were intentionally excluded.",
+    "No full text, images, video, maps, page bytes, or immutable artifacts were captured.",
+    "No strike, casualty, damage, interception, responsibility, or attribution assertion was independently assessed or converted into a claim, observation, territorial conclusion, or report narrative."
+  ],
+  "follow_up_task_proposals": [],
+  "safety_notes": [
+    "No precise current position, movement route, active-unit location, target coordinate, vulnerable-facility detail, strike geometry, or map geometry was persisted.",
+    "No authenticated platform data, private material, robots or access-control bypass, or inferred publication identity was used.",
+    "A zero-result receipt was preferred over historical-date confusion, cross-shard duplicate identities, or unsafe operational detail."
+  ],
+  "retrieved_at": "2026-08-06T06:31:00Z"
+}

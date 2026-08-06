@@ -26,6 +26,7 @@
       "required": [
         "status",
         "last_run_at",
+        "last_successful_run_at",
         "since",
         "selected_sources",
         "attempted",
@@ -39,6 +40,10 @@
           "enum": ["ok", "idle", "partial", "blocked", "failed", "unknown"]
         },
         "last_run_at": {"type": ["string", "null"], "format": "date-time"},
+        "last_successful_run_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
         "since": {"type": ["string", "null"], "format": "date-time"},
         "selected_sources": {"type": "integer", "minimum": 0},
         "attempted": {"type": "integer", "minimum": 0},

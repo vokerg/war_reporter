@@ -4,14 +4,17 @@ from __future__ import annotations
 
 from .collector_common import *  # noqa: F401,F403
 from .collector_common import _article_fields
+from .publisher_fetch import extract_publisher_article, publisher_get
 
 
 def collect_rss(
     source: dict[str, Any], settings: dict[str, Any], since: datetime
 ) -> list[dict[str, Any]]:
     session = session_for(source, settings)
-    response = safe_get(
+    response = publisher_get(
         session,
+        source,
+        settings,
         source["url"],
         timeout=settings["request_timeout_seconds"],
     )
@@ -48,8 +51,12 @@ def collect_rss(
                 media,
                 fetched_published_at,
                 fetched_url,
-            ) = extract_article(
-                session, url, settings["request_timeout_seconds"]
+            ) = extract_publisher_article(
+                session,
+                source,
+                settings,
+                url,
+                settings["request_timeout_seconds"],
             )
             url = fetched_url
             title = title or fetched_title
@@ -350,8 +357,10 @@ def collect_web(
     source: dict[str, Any], settings: dict[str, Any], since: datetime
 ) -> list[dict[str, Any]]:
     session = session_for(source, settings)
-    response = safe_get(
+    response = publisher_get(
         session,
+        source,
+        settings,
         source["url"],
         timeout=settings["request_timeout_seconds"],
     )
@@ -371,8 +380,14 @@ def collect_web(
         items: list[dict[str, Any]] = []
         for link in links:
             try:
-                title, text, html, media, published_at, canonical = extract_article(
-                    session, link, settings["request_timeout_seconds"]
+                title, text, html, media, published_at, canonical = (
+                    extract_publisher_article(
+                        session,
+                        source,
+                        settings,
+                        link,
+                        settings["request_timeout_seconds"],
+                    )
                 )
             except (requests.RequestException, CollectionError):
                 continue

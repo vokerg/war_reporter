@@ -1,0 +1,115 @@
+{
+  "task_id": "task_backfill_20260805_05_international_media",
+  "worker_run_id": "run_20260806T061000Z_intl05",
+  "window": {
+    "from": "2026-08-05T05:00:00Z",
+    "to": "2026-08-06T00:00:00Z"
+  },
+  "searched_at": "2026-08-06T06:12:00Z",
+  "method": "Bounded public-web search and direct metadata review of Reuters, Associated Press, BBC, and Guardian publication surfaces. Only stable canonical article URLs with verifiable in-window publication times were admitted. No authentication, paywall or robots bypass, full-text capture, binary download, inferred timestamp, map capture, or precise operational-location retention was used.",
+  "source_checks": [],
+  "sources_checked": [
+    {
+      "source_entity_id": "src_reuters",
+      "access_url": "https://www.reuters.com/",
+      "status": "one_new_item_admitted",
+      "result": "Reuters exposed a stable article URL and displayed publication time of 08:35 UTC on 5 August 2026 for the EU frozen-assets support item. Earlier Reuters records from the completed 00:00–05:00 UTC interval were not duplicated."
+    },
+    {
+      "source_entity_id": "src_the_guardian",
+      "access_url": "https://www.theguardian.com/world/ukraine",
+      "status": "one_new_item_admitted_one_existing_identity_excluded",
+      "result": "The Guardian exposed stable publication metadata for a Leipzig security analysis at 17:32 UTC. The Kyiv air-defence article was excluded because its canonical URL is already represented by item_20260805_guardian_air_defence_criticism in another shard; the current page's displayed first-publication time differs from that existing record and remains unresolved metadata drift rather than a second identity."
+    },
+    {
+      "target": "Associated Press Ukraine coverage",
+      "access_url": "https://apnews.com/hub/russia-ukraine",
+      "status": "candidate_excluded_timestamp_unresolved",
+      "result": "A stable AP article URL and 5 August dateline were available, but the approved parsed page did not expose an exact publication timestamp. It was not admitted by date inference."
+    },
+    {
+      "target": "BBC Ukraine coverage",
+      "access_url": "https://www.bbc.com/news/topics/c1vw6q14rzqt",
+      "status": "access_restricted",
+      "result": "Candidate article pages were not retrievable through the approved public-web connector because of robots restrictions; no bypass was attempted."
+    }
+  ],
+  "included_items": [
+    {
+      "source_item_id": "item_20260805_reuters_frozen_assets_support_backfill",
+      "short_excerpt_original": "EU to use €1.4 billion from interest on frozen Russian assets to help Ukraine",
+      "quote_locator": "Reuters article heading and displayed publication metadata.",
+      "summary": "Reuters reported an EU announcement that €1.4 billion from interest on frozen Russian assets would be made available to support Ukraine.",
+      "publication_time_basis": "Reuters displayed August 5, 2026 8:35 AM UTC.",
+      "lineage_note": "The article attributes the announcement to the European Commission and quotes its president; the Commission primary statement was not separately registered in this media shard."
+    },
+    {
+      "source_item_id": "item_20260805_guardian_leipzig_drone_analysis_backfill",
+      "short_excerpt_original": "The Leipzig drone bomb marks a dangerous escalation for Europe",
+      "quote_locator": "Guardian analysis heading and publication line.",
+      "summary": "The Guardian published a labelled analysis of the security implications of an explosive-bearing drone found near Ukrainian cargo aircraft at Leipzig airport.",
+      "publication_time_basis": "The Guardian displayed publication at 19:32 CEST on 5 August 2026 and last modification at 04:18 CEST on 6 August 2026; these convert to 17:32 and 02:18 UTC.",
+      "lineage_note": "The analysis cites German police, German media, NATO context, and expert interpretation. Attribution about possible state involvement remains the publication's analysis and was not independently assessed here."
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "source": "Reuters Kyiv attack and North Korean missile-unit articles plus Guardian war briefing from the earlier campaign",
+      "reason": "Already represented by canonical URLs in the completed 00:00–05:00 UTC discovery interval."
+    },
+    {
+      "source": "Guardian Kyiv air-defence article",
+      "reason": "The canonical URL is already represented by item_20260805_guardian_air_defence_criticism in reactions-corrections.ndjson. The current page displays first publication at 07:53 CEST, while the existing record stores 03:53 UTC; without an immutable earlier page version, the discrepancy was recorded as unresolved metadata drift and no duplicate or cross-shard correction was made."
+    },
+    {
+      "source": "Associated Press article on the Kyiv-region barrage",
+      "reason": "The stable page and calendar date were available, but no exact publication timestamp was exposed through the approved parsed page; date inference was not accepted."
+    },
+    {
+      "source": "Guardian Europe live blog for 5 August 2026",
+      "reason": "The rolling page substantially overlaps the existing Kyiv article identity and the admitted Leipzig analysis; it was excluded to avoid duplicate lineage and unstable rolling-page revisions."
+    },
+    {
+      "source": "Guardian Weekly drone feature and other broader commentary",
+      "reason": "The pages were outside the bounded operational and external-support focus or did not add distinct event lineage beyond admitted items."
+    }
+  ],
+  "access_failures": [
+    {
+      "target": "BBC candidate article pages",
+      "detail": "Robots restrictions prevented retrieval through the approved connector. No alternate bypass, cached full-text source, or authentication was used."
+    },
+    {
+      "target": "Associated Press publication timestamp",
+      "detail": "The parsed page exposed the article, author, dateline, and event date but not an exact publication timestamp suitable for the task window."
+    },
+    {
+      "target": "Guardian Kyiv immutable publication history",
+      "detail": "The current page's first-publication line differs from the timestamp stored by the existing canonical source item. No immutable earlier page bytes or complete revision history were available to resolve the drift."
+    },
+    {
+      "target": "Immutable page versions",
+      "detail": "Reuters and Guardian pages were reviewed as current public pages. No immutable webpage bytes, content hashes, or complete revision histories were captured."
+    }
+  ],
+  "artifact_capture": {
+    "captured": false,
+    "reason": "No full article text, image, video, map, page bytes, or other immutable artifact was downloaded, hashed, or stored."
+  },
+  "coverage_gaps": [
+    "The bounded result contains two new publications from two outlets and is not an exhaustive survey of international media coverage.",
+    "The AP candidate was excluded because exact publication time could not be verified; BBC candidate pages were blocked by robots restrictions.",
+    "The existing Guardian Kyiv canonical record and the current page expose conflicting publication-time metadata that could not be resolved without an immutable earlier version.",
+    "The Guardian Leipzig analysis was modified after the task window, so the retained metadata distinguishes first publication from later modification but does not preserve the original page version.",
+    "The admitted articles aggregate official statements, wire reporting, witnesses, and analysis whose complete upstream canonical lineage was not separately registered.",
+    "No full text, images, video, maps, or immutable webpage artifacts were captured.",
+    "No media assertion was independently assessed or converted into a claim, observation, territorial conclusion, or report narrative."
+  ],
+  "follow_up_task_proposals": [],
+  "safety_notes": [
+    "No precise current positions, movement routes, active-unit locations, target coordinates, vulnerable-facility details, or map geometry were persisted.",
+    "No copyrighted article body or binary media was stored.",
+    "All casualty, responsibility, and security-attribution language remains explicitly attributed to the publications and their named upstreams."
+  ],
+  "retrieved_at": "2026-08-06T06:12:00Z"
+}

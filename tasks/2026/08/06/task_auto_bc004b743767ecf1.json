@@ -2,7 +2,7 @@
   "task_id": "task_auto_bc004b743767ecf1",
   "task_type": "correction",
   "role": "correction-editor",
-  "state": "ready",
+  "state": "review",
   "priority": 95,
   "created_at": "2026-08-06T09:06:00Z",
   "parent_issue": null,
@@ -53,5 +53,22 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "control_plane:finalizer_explicit_followup_dispatch:reconcile-deploy:v1",
-  "lease": null
+  "lease": {
+    "worker_run_id": "run_20260806T090600Z_continuous_loop",
+    "lease_branch": "work/task_auto_bc004b743767ecf1",
+    "base_sha": "26980c012224340092bea6114ad7a99210f10e8b",
+    "leased_at": "2026-08-06T09:06:00Z",
+    "lease_until": "2026-08-06T15:06:00Z"
+  },
+  "result": {
+    "branch": "work/task_auto_bc004b743767ecf1",
+    "pr_number": 138,
+    "completed_at": "2026-08-06T09:12:00Z",
+    "summary": "Added explicit post-finalization workflow dispatch for repository reconciliation and GitHub Pages deployment, backed by regression tests for Actions permission, dispatch targets, ordering, and non-recursion.",
+    "coverage_gaps": [
+      "The correction relies on GitHub workflow_dispatch semantics and repository-token Actions write permission.",
+      "Deployment remains an unconditional post-finalization action, trading a small amount of extra workflow usage for reliable publication.",
+      "The correction does not alter or retroactively rebuild report evidence; it only restores control-plane follow-up execution."
+    ]
+  }
 }

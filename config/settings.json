@@ -1,0 +1,13 @@
+{
+  "poll_seconds": 900,
+  "workers": 32,
+  "request_timeout_seconds": 30,
+  "user_agent": "war-reporter/2.0 (+https://github.com/vokerg/war_reporter)",
+  "report_timezone": "Europe/Kyiv",
+  "raw_root": "data/raw",
+  "error_root": "data/errors",
+  "state_file": "data/state.json",
+  "report_root": "reports/daily",
+  "site_root": "site",
+  "default_lookback_hours": 48
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "War Reporter raw item",
+  "type": "object",
+  "required": [
+    "id",
+    "source",
+    "platform",
+    "url",
+    "collected_at",
+    "text",
+    "media",
+    "tags"
+  ],
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "source": {"type": "string", "minLength": 1},
+    "source_name": {"type": "string"},
+    "platform": {"enum": ["telegram", "x", "rss", "web"]},
+    "url": {"type": "string", "format": "uri"},
+    "published_at": {"type": ["string", "null"], "format": "date-time"},
+    "collected_at": {"type": "string", "format": "date-time"},
+    "title": {"type": "string"},
+    "text": {"type": "string"},
+    "html": {"type": "string"},
+    "media": {"type": "array", "items": {"type": "string"}},
+    "author": {"type": "string"},
+    "language": {"type": "string"},
+    "group": {"type": "string"},
+    "perspective": {"type": "string"},
+    "trust": {"enum": ["primary", "high", "medium", "low", "unknown"]},
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "raw": {}
+  },
+  "additionalProperties": true
+}

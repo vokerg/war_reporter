@@ -1,0 +1,10 @@
+services:
+  collector:
+    build: .
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports
+      - ./site:/app/site

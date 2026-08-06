@@ -1,0 +1,34 @@
+name: Collect OSINT
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "7,27,47 * * * *"
+permissions:
+  contents: write
+concurrency:
+  group: war-reporter-collector
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Collect and render
+        env:
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+          WAR_REPORTER_WORKERS: "32"
+        run: python -m scripts.continuous_loop --once
+      - name: Persist archive
+        run: |
+          git config user.name "war-reporter-bot"
+          git config user.email "war-reporter-bot@users.noreply.github.com"
+          git add data reports site
+          git diff --cached --quiet || git commit -m "data: collect OSINT $(date -u +%FT%TZ)"
+          git push

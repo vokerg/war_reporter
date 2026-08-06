@@ -59,7 +59,7 @@ def run_loop(
         signal.signal(signal.SIGINT, request_stop)
 
     while not stop.is_set():
-        iteration_exit = 0
+        iteration_failed = False
         try:
             state = run_collection(root)
             LOG.info(
@@ -74,12 +74,10 @@ def run_loop(
                 state["errors"],
                 state["sources_skipped"],
             )
-            if state["status"] in {"failed", "blocked"}:
-                iteration_exit = 1
-            elif state["status"] == "partial":
-                iteration_exit = 2
+            if state["status"] in {"failed", "blocked", "partial"}:
+                iteration_failed = True
         except Exception:
-            iteration_exit = 1
+            iteration_failed = True
             LOG.exception(
                 "collection iteration failed; service mode will continue"
             )
@@ -89,7 +87,7 @@ def run_loop(
             try:
                 build_report(root, day.isoformat())
             except Exception:
-                iteration_exit = 1
+                iteration_failed = True
                 LOG.exception(
                     "report build failed for %s; service mode will continue",
                     day,
@@ -97,13 +95,13 @@ def run_loop(
         try:
             build_site(root)
         except Exception:
-            iteration_exit = 1
+            iteration_failed = True
             LOG.exception(
                 "site build failed; service mode will continue"
             )
 
         if once:
-            return iteration_exit
+            return 1 if iteration_failed else 0
         stop.wait(interval)
     return 0
 

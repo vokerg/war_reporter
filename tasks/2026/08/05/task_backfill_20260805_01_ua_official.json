@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260805_01_ua_official",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "pr_open",
+  "state": "validating",
   "priority": 90,
   "created_at": "2026-08-06T05:02:00Z",
   "parent_issue": 33,
@@ -44,7 +44,9 @@
     "catalogs/sources/2026/08/05/ua-official-backfill-0500-2400.json",
     "data/source-items/2026/08/05/ua-official-backfill-0500-2400.ndjson",
     "data/artifacts/2026/08/05/ua-official-backfill-0500-2400.ndjson",
-    "raw-manifests/2026/08/05/ua-official-backfill-0500-2400.json"
+    "raw-manifests/2026/08/05/ua-official-backfill-0500-2400.json",
+    "queue/proposals/task_backfill_20260805_01_ua_official.json",
+    "review/self/task_backfill_20260805_01_ua_official.json"
   ],
   "definition_of_done": [
     "The assigned public-web discovery shard was searched for the missing 05:00–24:00 UTC interval on 5 August 2026",

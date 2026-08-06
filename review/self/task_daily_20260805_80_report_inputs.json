@@ -1,0 +1,38 @@
+{
+  "task_id": "task_daily_20260805_80_report_inputs",
+  "pr_number": null,
+  "rounds": [
+    {
+      "round": 1,
+      "reviewed_at": "2026-08-06T07:19:00Z",
+      "reviewer_run_id": "run_20260806T071800Z_contloop",
+      "checks": ["scope", "provenance", "deduplication", "temporal_precision", "safety", "tests", "coverage_gaps", "claim_strength", "evidence_independence", "assessment_consistency", "editorial_status", "schema_conformance"],
+      "findings": [
+        "All outputs are within the task's declared paths.",
+        "Five claims resolve only to the five merged observations present for 5 August; no raw source item was promoted directly into report prose.",
+        "The Kyiv response statement is confirmed only as an attributable official publication, while the casualty total remains unverified because no independent compatible record is frozen.",
+        "The three support-request claims remain probable because they derive from Guardian attribution without a separately persisted primary presidential publication.",
+        "Both approved assessments declare the frozen 5 August UTC reporting period and retain the actual assessment time in as_of.",
+        "Coverage is materially sparse: most discovery shards produced no approved observations, so no broader battlefield, territorial, strike-damage, or diplomatic conclusions were approved."
+      ],
+      "repairs": ["Separated the attributable Kyiv response statement from the unverified casualty figures and avoided precise operational-location detail."],
+      "outcome": "pass"
+    },
+    {
+      "round": 2,
+      "reviewed_at": "2026-08-06T07:20:00Z",
+      "reviewer_run_id": "run_20260806T071800Z_contloop",
+      "checks": ["scope", "provenance", "deduplication", "temporal_precision", "safety", "tests", "coverage_gaps", "fresh_complete_diff", "claim_strength", "evidence_independence", "assessment_consistency", "editorial_status", "definition_of_done"],
+      "findings": [
+        "A fresh review found five approved claims, two approved assessments, one empty proposal receipt, this review receipt, and the task manifest only.",
+        "Every evidence reference resolves to a merged observation and every assessment claim reference resolves to a claim created by this task.",
+        "No assessment exceeds the strength or independence of its frozen evidence.",
+        "The explicit coverage gap prevents the downstream report from implying comprehensive daily coverage.",
+        "No sensitive geodata, targeting-enabling detail, unsupported causality, or forecast was introduced."
+      ],
+      "repairs": [],
+      "outcome": "pass"
+    }
+  ],
+  "exceptional_condition": false
+}

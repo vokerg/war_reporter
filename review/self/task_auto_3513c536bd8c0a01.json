@@ -1,0 +1,55 @@
+{
+  "task_id": "task_auto_3513c536bd8c0a01",
+  "pr_number": 133,
+  "rounds": [
+    {
+      "round": 1,
+      "reviewed_at": "2026-08-06T07:42:45Z",
+      "reviewer_run_id": "run_20260806T074245Z_casualty_review_1",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps",
+        "claim_strength",
+        "correction_lineage",
+        "proposal_scope"
+      ],
+      "findings": [
+        "The exact nine-of-fifteen hospital wording is assigned by Kyiv's official portal to 09:26 local time on 19 July 2026, while the repository source item assigns Telegram post 7134 to 5 August.",
+        "The source item, observation, and raw-manifest correction paths are outside this task's immutable scope."
+      ],
+      "repairs": [
+        "Added an approved correction claim with July 19 event time that supersedes the misleading 5 August object-level casualty claim.",
+        "Added an approved negative assessment excluding the casualty figure from 5 August report use.",
+        "Added a priority-95 correction proposal covering the affected source-item, observation, raw-manifest, claim, and assessment paths."
+      ],
+      "outcome": "pass"
+    },
+    {
+      "round": 2,
+      "reviewed_at": "2026-08-06T07:42:55Z",
+      "reviewer_run_id": "run_20260806T074255Z_casualty_review_2",
+      "checks": [
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps",
+        "fresh_complete_diff",
+        "assessment_consistency",
+        "report_input_exclusion",
+        "definition_of_done"
+      ],
+      "findings": [],
+      "repairs": [],
+      "outcome": "pass"
+    }
+  ],
+  "exceptional_condition": false
+}

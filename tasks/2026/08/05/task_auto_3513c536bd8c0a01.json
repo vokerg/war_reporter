@@ -1,0 +1,56 @@
+{
+  "task_id": "task_auto_3513c536bd8c0a01",
+  "task_type": "investigate_claim",
+  "role": "corroborator",
+  "state": "ready",
+  "priority": 80,
+  "created_at": "2026-08-06T07:35:05.919111Z",
+  "parent_issue": null,
+  "issue_number": null,
+  "depends_on_task_ids": [
+    "task_daily_20260805_80_report_inputs"
+  ],
+  "window": {
+    "from": "2026-08-05T00:00:00Z",
+    "to": "2026-08-06T00:00:00Z"
+  },
+  "scope": {
+    "content_types": [
+      "claim",
+      "assessment"
+    ],
+    "regions": [
+      "ukraine-war"
+    ],
+    "source_ids": [
+      "src_vitaliy_klitschko"
+    ],
+    "source_item_ids": [
+      "item_20260805_klitschko_casualty_update"
+    ],
+    "topics": [
+      "kyiv-casualty-corroboration"
+    ],
+    "source_groups": []
+  },
+  "exclusions": [
+    "Do not treat repetition of the municipal figure as independent corroboration",
+    "Do not add medical identifiers, precise impact locations, or targeting-enabling detail",
+    "Do not approve the object-level casualty claim without independent compatible evidence"
+  ],
+  "allowed_output_paths": [
+    "data/claims/2026/08/05/casualty-corroboration.ndjson",
+    "data/assessments/2026/08/05/casualty-corroboration.ndjson",
+    "queue/proposals/task_auto_3513c536bd8c0a01.json",
+    "review/self/task_auto_3513c536bd8c0a01.json"
+  ],
+  "definition_of_done": [
+    "Independent hospital, emergency-service, or other compatible casualty evidence is located and its upstream lineage is resolved, or the access failure is documented",
+    "The object-level casualty claim is reassessed without upgrading the municipal publication fact into independent confirmation",
+    "Unsupported casualty figures remain unapproved",
+    "Two separate self-review rounds pass",
+    "Two separate self-review rounds passed and a receipt was persisted"
+  ],
+  "idempotency_key": "claim_corroboration:2026-08-05:kyiv-casualties",
+  "lease": null
+}

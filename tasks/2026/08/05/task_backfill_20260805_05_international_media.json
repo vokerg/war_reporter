@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260805_05_international_media",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "review",
+  "state": "merged",
   "priority": 80,
   "created_at": "2026-08-06T05:02:00Z",
   "parent_issue": 33,
@@ -55,17 +55,11 @@
     "No final truth assessment, territorial conclusion, or report narrative was added"
   ],
   "idempotency_key": "daily_discovery_gap:2026-08-05:international-media:ukraine-war:20260805T0500Z:20260806T0000Z",
-  "lease": {
-    "worker_run_id": "run_20260806T061000Z_intl05",
-    "lease_branch": "work/task_backfill_20260805_05_international_media",
-    "base_sha": "a8858b752f9d24b82d2fb2ea143bc1ad9eb0458d",
-    "leased_at": "2026-08-06T06:10:00Z",
-    "lease_until": "2026-08-06T08:10:00Z"
-  },
+  "lease": null,
   "result": {
     "branch": "work/task_backfill_20260805_05_international_media",
     "pr_number": 120,
-    "completed_at": "2026-08-06T06:18:00Z",
+    "completed_at": "2026-08-06T06:16:39Z",
     "summary": "Completed a bounded public-web recovery scan of Reuters, Associated Press, BBC, and Guardian surfaces for the missing 05:00–24:00 UTC interval. Registered two new non-duplicative publications: a Reuters report on EU use of €1.4 billion in frozen-asset interest for Ukraine at 08:35 UTC and a Guardian Leipzig security analysis at 17:32 UTC. A Guardian Kyiv article was removed after repository validation found its canonical URL already represented in another shard; conflicting current-page and stored publication metadata remains an explicit unresolved drift rather than a duplicate identity or cross-shard rewrite. AP was excluded because exact publication time was unavailable, BBC was not bypassed around robots restrictions, and a Guardian live blog was excluded as overlapping rolling lineage. No full article text, binary artifact, truth assessment, claim, observation, territorial conclusion, or report narrative was created.",
     "coverage_gaps": [
       "The bounded result contains two new publications from two outlets and is not an exhaustive survey of international media coverage.",
@@ -75,6 +69,8 @@
       "The admitted articles aggregate official statements, wire reporting, witnesses, and analysis whose complete upstream canonical lineage was not separately registered.",
       "No full text, images, video, maps, or immutable webpage artifacts were captured.",
       "No media assertion was independently assessed or converted into a claim, observation, territorial conclusion, or report narrative."
-    ]
+    ],
+    "merge_sha": "80810b00900a8b30de71e29ba767cf245e06f8a3",
+    "merged_at": "2026-08-06T06:16:39Z"
   }
 }

@@ -40,6 +40,16 @@ Use RFC 3339 UTC timestamps where time is known. Use explicit precision when pub
 
 A completed source scan means only that the assigned source list and time window were checked using the documented access method. It does not mean the open internet was exhaustively searched. Reports must disclose material coverage gaps, inaccessible sources, and platform/API failures.
 
+## Public reports
+
+The machine-readable report manifest carries the complete audit trail: claim IDs, assessment IDs, deterministic hashes, record status, and content path. Public Markdown is a separate reader-facing product and must not expose those internal identifiers or repository workflow terminology.
+
+Public reports are editorial selections, not enumerations of every approved input. Include the developments necessary to give a fair account of the reporting period and omit low-salience or out-of-period material when omission does not distort the overall picture.
+
+Use human-readable source attribution and calibrated language to express uncertainty. Consolidate general verification limits into one short section instead of repeating the same disclaimer after every statement. Repeat a limitation near a specific item only when it is essential to interpret conflicting figures, serious allegations, uncertain identity, or disputed operational outcomes.
+
+The absence of internal references from public prose does not weaken traceability: the report manifest and underlying records remain the canonical audit path. See `docs/editorial/PUBLIC_REPORT_STYLE.md` for the publication contract.
+
 ## Corrections
 
 Released records are append-only in meaning. Supersede or correct them; do not silently mutate history. Corrections must propagate to dependent assessments, reports, and map snapshots.

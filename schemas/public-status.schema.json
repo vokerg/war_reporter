@@ -51,9 +51,16 @@
     },
     "registry": {
       "type": "object",
-      "required": ["configured_enabled", "orphaned_state_sources"],
+      "required": [
+        "configured_entries",
+        "virtual_query_sources",
+        "configured_total",
+        "orphaned_state_sources"
+      ],
       "properties": {
-        "configured_enabled": {"type": "integer", "minimum": 0},
+        "configured_entries": {"type": "integer", "minimum": 0},
+        "virtual_query_sources": {"type": "integer", "minimum": 0},
+        "configured_total": {"type": "integer", "minimum": 0},
         "orphaned_state_sources": {"type": "integer", "minimum": 0}
       },
       "additionalProperties": false

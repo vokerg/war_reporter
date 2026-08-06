@@ -8,6 +8,7 @@
     "platform",
     "url",
     "collected_at",
+    "title",
     "text",
     "html",
     "media",
@@ -36,30 +37,66 @@
     "trust": {"enum": ["primary", "high", "medium", "low", "unknown"]},
     "tags": {"type": "array", "items": {"type": "string"}},
     "raw": {
-      "type": "object",
-      "required": [
-        "archive_policy",
-        "content_sha256",
-        "original_text_chars",
-        "original_html_chars",
-        "text_truncated",
-        "media_count",
-        "platform"
-      ],
-      "properties": {
-        "archive_policy": {"const": "public_excerpt_v1"},
-        "content_sha256": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "archive_policy",
+            "content_sha256",
+            "original_text_chars",
+            "original_html_chars",
+            "text_truncated",
+            "media_count",
+            "platform"
+          ],
+          "properties": {
+            "archive_policy": {"const": "public_excerpt_v1"},
+            "content_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "original_text_chars": {"type": "integer", "minimum": 0},
+            "original_html_chars": {"type": "integer", "minimum": 0},
+            "text_truncated": {"type": "boolean"},
+            "media_count": {"type": "integer", "minimum": 0},
+            "platform": {"type": "object"}
+          },
+          "additionalProperties": false
         },
-        "original_text_chars": {"type": "integer", "minimum": 0},
-        "original_html_chars": {"type": "integer", "minimum": 0},
-        "text_truncated": {"type": "boolean"},
-        "media_count": {"type": "integer", "minimum": 0},
-        "platform": {"type": "object"}
-      },
-      "additionalProperties": false
+        {
+          "type": "object",
+          "required": ["archive_policy", "redacted", "platform"],
+          "properties": {
+            "archive_policy": {"const": "public_redacted_v1"},
+            "redacted": {"const": true},
+            "platform": {"type": "object"}
+          },
+          "additionalProperties": false
+        }
+      ]
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "raw": {
+            "properties": {
+              "archive_policy": {"const": "public_redacted_v1"}
+            },
+            "required": ["archive_policy"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "title": {"const": ""},
+          "text": {"const": ""},
+          "html": {"const": ""},
+          "media": {"maxItems": 0}
+        }
+      }
+    }
+  ],
   "additionalProperties": true
 }

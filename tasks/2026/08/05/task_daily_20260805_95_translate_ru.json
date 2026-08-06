@@ -2,7 +2,7 @@
   "task_id": "task_daily_20260805_95_translate_ru",
   "task_type": "translate_report",
   "role": "translator",
-  "state": "validating",
+  "state": "review",
   "priority": 55,
   "created_at": "2026-08-06T08:59:00Z",
   "parent_issue": null,
@@ -61,7 +61,7 @@
   "result": {
     "branch": "work/task_daily_20260805_95_translate_ru",
     "pr_number": 137,
-    "completed_at": null,
+    "completed_at": "2026-08-06T09:04:00Z",
     "summary": "Produced the Russian translation of rpt_daily_20260805_en from the exact merged English source commit while preserving the report structure, attribution, uncertainty, claim and assessment sets, and deterministic hash without adding evidence or analysis.",
     "coverage_gaps": [
       "The Russian report inherits every evidentiary and analytical limitation of the English source report.",

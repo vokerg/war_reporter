@@ -1,8 +1,19 @@
 {
+  "status": "blocked",
   "errors": 0,
-  "items_added": 12,
-  "last_run_at": "2026-08-06T11:30:00Z",
-  "note": "Seed backfill reconstructed from the previous repository and public reporting; every record is marked requires_refetch until the new collectors revisit its source.",
-  "since": "2026-08-04T11:30:00Z",
-  "sources_attempted": 0
+  "items_added": 0,
+  "last_run_at": null,
+  "note": "No live collector run has completed on this branch. Keep PR draft until source smoke evidence is inspected.",
+  "since": null,
+  "sources_configured": 146,
+  "sources_attempted": 0,
+  "sources_succeeded": 0,
+  "sources_skipped": 0,
+  "configuration_errors": [
+    "live source smoke test pending"
+  ],
+  "per_source": {},
+  "items_withheld_recent": 0,
+  "items_withheld_undated": 0,
+  "archive_policy": "public_excerpt_v1"
 }

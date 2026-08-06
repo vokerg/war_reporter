@@ -60,7 +60,6 @@ DELAY_MAP_SETTINGS = {
     "collection_delay_by_tag",
     "collection_delay_by_source",
 }
-
 PATH_SETTINGS = {
     "raw_root",
     "error_root",
@@ -80,9 +79,43 @@ def safe_int(
         return None
 
 
+def parsed_public_url(value: Any):
+    raw = str(value or "").strip()
+    if not raw or any(ord(char) < 32 for char in raw):
+        return None
+    parsed = urlparse(raw)
+    if (
+        parsed.scheme not in {"http", "https"}
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+    ):
+        return None
+    return parsed
+
+
 def valid_url(value: Any) -> bool:
-    parsed = urlparse(str(value or ""))
-    return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
+    return parsed_public_url(value) is not None
+
+
+def safe_relative_path(value: Any) -> bool:
+    if not isinstance(value, str) or not value or "\\" in value:
+        return False
+    path = Path(value)
+    return not path.is_absolute() and ".." not in path.parts and path != Path(".")
+
+
+def expected_platform_suffix(source_id: str) -> str | None:
+    suffixes = {
+        "-tg": "telegram",
+        "-x": "x",
+        "-rss": "rss",
+        "-web": "web",
+    }
+    for suffix, platform in suffixes.items():
+        if source_id.endswith(suffix):
+            return platform
+    return None
 
 
 def validate(root: Path = ROOT) -> list[str]:
@@ -128,8 +161,13 @@ def validate(root: Path = ROOT) -> list[str]:
                 if value < 0:
                     errors.append(f"settings.{key}.{name} must not be negative")
     for key in PATH_SETTINGS:
-        if not isinstance(settings.get(key), str) or not settings[key]:
+        value = settings.get(key)
+        if not isinstance(value, str) or not value:
             errors.append(f"settings.{key} must be a non-empty string")
+        elif not safe_relative_path(value):
+            errors.append(
+                f"settings.{key} must be a safe repository-relative path"
+            )
     try:
         ZoneInfo(str(settings.get("report_timezone")))
     except ZoneInfoNotFoundError:
@@ -143,7 +181,8 @@ def validate(root: Path = ROOT) -> list[str]:
         settings.get("public_redact_tags"), list
     ):
         missing_sensitive = sorted(
-            set(settings["public_redact_tags"]) - set(settings["sensitive_tags"])
+            set(settings["public_redact_tags"])
+            - set(settings["sensitive_tags"])
         )
         if missing_sensitive:
             errors.append(
@@ -157,9 +196,7 @@ def validate(root: Path = ROOT) -> list[str]:
     else:
         for platform, value in platform_cadence.items():
             if platform not in PLATFORMS:
-                errors.append(
-                    f"unknown cadence platform: {platform}"
-                )
+                errors.append(f"unknown cadence platform: {platform}")
             parsed = safe_int(
                 value,
                 f"platform_cadence_minutes.{platform}",
@@ -191,10 +228,19 @@ def validate(root: Path = ROOT) -> list[str]:
         if source_id in ids:
             errors.append(f"duplicate source id: {source_id}")
         ids.add(source_id)
-        if source.get("platform") not in PLATFORMS:
+        platform = source.get("platform")
+        if platform not in PLATFORMS:
             errors.append(f"{source_id}: unsupported platform")
-        if not valid_url(source.get("url")):
+        parsed_url = parsed_public_url(source.get("url"))
+        if parsed_url is None:
             errors.append(f"{source_id}: invalid URL")
+        elif parsed_url.scheme != "https":
+            errors.append(f"{source_id}: source URL must use HTTPS")
+        expected_platform = expected_platform_suffix(source_id)
+        if expected_platform is not None and platform != expected_platform:
+            errors.append(
+                f"{source_id}: id suffix expects platform {expected_platform}"
+            )
         if source.get("trust") not in TRUST_LEVELS:
             errors.append(f"{source_id}: invalid trust level")
         if source.get("perspective") not in PERSPECTIVES:
@@ -220,7 +266,8 @@ def validate(root: Path = ROOT) -> list[str]:
         for source_id in source_delays:
             if source_id not in ids:
                 errors.append(
-                    f"collection_delay_by_source references unknown source: {source_id}"
+                    "collection_delay_by_source references unknown source: "
+                    f"{source_id}"
                 )
 
     queries = settings.get("x_search_queries", [])
@@ -256,7 +303,7 @@ def validate(root: Path = ROOT) -> list[str]:
                 )
 
     state_file_value = settings.get("state_file")
-    if isinstance(state_file_value, str):
+    if isinstance(state_file_value, str) and safe_relative_path(state_file_value):
         state_path = root / state_file_value
         if state_path.exists():
             try:
@@ -264,17 +311,46 @@ def validate(root: Path = ROOT) -> list[str]:
             except json.JSONDecodeError as exc:
                 errors.append(f"{state_path}: {exc}")
             else:
-                valid_statuses = {"ok", "idle", "partial", "blocked", "failed"}
+                valid_statuses = {
+                    "ok", "idle", "partial", "blocked", "failed"
+                }
                 if not isinstance(state, dict):
                     errors.append(f"{state_path}: must contain an object")
                 elif state.get("status") not in valid_statuses:
                     errors.append(
-                        f"{state_path}: invalid or missing status {state.get('status')}"
+                        f"{state_path}: invalid or missing status "
+                        f"{state.get('status')}"
                     )
+                per_source = (
+                    state.get("per_source", {})
+                    if isinstance(state, dict)
+                    else {}
+                )
+                if not isinstance(per_source, dict):
+                    errors.append(f"{state_path}: per_source must be an object")
+                else:
+                    valid_source_statuses = {
+                        "ok", "error", "skipped_config", "skipped_cadence"
+                    }
+                    for source_id, row in per_source.items():
+                        if source_id not in ids:
+                            errors.append(
+                                f"{state_path}: unknown per_source id {source_id}"
+                            )
+                        if not isinstance(row, dict):
+                            errors.append(
+                                f"{state_path}: per_source.{source_id} "
+                                "must be an object"
+                            )
+                        elif row.get("status") not in valid_source_statuses:
+                            errors.append(
+                                f"{state_path}: invalid status for {source_id}: "
+                                f"{row.get('status')}"
+                            )
 
     seen_item_ids: dict[str, Path] = {}
     raw_root_value = settings.get("raw_root")
-    if isinstance(raw_root_value, str):
+    if isinstance(raw_root_value, str) and safe_relative_path(raw_root_value):
         raw_root = root / raw_root_value
         for path in raw_root.glob("*/*/*/items.ndjson"):
             try:
@@ -335,6 +411,37 @@ def validate(root: Path = ROOT) -> list[str]:
                     errors.append(f"{path}: media must be an array")
                 if not isinstance(row.get("tags"), list):
                     errors.append(f"{path}: tags must be an array")
+
+    error_root_value = settings.get("error_root")
+    if isinstance(error_root_value, str) and safe_relative_path(error_root_value):
+        error_root = root / error_root_value
+        for path in error_root.glob("*/*/*/errors.ndjson"):
+            try:
+                rows = read_ndjson([path])
+            except ValueError as exc:
+                errors.append(str(exc))
+                continue
+            for row in rows:
+                source_id = row.get("source")
+                if source_id not in ids:
+                    errors.append(f"{path}: unknown error source {source_id}")
+                parsed_url = parsed_public_url(row.get("url"))
+                if parsed_url is None:
+                    errors.append(f"{path}: invalid public error URL")
+                elif parsed_url.query or parsed_url.fragment:
+                    errors.append(
+                        f"{path}: error URL contains query or fragment"
+                    )
+                error_value = str(row.get("error") or "")
+                if (
+                    not error_value
+                    or "http://" in error_value
+                    or "https://" in error_value
+                ):
+                    errors.append(
+                        f"{path}: unsafe or missing public error category"
+                    )
+
     return errors
 
 

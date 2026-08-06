@@ -8,7 +8,7 @@
     "to": "2026-08-05T05:00:00Z"
   },
   "scope": {
-    "method": "bounded public-web discovery",
+    "method": "bounded public-web discovery with subsequent provenance correction",
     "region": "ukraine-war",
     "topics": [
       "strikes",
@@ -27,23 +27,16 @@
     "official Ukraine regional administration August 5 2026 infrastructure attack",
     "official air-defense reporting August 5 2026 Ukraine"
   ],
-  "discovered_items": [
+  "discovered_items": [],
+  "excluded_candidates": [
     {
-      "source_item_id": "item_20260805_klitschko_attack_consolidated",
-      "quote_locator": "Telegram post 7127, consolidated update displayed at 00:20 Kyiv summer time on the overnight August 4/5 attack context page.",
-      "short_excerpt": "Emergency services continue addressing consequences in several districts.",
-      "attribution_note": "The post is an official mayoral account update. Damage and casualty descriptions remain attributed statements and were not independently assessed.",
-      "lineage_note": "The post predates the in-window Reuters article and is treated as a direct upstream publication rather than independent corroboration of Reuters. The public context page exposed stable post IDs and local displayed times; Kyiv summer time was normalized to UTC."
+      "url": "https://t.me/vitaliy_klitschko/7127",
+      "reason": "Historical date collision. The displayed 00:20 Kyiv summer time belongs to the overnight 18/19 July 2026 chronology, not the assigned August 4/5 window. The canonical identity was moved to the July 19 correction shard."
     },
     {
-      "source_item_id": "item_20260805_klitschko_casualty_update",
-      "quote_locator": "Telegram post 7134, update displayed at 06:26 Kyiv summer time on the same overnight attack context page.",
-      "short_excerpt": "Nine of fifteen injured people remained in city hospitals.",
-      "attribution_note": "The figures are attributed to the Kyiv mayor's official account and were not converted into assessed facts.",
-      "lineage_note": "Recorded as a later update to item_20260805_klitschko_attack_consolidated. It overlaps the same incident cluster as Reuters and DSNS publications and is not counted as independent corroboration."
-    }
-  ],
-  "excluded_candidates": [
+      "url": "https://t.me/vitaliy_klitschko/7134",
+      "reason": "Historical date collision. Kyiv's official portal timestamps the exact nine-of-fifteen hospital wording at 09:26 Kyiv summer time on 19 July 2026. The canonical identity was moved to the July 19 correction shard."
+    },
     {
       "url": "https://www.reuters.com/world/europe/russian-forces-attack-ukrainian-capital-kyiv-with-ballistic-missiles-mayor-says-2026-08-04/",
       "reason": "Already represented in the merged international-media shard as item_20260805_reuters_kyiv_attack; excluded by canonical URL deduplication."
@@ -70,7 +63,7 @@
     },
     {
       "url": "https://t.me/kpszsu",
-      "reason": "Live air-raid and target-direction notices were excluded because preserving current movement or direction detail could create operational risk; no safe, distinct, in-window retrospective summary was verified before the cutoff."
+      "reason": "Live air-raid and target-direction notices were excluded because preserving current movement or direction detail could create operational risk."
     }
   ],
   "access_failures": [
@@ -79,22 +72,12 @@
       "reason": "Direct article retrieval through the research connector failed; the already-merged canonical repository record was used only for deduplication and lineage. No bypass was attempted."
     }
   ],
-  "follow_up_task_proposals": [
-    {
-      "task_type": "source_profile_review",
-      "purpose": "Review the draft identity-only profile for the official Vitali Klitschko Telegram account without assigning reliability from this discovery pass."
-    },
-    {
-      "task_type": "extract_observations",
-      "purpose": "After source-item review, extract atomic attributed observations from the two accepted posts while preserving qualifiers, update lineage, and safety generalization."
-    }
-  ],
+  "follow_up_task_proposals": [],
   "coverage_gaps": [
-    "The narrow eleven-hour window was dominated by one Kyiv attack cluster; only two unique upstream official posts were retained after global deduplication.",
-    "Public Telegram context pages exposed stable post IDs and displayed local times, but did not provide immutable captures or content hashes.",
-    "Search indexing for same-day official websites and infrastructure operators lagged the event; no distinct DTEK, Ukrenergo, ministry, or municipal-operator publication with a verifiable in-window timestamp was retained.",
-    "Live air-defense warnings and movement-direction notices were intentionally excluded for operational safety.",
+    "After provenance correction, this shard retains no unique Vitaliy Klitschko source item inside the assigned eleven-hour window.",
+    "Telegram posts 7127 and 7134 were initially misdated because a rolling public context page was interpreted as an August chronology.",
+    "The exact hospital wording is independently anchored to 19 July 2026 by Kyiv's official portal.",
     "No binaries, photographs, videos, maps, or full-text artifacts were downloaded or hashed.",
-    "This shard records discovery and provenance only; it does not verify casualties, damage, weapon type, interception performance, targeting intent, or attribution."
+    "This correction does not independently verify casualties, damage, weapon type, interception performance, targeting intent, or attribution."
   ]
 }

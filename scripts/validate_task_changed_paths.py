@@ -120,7 +120,13 @@ def validate(
         normalize_path(item, field=f"{manifest_path}: allowed_output_paths")
         for item in declared
     }
-    allowed.add(manifest_path)
+    allowed.update(
+        {
+            manifest_path,
+            f"review/self/{task_id}.json",
+            f"queue/proposals/{task_id}.json",
+        }
+    )
 
     changed = changed_paths(repo, base, head)
     violations = sorted(path for path in changed if path not in allowed)

@@ -116,7 +116,6 @@ class ContinuousLoopTests(unittest.TestCase):
         decision = evaluate_loop(root, now=datetime(2026, 8, 5, 12, tzinfo=UTC))
         self.assertEqual(decision["action"], "claim")
         self.assertEqual(decision["task"]["task_id"], "task_ready")
-        self.assertEqual(decision["queue"]["retired_human_gate_task_ids"], [])
 
     def test_operational_block_without_ready_work_waits(self) -> None:
         root = self.make_root()
@@ -127,25 +126,6 @@ class ContinuousLoopTests(unittest.TestCase):
         decision = evaluate_loop(root, now=datetime(2026, 8, 5, 12, tzinfo=UTC))
         self.assertEqual(decision["action"], "wait")
         self.assertEqual(decision["reason"], "nonterminal_queue_not_claimable")
-
-    def test_retired_human_review_block_is_pickable(self) -> None:
-        root = self.make_root()
-        dump(
-            root / "tasks/task_blocked.json",
-            self.task(
-                "task_blocked",
-                "blocked",
-                blocked_reason="HUMAN_REVIEW_REQUIRED: legal approval is required",
-                priority=90,
-            ),
-        )
-        dump(root / "tasks/task_ready.json", self.task("task_ready", priority=80))
-        decision = evaluate_loop(root, now=datetime(2026, 8, 5, 12, tzinfo=UTC))
-        self.assertEqual(decision["action"], "claim")
-        self.assertEqual(decision["task"]["task_id"], "task_blocked")
-        self.assertTrue(decision["task"]["retired_human_gate"])
-        self.assertEqual(decision["task"]["claim_transition"], "blocked_to_leased")
-        self.assertEqual(decision["queue"]["retired_human_gate_task_ids"], ["task_blocked"])
 
     def test_exceptional_pr_telemetry_does_not_halt_loop(self) -> None:
         root = self.make_root()

@@ -2,7 +2,7 @@
   "task_id": "task_daily_20260805_90_snapshot",
   "task_type": "daily_report",
   "role": "report-editor",
-  "state": "leased",
+  "state": "pr_open",
   "priority": 65,
   "created_at": "2026-08-06T08:41:00Z",
   "parent_issue": null,
@@ -90,5 +90,16 @@
     "base_sha": "83b04414621e432ef868325cd647e7b67ffa9cfd",
     "leased_at": "2026-08-06T08:41:00Z",
     "lease_until": "2026-08-06T14:41:00Z"
+  },
+  "result": {
+    "branch": "work/task_daily_20260805_90_snapshot",
+    "pr_number": 136,
+    "completed_at": null,
+    "summary": "Produced the English daily report for 5 August 2026 from the exact frozen set of three approved Guardian attribution claims and one approved assessment. The report distinguishes confirmed media attribution from the still-unverified underlying presidential statements and introduces no new evidence.",
+    "coverage_gaps": [
+      "The report contains only the approved Guardian attribution events; no independently verified primary presidential publication was available in the frozen inputs.",
+      "The Guardian page was later edited and no immutable article artifact was stored.",
+      "The frozen report inputs contain no other approved developments for the reporting window."
+    ]
   }
 }

@@ -2,7 +2,7 @@
   "task_id": "task_backfill_20260805_04_ru_milbloggers",
   "task_type": "open_web_discovery",
   "role": "open-web-discovery",
-  "state": "pr_open",
+  "state": "review",
   "priority": 85,
   "created_at": "2026-08-06T05:02:00Z",
   "parent_issue": 33,
@@ -64,6 +64,16 @@
   },
   "result": {
     "branch": "work/task_backfill_20260805_04_ru_milbloggers",
-    "pr_number": 119
+    "pr_number": 119,
+    "completed_at": "2026-08-06T06:08:00Z",
+    "summary": "Completed a bounded public-web recovery scan of established Russian milblogger surfaces for the missing 05:00–24:00 UTC interval. Registered one non-duplicative Rybar daily digest, Telegram message 82240, as a day-precision candidate because its heading explicitly dates it to 5 August 2026 while the public preview displays 19:49 without a timezone-bearing datetime. Canonical identity, retrieval time, quote locator, aggregation lineage, and explicit exact-window uncertainty were preserved. The overlapping video digest 82238, earlier-window duplicates, out-of-topic posts, official relays, granular infrastructure, route, launch, strike and tactical content, maps, and attached media were excluded. No assertion was assessed or converted into a claim, observation, territorial conclusion, or report narrative.",
+    "coverage_gaps": [
+      "Exact inclusion after the 05:00 UTC boundary remains uncertain because Telegram did not expose timezone-bearing publication metadata.",
+      "The bounded four-channel scan is not exhaustive across Russian milblogger publishing.",
+      "Rolling Telegram previews may omit posts, edits, deletions, and original publication metadata.",
+      "The retained digest aggregates multiple upstream reports whose complete canonical lineage was not resolved.",
+      "Granular frontline claims, named vulnerable facilities, movement and route detail, strike geometry, maps, and attached media were intentionally excluded.",
+      "No milblogger assertion was independently assessed or converted into a claim, observation, territorial conclusion, or report narrative."
+    ]
   }
 }

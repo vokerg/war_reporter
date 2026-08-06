@@ -5,7 +5,11 @@ on:
     paths:
       - "data/raw/**"
       - "reports/**"
+      - "config/settings.json"
+      - "requirements.txt"
+      - "scripts/build_report.py"
       - "scripts/build_site.py"
+      - "SAFETY.md"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 permissions:

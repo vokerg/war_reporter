@@ -2,7 +2,7 @@
   "task_id": "task_daily_20260805_80_report_inputs",
   "task_type": "investigate_claim",
   "role": "corroborator",
-  "state": "ready",
+  "state": "merged",
   "priority": 75,
   "created_at": "2026-08-06T06:54:28.175896Z",
   "parent_issue": null,
@@ -72,5 +72,12 @@
     "Two separate self-review rounds passed and a receipt was persisted"
   ],
   "idempotency_key": "daily_report_inputs:2026-08-05:ukraine-war",
-  "lease": null
+  "lease": null,
+  "result": {
+    "branch": "work/task_daily_20260805_80_report_inputs",
+    "pr_number": 129,
+    "merge_sha": "18575b4ef4a70ec5cb2e92033707e84177005d75",
+    "merged_at": "2026-08-06T07:34:36Z",
+    "completed_at": "2026-08-06T07:34:36Z"
+  }
 }

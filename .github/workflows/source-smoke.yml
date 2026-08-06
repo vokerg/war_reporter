@@ -1,0 +1,50 @@
+name: Source smoke test
+on:
+  workflow_dispatch:
+    inputs:
+      platforms:
+        description: Comma-separated platforms
+        required: false
+        default: telegram,rss,web
+      groups:
+        description: Optional comma-separated groups
+        required: false
+        default: ""
+      sources:
+        description: Comma-separated source ids
+        required: false
+        default: "ua-general-staff-tg,cit-rss,ua-president-web"
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m scripts.validate
+      - id: collect
+        continue-on-error: true
+        env:
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+        run: |
+          args=(--force --lookback-hours 2 --workers 16)
+          if [ -n "${{ inputs.platforms }}" ]; then args+=(--platforms "${{ inputs.platforms }}"); fi
+          if [ -n "${{ inputs.groups }}" ]; then args+=(--groups "${{ inputs.groups }}"); fi
+          if [ -n "${{ inputs.sources }}" ]; then args+=(--sources "${{ inputs.sources }}"); fi
+          python -m scripts.collect "${args[@]}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: source-smoke-state
+          path: |
+            data/state.json
+            data/errors
+          if-no-files-found: warn
+      - name: Require complete smoke result
+        if: steps.collect.outcome != 'success'
+        run: exit 1

@@ -71,11 +71,13 @@ def _latest_report_day(root: Path, report_root: str) -> str | None:
 
 def _configured_sources(
     registry: dict[str, Any], settings: dict[str, Any]
-) -> list[dict[str, str]]:
+) -> tuple[list[dict[str, str]], int, int]:
     rows: list[dict[str, str]] = []
+    registry_entries = 0
     for source in registry.get("sources", []):
         if not isinstance(source, dict) or source.get("enabled") is not True:
             continue
+        registry_entries += 1
         rows.append(
             {
                 "id": str(source.get("id", "")),
@@ -83,10 +85,12 @@ def _configured_sources(
                 "group": str(source.get("group", "other")),
             }
         )
+    virtual_queries = 0
     queries = settings.get("x_search_queries", [])
     if isinstance(queries, list):
         for index, query in enumerate(queries, 1):
             if isinstance(query, str) and query.strip():
+                virtual_queries += 1
                 rows.append(
                     {
                         "id": f"x-discovery-{index}",
@@ -94,7 +98,7 @@ def _configured_sources(
                         "group": "x-discovery",
                     }
                 )
-    return rows
+    return rows, registry_entries, virtual_queries
 
 
 def _aggregate(
@@ -136,7 +140,9 @@ def build_public_status(
     if not isinstance(per_source, dict):
         per_source = {}
 
-    sources = _configured_sources(registry, settings)
+    sources, registry_entries, virtual_queries = _configured_sources(
+        registry, settings
+    )
     configured_ids = {source["id"] for source in sources}
     status_counts: Counter[str] = Counter()
     latest_success_values: list[Any] = []
@@ -193,7 +199,9 @@ def build_public_status(
             "items_added": _nonnegative_int(state.get("items_added")),
         },
         "registry": {
-            "configured_enabled": len(sources),
+            "configured_entries": registry_entries,
+            "virtual_query_sources": virtual_queries,
+            "configured_total": len(sources),
             "orphaned_state_sources": len(set(per_source) - configured_ids),
         },
         "source_status_counts": {
@@ -274,6 +282,7 @@ def _aggregate_table(
 
 def render_public_status(status: dict[str, Any]) -> str:
     run = status["run"]
+    registry = status["registry"]
     freshness = status["freshness"]
     withholding = status["withholding"]
     degradation = status["degradation"]
@@ -297,6 +306,10 @@ def render_public_status(status: dict[str, Any]) -> str:
         f"<tr><th>Устарело</th><td>{_fmt(freshness['stale'])}</td></tr>"
         f"<tr><th>Возраст состояния, часы</th><td>"
         f"{_fmt(freshness['last_run_age_hours'])}</td></tr>"
+        f"<tr><th>Registry entries / virtual queries / total</th><td>"
+        f"{registry['configured_entries']} / "
+        f"{registry['virtual_query_sources']} / "
+        f"{registry['configured_total']}</td></tr>"
         f"<tr><th>Выбрано / попыток / успешно / пропущено</th><td>"
         f"{run['selected_sources']} / {run['attempted']} / "
         f"{run['succeeded']} / {run['skipped']}</td></tr>"

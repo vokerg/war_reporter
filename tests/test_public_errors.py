@@ -113,7 +113,7 @@ class PublicErrorTests(unittest.TestCase):
     def test_http_status_is_retained_without_exception_message(self) -> None:
         response = requests.Response()
         response.status_code = 403
-        exc = requests.HTTPError(
+        exc = requests.exceptions.HTTPError(
             "https://example.com/?token=super-secret",
             response=response,
         )
@@ -121,7 +121,9 @@ class PublicErrorTests(unittest.TestCase):
         self.assertNotIn("super-secret", public_error_summary(exc))
 
     def test_tls_error_has_distinct_public_category(self) -> None:
-        exc = requests.SSLError("certificate contains super-secret detail")
+        exc = requests.exceptions.SSLError(
+            "certificate contains super-secret detail"
+        )
         self.assertEqual(public_error_summary(exc), "SSLError: tls_error")
         self.assertNotIn("super-secret", public_error_summary(exc))
 

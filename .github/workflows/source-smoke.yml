@@ -3,22 +3,33 @@ on:
   workflow_dispatch:
     inputs:
       sources:
-        description: Comma-separated source ids
+        description: Comma-separated non-X source ids
         required: false
         default: "ua-general-staff-tg,bellingcat-rss,ua-president-web"
+      include_x:
+        description: Also test X account and recent-search adapters
+        required: false
+        type: boolean
+        default: false
+      x_sources:
+        description: Comma-separated X source ids
+        required: false
+        default: "ua-general-staff-x,x-discovery-1"
 permissions:
   contents: read
 concurrency:
   group: source-smoke-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  smoke:
+  non-x:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
       SMOKE_SOURCES: ${{ inputs.sources }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -26,8 +37,6 @@ jobs:
       - run: python -m scripts.validate
       - id: collect
         continue-on-error: true
-        env:
-          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
         run: |
           sources="$SMOKE_SOURCES"
           if [ -z "$sources" ]; then
@@ -46,7 +55,6 @@ jobs:
           import os
           from pathlib import Path
 
-          state = json.loads(Path("data/state.json").read_text(encoding="utf-8"))
           configured = os.environ.get("SMOKE_SOURCES", "")
           expected = {
               value.strip()
@@ -57,6 +65,7 @@ jobs:
               "bellingcat-rss",
               "ua-president-web",
           }
+          state = json.loads(Path("data/state.json").read_text(encoding="utf-8"))
           failures = []
           for source_id in sorted(expected):
               row = state.get("per_source", {}).get(source_id, {})
@@ -73,11 +82,82 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: source-smoke-state
+          name: non-x-source-smoke
           path: |
             data/state.json
             data/errors
           if-no-files-found: warn
+          retention-days: 7
+      - name: Require collector success
+        if: steps.collect.outcome != 'success'
+        run: exit 1
+
+  x:
+    if: ${{ inputs.include_x }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      X_SMOKE_SOURCES: ${{ inputs.x_sources }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m scripts.validate
+      - id: collect
+        continue-on-error: true
+        env:
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+        run: |
+          sources="$X_SMOKE_SOURCES"
+          if [ -z "$sources" ]; then
+            sources="ua-general-staff-x,x-discovery-1"
+          fi
+          python -m scripts.collect \
+            --force \
+            --lookback-hours 168 \
+            --workers 2 \
+            --sources "$sources"
+      - name: Verify X account and discovery results
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          configured = os.environ.get("X_SMOKE_SOURCES", "")
+          expected = {
+              value.strip()
+              for value in configured.split(",")
+              if value.strip()
+          } or {"ua-general-staff-x", "x-discovery-1"}
+          state = json.loads(Path("data/state.json").read_text(encoding="utf-8"))
+          failures = []
+          for source_id in sorted(expected):
+              row = state.get("per_source", {}).get(source_id, {})
+              if row.get("status") != "ok":
+                  failures.append(f"{source_id}: status={row.get('status')!r}")
+              if int(row.get("fetched", 0)) < 1:
+                  failures.append(f"{source_id}: fetched={row.get('fetched', 0)!r}")
+          if state.get("status") != "ok":
+              failures.append(f"run status={state.get('status')!r}")
+          if failures:
+              raise SystemExit("; ".join(failures))
+          print(json.dumps(state, ensure_ascii=False, indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: x-source-smoke
+          path: |
+            data/state.json
+            data/errors
+          if-no-files-found: warn
+          retention-days: 7
       - name: Require collector success
         if: steps.collect.outcome != 'success'
         run: exit 1

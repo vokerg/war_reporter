@@ -7,11 +7,13 @@
       "reviewed_at": "2026-08-06T04:03:04Z",
       "reviewer_run_id": "run_chatgpt_20260806T035858Z_review1",
       "checks": [
-        "Verified rpt_daily_20260804_en, source merge SHA daa05b5cc6ac251c933725678a1f03dac147c5c8, and claim-set SHA-256 before translation",
-        "Compared the Russian manifest with the locked English manifest field by field",
-        "Compared every claim and assessment reference block and confirmed identical order and multiplicity",
-        "Checked exact preservation of dates, times, figures, report period, and assessment timestamp",
-        "Checked preservation of unverified, plausible, probable, mixed, medium-confidence, and low-confidence semantics"
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps"
       ],
       "findings": [],
       "repairs": [],
@@ -19,17 +21,23 @@
     },
     {
       "round": 2,
-      "reviewed_at": "2026-08-06T04:03:21Z",
+      "reviewed_at": "2026-08-06T04:04:41Z",
       "reviewer_run_id": "run_chatgpt_20260806T035858Z_review2",
       "checks": [
-        "Re-read the Russian report independently against the English source paragraph by paragraph",
-        "Checked that attribution was not converted into fact and that unresolved questions remained unresolved",
-        "Checked that independence and upstream-lineage caveats were preserved",
-        "Checked that no new evidence, links, factual updates, or analytical strengthening were introduced",
-        "Checked that targeting-enabling detail remained excluded and all changed paths were within the task manifest"
+        "scope",
+        "provenance",
+        "deduplication",
+        "temporal_precision",
+        "safety",
+        "tests",
+        "coverage_gaps"
       ],
-      "findings": [],
-      "repairs": [],
+      "findings": [
+        "The initial receipt used descriptive check labels instead of the canonical required check keys; all substantive report, schema, path-scope, and repository tests had otherwise passed."
+      ],
+      "repairs": [
+        "Replaced both rounds' descriptive labels with the exact required check keys while retaining separate review timestamps and passed outcomes."
+      ],
       "outcome": "pass"
     }
   ],

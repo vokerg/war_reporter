@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from .collector_common import *  # noqa: F401,F403
 from .collector_adapters import *  # noqa: F401,F403
+from .common import atomic_text
 from .public_archive import harden_public_projection
+from .sensitivity import classify_item
 
 
 _TRANSIENT_SOURCE_STATE_KEYS = {"error", "reason", "next_due_at"}
@@ -126,6 +128,7 @@ def next_source_state(
 def item_storage_delay_hours(
     item: dict[str, Any], settings: dict[str, Any]
 ) -> float:
+    item = classify_item(item)
     delays = [float(settings.get("collection_delay_hours", 0))]
     by_group = settings.get("collection_delay_by_group", {})
     by_tag = settings.get("collection_delay_by_tag", {})
@@ -198,8 +201,9 @@ def archive_projection(
     item: dict[str, Any], settings: dict[str, Any]
 ) -> dict[str, Any]:
     """Apply the mandatory final public-archive boundary."""
+    classified = classify_item(item)
     return harden_public_projection(
-        public_projection(item, settings), item, settings
+        public_projection(classified, settings), classified, settings
     )
 
 

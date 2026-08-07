@@ -32,15 +32,22 @@ jobs:
           X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
           WAR_REPORTER_WORKERS: "32"
         run: python -m scripts.continuous_loop --once
-      - id: upload
-        name: Upload generated public projection
+      - id: package
+        name: Validate and describe generated artifact
         if: always()
+        run: >-
+          python -m scripts.package_collection_artifact
+          --output collection-artifact-manifest.json
+      - id: upload
+        name: Upload validated public projection
+        if: steps.package.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: collected-osint-${{ github.run_id }}
           path: |
             data
             reports
+            collection-artifact-manifest.json
           if-no-files-found: error
           retention-days: 2
       - name: Fail visibly on incomplete collection
@@ -63,13 +70,11 @@ jobs:
         with:
           name: collected-osint-${{ github.run_id }}
           path: .
-      - name: Validate artifact boundary
-        run: |
-          test -f data/state.json
-          if find data reports -type l -print -quit | grep -q .; then
-            echo "collector artifact must not contain symlinks" >&2
-            exit 1
-          fi
+      - name: Verify validated artifact integrity
+        run: >-
+          python -I scripts/verify_collection_artifact.py
+          --root .
+          --manifest collection-artifact-manifest.json
       - name: Persist successful and partial results
         env:
           GH_TOKEN: ${{ github.token }}

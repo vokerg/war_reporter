@@ -1,0 +1,106 @@
+name: One-off full branch collection 2026-08-06
+# rerun: no-delay-72h-v1
+on:
+  push:
+    branches:
+      - refactor/raw-first-osint-loop
+    paths:
+      - .github/workflows/branch-collect-2026-08-06.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: war-reporter-one-off-2026-08-06
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m scripts.validate
+      - id: collect
+        name: Collect all enabled sources covering 2026-08-06
+        continue-on-error: true
+        env:
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+          WAR_REPORTER_WORKERS: "32"
+        run: >-
+          python -m scripts.collect
+          --force
+          --lookback-hours 72
+          --workers 32
+      - name: Build 2026-08-06 daily snapshot
+        if: always()
+        run: python -m scripts.build_report 2026-08-06
+      - id: package
+        name: Validate generated public artifact
+        if: always()
+        run: >-
+          python -m scripts.package_collection_artifact
+          --output collection-artifact-manifest.json
+      - id: upload
+        name: Upload validated collection artifact
+        if: steps.package.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-collection-2026-08-06-${{ github.run_id }}
+          path: |
+            data
+            reports
+            collection-artifact-manifest.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Keep incomplete coverage visible
+        if: steps.collect.outcome != 'success'
+        run: exit 1
+
+  persist:
+    needs: collect
+    if: ${{ always() && needs.collect.outputs.artifact_id != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: full-collection-2026-08-06-${{ github.run_id }}
+          path: .
+      - name: Verify artifact before write
+        run: >-
+          python -I scripts/verify_collection_artifact.py
+          --root .
+          --manifest collection-artifact-manifest.json
+      - name: Commit collected data and daily report to this branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "war-reporter-bot"
+          git config user.email "war-reporter-bot@users.noreply.github.com"
+          git add data reports
+          if git diff --cached --quiet; then
+            echo "No new collection data to commit"
+            exit 0
+          fi
+          git commit -m "data: collect all sources for 2026-08-06"
+          auth_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c http.extraheader="$auth_header" pull --rebase origin "${GITHUB_REF_NAME}"
+          python -m scripts.validate
+          git -c http.extraheader="$auth_header" push origin "HEAD:${GITHUB_REF_NAME}"

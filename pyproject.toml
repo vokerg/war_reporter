@@ -1,0 +1,8 @@
+[project]
+name = "war-reporter"
+version = "2.0.0"
+description = "Raw-first OSINT collection and daily reporting"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

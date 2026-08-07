@@ -1,0 +1,64 @@
+{
+  "poll_seconds": 900,
+  "workers": 32,
+  "request_timeout_seconds": 30,
+  "user_agent": "war-reporter/2.0 (+https://github.com/vokerg/war_reporter)",
+  "report_timezone": "Europe/Kyiv",
+  "raw_root": "data/raw",
+  "error_root": "data/errors",
+  "state_file": "data/state.json",
+  "report_root": "reports/daily",
+  "site_root": "site",
+  "default_lookback_hours": 168,
+  "telegram_max_pages": 50,
+  "x_max_pages": 20,
+  "platform_cadence_minutes": {
+    "telegram": 15,
+    "x": 15,
+    "rss": 60,
+    "web": 1440
+  },
+  "article_host_allowlist": {
+    "bbc-ukraine-rss": [
+      "bbc.co.uk",
+      "bbc.com"
+    ]
+  },
+  "status_stale_after_hours": 1,
+  "site_publication_delay_hours": 0,
+  "site_sensitive_delay_hours": 0,
+  "sensitive_tags": [
+    "frontline",
+    "operations",
+    "operational-position",
+    "precise-location",
+    "map",
+    "maps",
+    "deep-strikes"
+  ],
+  "minimum_group_counts": {
+    "official-ua": 30,
+    "official-ru": 10,
+    "osint": 25,
+    "analysts": 10,
+    "ua-media-bloggers": 10,
+    "ru-milbloggers": 15,
+    "international-media": 15
+  },
+  "x_search_queries": [
+    "(Ukraine OR Ukrainian OR Україна OR Украина) (frontline OR фронт OR наступ OR advance OR retreat) -is:retweet",
+    "(Ukraine OR Україна OR Украина) (missile OR ракета OR drone OR БПЛА OR strike OR удар) -is:retweet",
+    "(Russia OR Россия) (Kursk OR Курск OR Belgorod OR Белгород OR Crimea OR Крым) (drone OR БПЛА OR explosion OR взрыв OR attack OR атака) -is:retweet"
+  ],
+  "collection_delay_hours": 0,
+  "collection_delay_by_group": {},
+  "collection_delay_by_tag": {},
+  "collection_delay_by_source": {},
+  "web_max_links": 12,
+  "public_excerpt_chars": 1200,
+  "public_media_limit": 8,
+  "public_redact_tags": [
+    "operational-position",
+    "precise-location"
+  ]
+}

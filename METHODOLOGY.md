@@ -1,55 +1,79 @@
 # Methodology
 
-## Evidence chain
+## Record model
 
-`source entity → source item → artifact → observation → claim → event → assessment → report/map`
+A stored row represents a **source publication**, not a fact and not an analytical claim.
 
-A factual publication statement must resolve to claim IDs. Each claim must resolve to attributable observations, and each observation must resolve to a source item and, where applicable, an immutable artifact manifest.
+The path `data/raw/` is retained for compatibility, but it contains one of two public projections:
 
-## Three separate axes
+- `public_excerpt_v1`: provenance, bounded text/media, minimal platform identifiers and a SHA-256 fingerprint calculated from the fuller in-memory capture;
+- `public_redacted_v1`: minimal provenance/platform identifiers only. Title, text, HTML, media, content lengths and content fingerprint are absent.
 
-Do not collapse these concepts:
+`public_redacted_v1` is used for records tagged `operational-position` or `precise-location`. Omitting the fingerprint and lengths prevents the public archive from acting as a confirmation oracle for guessed sensitive content.
 
-- **Record status:** `draft`, `in_review`, `approved`, `rejected`, `superseded`, or `withdrawn`.
-- **Assessment outcome:** `confirmed`, `probable`, `plausible`, `unverified`, `contested`, `misleading`, or `refuted`.
-- **Assessment confidence:** `high`, `medium`, or `low`, meaning confidence in the assigned outcome—not confidence that the underlying proposition is true.
+A fingerprint supports duplicate/change detection for ordinary excerpt records. It does not authenticate the publisher, establish factual truth or prove that two reports are independent.
 
-Example: a claim may be `approved`, assessed as `contested`, with `high` confidence that substantial conflict exists.
+## Trust
 
-## Independence and lineage
+`trust` is a handling hint:
 
-Evidence count is meaningless until upstream lineage is resolved. Publications are not independent when they share a post, document, image, briefing, owner-controlled network, anonymous source, or circular citation. Store upstream item IDs and distinguish original evidence from repetition.
+- `primary`: authoritative for the source's own statement;
+- `high`: established newsroom, analyst or OSINT practice;
+- `medium`: useful but normally needs comparison;
+- `low`: partisan, rumour-prone or propaganda source;
+- `unknown`: discovery output not mapped to a known source.
 
-## Source profiles
+No trust value is a truth verdict.
 
-Assess sources by topic and time period. Separate identity, access, historical accuracy, methodology transparency, correction behavior, independence, affiliation, incentives, and recurring framing. Bias metadata is contextual information, not an automatic truth-value judgment. Every reputation assessment requires documented rationale and resolved evidence.
+## Independence
 
-## Observations and claims
+Repeated claims are not independent corroboration when they share an upstream source. Canonical X deduplication prevents duplicate storage, but analytical work must still inspect source lineage. Registry/source counts are coverage metadata, not evidence counts.
 
-An observation records what a source communicated. A claim is a normalized testable proposition. Extraction must not upgrade source language such as “reportedly,” “may,” or “appears” into certainty. Preserve qualifiers, speaker attribution, event-time uncertainty, and location uncertainty.
+## Capture and publication
 
-## Quotations and rights
+- RSS entries attempt same-run linked-article extraction and fall back to supplied feed text.
+- Web index pages use bounded same-host article discovery; snapshot fallback is explicit.
+- Publication time is read from feed timestamps, metadata, JSON-LD or `<time>` elements.
+- Operational records enter the public archive only after configured 24/72-hour embargoes.
+- Undated embargoed snapshots are counted as `items_withheld_undated` and are not silently released.
+- Public excerpts are capped by `public_excerpt_chars`; stored HTML is always empty.
+- Full platform payloads and response HTML are discarded before persistence.
+- Archive/state/error writes are atomic and fail closed when an existing NDJSON partition is malformed.
 
-Store only short excerpts necessary for verification, with original language, URL, publication time, retrieval time, and page/paragraph/timecode locator. Store translations separately. Do not bulk-copy articles, transcripts, image sets, or proprietary maps. Artifact manifests must record access classification and rights notes.
+## Daily boundary
 
-## Temporal semantics
+Digests use the calendar day in `report_timezone` (`Europe/Kyiv`). Raw partitions are UTC; report generation reads the adjacent UTC files needed for the local day.
 
-Use RFC 3339 UTC timestamps where time is known. Use explicit precision when publication or event time is uncertain. Never substitute retrieval time for publication time or assessment time.
+## Automatic output
 
-## Coverage claims
+`reports/daily/` is a transparent automatic source digest. It reports coverage and attributed excerpts; it does not resolve contradictions, calculate territorial control or assign claim confidence.
 
-A completed source scan means only that the assigned source list and time window were checked using the documented access method. It does not mean the open internet was exhaustively searched. Reports must disclose material coverage gaps, inaccessible sources, and platform/API failures.
+The map section lists delayed map publications from sources. It is not a verified map layer. Any derived geometry is a separate historical product decision under issue #131.
 
-## Public reports
+## Runtime coverage
 
-The machine-readable report manifest carries the complete audit trail: claim IDs, assessment IDs, deterministic hashes, record status, and content path. Public Markdown is a separate reader-facing product and must not expose those internal identifiers or repository workflow terminology.
+`data/state.json` records the latest execution state:
 
-Public reports are editorial selections, not enumerations of every approved input. Include the developments necessary to give a fair account of the reporting period and omit low-salience or out-of-period material when omission does not distort the overall picture.
+- `ok`: attempted work completed without known source/configuration degradation;
+- `idle`: no request was due under cadence and no blocker was present;
+- `partial`: at least one selected source succeeded, but source/configuration degradation remained;
+- `blocked`: the selected work could not start because required configuration was missing;
+- `failed`: attempted sources produced no successful result.
 
-Use human-readable source attribution and calibrated language to express uncertainty. Consolidate general verification limits into one short section instead of repeating the same disclaimer after every statement. Repeat a limitation near a specific item only when it is essential to interpret conflicting figures, serious allegations, uncertain identity, or disputed operational outcomes.
+`last_run_at` is the completion time of the latest pass. `last_successful_run_at` advances only on `ok` or `idle` and survives later partial/failed runs. Per-source `last_success_at` is separate from the run-level clean timestamp.
 
-The absence of internal references from public prose does not weaken traceability: the report manifest and underlying records remain the canonical audit path. See `docs/editorial/PUBLIC_REPORT_STYLE.md` for the publication contract.
+Configured count is not working count. The current configuration has 146 registry entries and three virtual X recent-search sources. A full run can therefore select 149 execution sources, but public status reports configured, attempted, successful, skipped and errored values separately.
 
-## Corrections
+## Public status
 
-Released records are append-only in meaning. Supersede or correct them; do not silently mutate history. Corrections must propagate to dependent assessments, reports, and map snapshots.
+`site/status.json` is the allowlist projection `war-reporter-public-status-v1`; `site/status/index.html` renders the same model for readers.
+
+The status model:
+
+- aggregates by platform/group without publishing raw error/configuration text;
+- distinguishes cadence-idle, partial, blocked, failed, stale and embargo-only states;
+- reports last run, last fully successful run, latest source success, archive day and digest day;
+- separates registry entries from virtual X query sources;
+- does not imply that successful retrieval validates a source's claims.
+
+Version 1 is deliberately **current-state-only**. Availability/latency history is not retained or claimed until a separate retention and size policy is accepted.

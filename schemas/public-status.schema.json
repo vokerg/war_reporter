@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vokerg.github.io/war_reporter/schemas/public-status-v1.json",
+  "title": "War Reporter public collection status v1",
+  "type": "object",
+  "required": [
+    "schema",
+    "scope",
+    "generated_at",
+    "run",
+    "registry",
+    "source_status_counts",
+    "by_platform",
+    "by_group",
+    "withholding",
+    "freshness",
+    "degradation",
+    "semantics"
+  ],
+  "properties": {
+    "schema": {"const": "war-reporter-public-status-v1"},
+    "scope": {"const": "current-state-only"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "run": {
+      "type": "object",
+      "required": [
+        "status",
+        "last_run_at",
+        "last_successful_run_at",
+        "since",
+        "selected_sources",
+        "attempted",
+        "succeeded",
+        "skipped",
+        "errors",
+        "items_added"
+      ],
+      "properties": {
+        "status": {
+          "enum": ["ok", "idle", "partial", "blocked", "failed", "unknown"]
+        },
+        "last_run_at": {"type": ["string", "null"], "format": "date-time"},
+        "last_successful_run_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "since": {"type": ["string", "null"], "format": "date-time"},
+        "selected_sources": {"type": "integer", "minimum": 0},
+        "attempted": {"type": "integer", "minimum": 0},
+        "succeeded": {"type": "integer", "minimum": 0},
+        "skipped": {"type": "integer", "minimum": 0},
+        "errors": {"type": "integer", "minimum": 0},
+        "items_added": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "registry": {
+      "type": "object",
+      "required": [
+        "configured_entries",
+        "virtual_query_sources",
+        "configured_total",
+        "orphaned_state_sources"
+      ],
+      "properties": {
+        "configured_entries": {"type": "integer", "minimum": 0},
+        "virtual_query_sources": {"type": "integer", "minimum": 0},
+        "configured_total": {"type": "integer", "minimum": 0},
+        "orphaned_state_sources": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "source_status_counts": {"$ref": "#/$defs/statusCounts"},
+    "by_platform": {"$ref": "#/$defs/aggregate"},
+    "by_group": {"$ref": "#/$defs/aggregate"},
+    "withholding": {
+      "type": "object",
+      "required": ["recent", "undated"],
+      "properties": {
+        "recent": {"type": "integer", "minimum": 0},
+        "undated": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "freshness": {
+      "type": "object",
+      "required": [
+        "stale",
+        "stale_after_hours",
+        "last_run_age_hours",
+        "latest_source_success_at",
+        "latest_archive_day",
+        "latest_digest_day"
+      ],
+      "properties": {
+        "stale": {"type": "boolean"},
+        "stale_after_hours": {"type": "number", "minimum": 0},
+        "last_run_age_hours": {"type": ["number", "null"], "minimum": 0},
+        "latest_source_success_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "latest_archive_day": {
+          "type": ["string", "null"],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "latest_digest_day": {
+          "type": ["string", "null"],
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "degradation": {
+      "type": "object",
+      "required": ["configuration_skips", "source_errors", "unknown_sources"],
+      "properties": {
+        "configuration_skips": {"type": "integer", "minimum": 0},
+        "source_errors": {"type": "integer", "minimum": 0},
+        "unknown_sources": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "semantics": {
+      "type": "object",
+      "required": [
+        "configured_is_not_working",
+        "source_success_does_not_verify_claims",
+        "error_details_omitted",
+        "history_available"
+      ],
+      "properties": {
+        "configured_is_not_working": {"const": true},
+        "source_success_does_not_verify_claims": {"const": true},
+        "error_details_omitted": {"const": true},
+        "history_available": {"const": false}
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "statusCounts": {
+      "type": "object",
+      "properties": {
+        "ok": {"type": "integer", "minimum": 0},
+        "error": {"type": "integer", "minimum": 0},
+        "skipped_config": {"type": "integer", "minimum": 0},
+        "skipped_cadence": {"type": "integer", "minimum": 0},
+        "unknown": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "aggregate": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "configured": {"type": "integer", "minimum": 0},
+          "ok": {"type": "integer", "minimum": 0},
+          "error": {"type": "integer", "minimum": 0},
+          "skipped_config": {"type": "integer", "minimum": 0},
+          "skipped_cadence": {"type": "integer", "minimum": 0},
+          "unknown": {"type": "integer", "minimum": 0}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

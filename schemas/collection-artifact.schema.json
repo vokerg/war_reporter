@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vokerg.github.io/war_reporter/schemas/collection-artifact-v1.json",
+  "title": "War Reporter collection artifact manifest v1",
+  "type": "object",
+  "required": [
+    "schema",
+    "state_status",
+    "last_run_at",
+    "files",
+    "file_count",
+    "total_bytes"
+  ],
+  "properties": {
+    "schema": {"const": "war-reporter-collection-artifact-v1"},
+    "state_status": {
+      "enum": ["ok", "idle", "partial", "blocked", "failed"]
+    },
+    "last_run_at": {
+      "anyOf": [
+        {"type": "string", "format": "date-time"},
+        {"type": "null"}
+      ]
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["path", "bytes", "sha256"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^(data/state\\.json|data/raw/[0-9]{4}/[0-9]{2}/[0-9]{2}/items\\.ndjson|data/errors/[0-9]{4}/[0-9]{2}/[0-9]{2}/errors\\.ndjson|reports/daily/[0-9]{4}-[0-9]{2}-[0-9]{2}\\.md)$"
+          },
+          "bytes": {"type": "integer", "minimum": 0},
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "file_count": {"type": "integer", "minimum": 1},
+    "total_bytes": {"type": "integer", "minimum": 0}
+  },
+  "additionalProperties": false
+}

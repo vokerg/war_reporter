@@ -33,8 +33,10 @@ class OperatorDocumentationTests(unittest.TestCase):
         self.assertIn("deployed GitHub Pages service", self.agents)
 
     def test_agent_contract_rejects_legacy_control_plane(self) -> None:
+        self.assertIn("Use these entrypoints:", self.agents)
+        self.assertIn("python -m scripts.collect", self.agents)
+        self.assertIn("python -m scripts.continuous_loop --once", self.agents)
         self.assertIn("Do not recreate task manifests", self.agents)
-        self.assertIn("one supported", self.readme.lower() + self.agents.lower())
 
 
 if __name__ == "__main__":

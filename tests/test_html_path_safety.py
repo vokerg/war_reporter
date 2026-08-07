@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from urllib.parse import quote
 
 from scripts.html_safety import _safe_href, sanitize_report_html
 
@@ -31,7 +32,9 @@ class HtmlPathSafetyTests(unittest.TestCase):
                 self.assertIsNone(_safe_href(href))
 
     def test_excessive_percent_encoding_fails_closed(self) -> None:
-        nested = "%25" * 6 + "2e%25" * 6 + "2e/secret"
+        nested = "../secret"
+        for _ in range(6):
+            nested = quote(nested, safe="")
         self.assertIsNone(_safe_href(nested))
 
     def test_sanitizer_removes_unsafe_href_but_keeps_text(self) -> None:

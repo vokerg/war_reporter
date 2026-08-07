@@ -1,0 +1,39 @@
+name: Tag legacy v1
+
+on:
+  push:
+    branches:
+      - refactor/raw-first-osint-loop
+    paths:
+      - .github/workflows/tag-legacy-v1.yml
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Tag legacy main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LEGACY_SHA: 64a97e46ae4ca61db6d0ae4461fbac72a226e7a7
+        run: |
+          set -euo pipefail
+          git fetch origin main --tags
+          git cat-file -e "${LEGACY_SHA}^{commit}"
+          if git rev-parse -q --verify refs/tags/legacy-v1 >/dev/null; then
+            existing="$(git rev-list -n 1 legacy-v1)"
+            test "$existing" = "$LEGACY_SHA"
+            echo "legacy-v1 already points to $LEGACY_SHA"
+            exit 0
+          fi
+          git config user.name "war-reporter-bot"
+          git config user.email "war-reporter-bot@users.noreply.github.com"
+          git tag -a legacy-v1 "$LEGACY_SHA" -m "Legacy v1 before raw-first OSINT rewrite"
+          auth_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c http.extraheader="$auth_header" push origin refs/tags/legacy-v1

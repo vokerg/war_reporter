@@ -77,6 +77,14 @@ jobs:
               raise SystemExit("; ".join(failures))
           print(json.dumps(state, ensure_ascii=False, indent=2))
           PY
+      - name: Build live public preview
+        run: python -m scripts.build_site
+      - uses: actions/upload-artifact@v4
+        with:
+          name: live-site-preview-${{ github.sha }}
+          path: site
+          if-no-files-found: error
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         if: always()
         with:

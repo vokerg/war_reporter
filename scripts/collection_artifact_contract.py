@@ -20,6 +20,12 @@ MANIFEST_FIELDS = {
 FILE_FIELDS = {"path", "bytes", "sha256"}
 RUN_STATUSES = {"ok", "idle", "partial", "blocked", "failed"}
 HEX_64 = set("0123456789abcdef")
+ARTIFACT_PATHS = {
+    "state_file": "data/state.json",
+    "raw_root": "data/raw",
+    "error_root": "data/errors",
+    "report_root": "reports/daily",
+}
 
 
 def safe_relative_path(value: Any) -> str:
@@ -33,18 +39,14 @@ def safe_relative_path(value: Any) -> str:
 
 def configured_paths(settings: dict[str, Any]) -> dict[str, str]:
     values = {
-        "state_file": safe_relative_path(settings.get("state_file")),
-        "raw_root": safe_relative_path(settings.get("raw_root")),
-        "error_root": safe_relative_path(settings.get("error_root")),
-        "report_root": safe_relative_path(settings.get("report_root")),
+        key: safe_relative_path(settings.get(key))
+        for key in ARTIFACT_PATHS
     }
-    if PurePosixPath(values["state_file"]).parts[0] != "data":
-        raise ValueError("configured state_file must stay under data/")
-    for key in ("raw_root", "error_root"):
-        if PurePosixPath(values[key]).parts[0] != "data":
-            raise ValueError(f"configured {key} must stay under data/")
-    if PurePosixPath(values["report_root"]).parts[0] != "reports":
-        raise ValueError("configured report_root must stay under reports/")
+    for key, expected in ARTIFACT_PATHS.items():
+        if values[key] != expected:
+            raise ValueError(
+                f"collection artifact v1 requires {key}={expected}"
+            )
     return values
 
 

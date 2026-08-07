@@ -88,9 +88,11 @@ jobs:
           git commit -m "data: collect OSINT $(date -u +%FT%TZ)"
           auth_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
           for attempt in 1 2 3; do
-            if git -c http.extraheader="$auth_header" pull --rebase origin "${GITHUB_REF_NAME}" \
-              && git -c http.extraheader="$auth_header" push origin "HEAD:${GITHUB_REF_NAME}"; then
-              exit 0
+            if git -c http.extraheader="$auth_header" pull --rebase origin "${GITHUB_REF_NAME}"; then
+              if python -I scripts/validate.py \
+                && git -c http.extraheader="$auth_header" push origin "HEAD:${GITHUB_REF_NAME}"; then
+                exit 0
+              fi
             fi
             git rebase --abort || true
             sleep $((attempt * 5))

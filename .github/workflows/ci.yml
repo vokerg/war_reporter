@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -28,6 +30,8 @@ jobs:
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -40,7 +44,7 @@ jobs:
           --force
           --lookback-hours 168
           --workers 3
-          --sources ua-general-staff-tg,bellingcat-rss,ua-president-web
+          --sources ua-general-staff-tg,bellingcat-rss,cit-web
       - name: Verify non-empty adapter results
         if: always()
         run: |
@@ -51,7 +55,7 @@ jobs:
           expected = {
               "ua-general-staff-tg",
               "bellingcat-rss",
-              "ua-president-web",
+              "cit-web",
           }
           state = json.loads(Path("data/state.json").read_text(encoding="utf-8"))
           failures = []

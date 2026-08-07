@@ -7,7 +7,7 @@ config/sources.json
         ↓
 parallel Telegram / X / RSS / web collection
         ↓
-publication embargo + public projection
+sensitivity classification + publication embargo + public projection
         ↓
 data/raw/YYYY/MM/DD/items.ndjson
         ↓
@@ -30,7 +30,7 @@ This repository is public. Collectors may temporarily hold fuller source respons
 - tags and handling metadata;
 - minimal platform identifiers and, for ordinary excerpt records, a SHA-256 content fingerprint.
 
-Captured HTML and full platform payloads are **not** persisted. Records tagged `operational-position` or `precise-location` use the stricter `public_redacted_v1` projection: title, text, HTML, media, content lengths and content fingerprint are omitted. This avoids turning the public archive into a confirmation oracle for guessed sensitive content.
+Captured HTML and full platform payloads are **not** persisted. High-confidence decimal, DMS and MGRS coordinates are tagged before embargo and persistence. Records tagged `operational-position` or `precise-location` use the stricter `public_redacted_v1` projection: title, author, text, HTML, media, content lengths and content fingerprint are omitted, and IDs/URLs are reduced to content-neutral provenance.
 
 The path name `data/raw/` is retained for compatibility; its records are public source projections, not a private full-text archive. A private durable capture backend is outside this PR.
 
@@ -42,14 +42,16 @@ The path name `data/raw/` is retained for compatibility; its records are public 
 - paginated Telegram history, X account timelines and X recent search;
 - canonical X deduplication across discovery and watched accounts;
 - RSS linked-article retrieval with feed-summary fallback;
+- publisher-domain and per-hop redirect controls for RSS/web retrieval;
 - bounded same-host article discovery for web index pages;
 - publication-time extraction from metadata, JSON-LD and `<time>` elements;
 - `Europe/Kyiv` daily boundaries;
 - 24/72-hour storage embargoes for configured operational source groups/tags;
-- permanent content suppression for `operational-position` and `precise-location` records;
+- permanent content-neutral suppression for `operational-position` and `precise-location` records;
 - atomic fail-closed state/archive/error writes;
+- strict allowlisted collection-artifact manifest, size/hash verification and post-rebase validation;
 - searchable static source cards and delayed map-publication cards;
-- sanitized report HTML, hash-based Content Security Policy and no-referrer outbound links;
+- fixed-point report-link canonicalization, sanitized HTML, hash-based Content Security Policy and no-referrer outbound links;
 - explicit `ok`, `idle`, `partial`, `blocked` and `failed` states;
 - versioned public collection status with platform/group aggregates and staleness.
 
@@ -71,9 +73,11 @@ schemas/raw-item.schema.json      public archive contract
 schemas/public-status.schema.json public status contract
 scripts/collect.py                collector facade and CLI
 scripts/collector_common.py       URL safety, extraction, base projection
-scripts/public_archive.py         final fail-closed archive hardening
 scripts/collector_adapters.py     Telegram, X, RSS and web adapters
 scripts/collector_runtime.py      cadence, embargo, state and persistence
+scripts/sensitivity.py            high-confidence location tagging
+scripts/public_archive.py         final fail-closed archive hardening
+scripts/publisher_fetch.py        publisher-domain article retrieval
 scripts/continuous_loop.py        one-shot/service runner
 scripts/build_report.py           source digest renderer
 scripts/build_site.py             static source/status reader
@@ -110,10 +114,12 @@ Successful sources are retained during a partial run, but the run remains visibl
 python -m scripts.collect \
   --force \
   --lookback-hours 168 \
-  --sources ua-general-staff-tg,bellingcat-rss,ua-president-web
+  --sources ua-general-staff-tg,bellingcat-rss,cit-web
 ```
 
-PR CI runs the same bounded Telegram/RSS/web adapters and requires each to return `status=ok` with at least one fetched item. The separate `Source smoke test` workflow supports manual reruns and alternate source IDs without committing its archive. Its optional X job receives `X_BEARER_TOKEN` only when explicitly enabled and checks both a watched account and recent search. Without inspected X smoke evidence, X is configured but unproven.
+PR CI runs the same bounded Telegram/RSS/web adapters and requires each to return `status=ok` with at least one fetched item. A separate same-repository PR job checks `ua-general-staff-x` and `x-discovery-1`, bounds X pagination and scopes `X_BEARER_TOKEN` only to the collection step. While X remains enabled, a missing secret is a red configuration blocker rather than a green skip.
+
+The manual `Source smoke test` workflow supports later/default-branch reruns and alternate source IDs without committing its archive. A workflow file that exists only on a feature branch is not sufficient pre-merge `workflow_dispatch` evidence.
 
 ## Continuous service
 
@@ -128,9 +134,9 @@ docker compose up -d --build
 
 The image excludes `.env`, Git metadata and generated/runtime data from the build context. The collector runs as a non-root user in a read-only container with no Linux capabilities; only `data/`, `reports/`, `site/` and `/tmp` are writable. The bind-mount directories must be writable by `WAR_REPORTER_UID:WAR_REPORTER_GID`.
 
-Scheduled GitHub collection builds in a read-only job, uploads only `data/` and `reports/`, then uses a separate minimal write job to persist the artifact. Pages build and deployment credentials are separated the same way.
+Scheduled GitHub collection runs dependencies in a read-only job, validates generated output, creates a strict path/size/SHA-256 manifest, and passes only that artifact to a minimal write job. The write job independently verifies the file set and revalidates after rebase before push. Pages build and deployment credentials are separated the same way.
 
-One source failure never terminates service mode. Scheduled collection persists successful and partial public projections, then leaves incomplete runs red.
+One source failure never terminates service mode. Scheduled collection persists structurally valid successful and partial projections, then leaves incomplete runs red.
 
 ## Read the source cards and status
 
@@ -151,6 +157,8 @@ The public status artifact is deliberately **current-state-only**. It does not r
 
 The site renders excerpts and links; it does not embed third-party media. Undated material subject to an embargo is withheld because no deterministic publication-time boundary exists.
 
+A downloaded CI site preview proves the generated static payload. It does **not** prove that GitHub Pages deployed that commit, preserved project-subpath behavior or used the expected protected environment. Record preview and deployed-service evidence separately.
+
 ## Validation
 
 ```bash
@@ -163,4 +171,4 @@ python -m scripts.build_site
 
 The validator rejects absolute/traversing repository paths, credentialed source URLs, source ID/platform mismatches, unsafe persisted error records and public archive rows that do not match `public_excerpt_v1` or `public_redacted_v1`.
 
-Merge readiness additionally requires a reviewed current-head GitHub-hosted run, a successful representative network smoke artifact, plus X smoke evidence when X coverage is claimed.
+Merge readiness additionally requires a reviewed exact-current-head hosted run, a successful representative network smoke artifact, X account/search evidence whenever X remains enabled or is claimed as working, and explicit separation between preview and deployed Pages evidence.

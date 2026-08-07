@@ -17,6 +17,32 @@ _DROP_WITH_CONTENT = {
     "meta", "object", "option", "script", "select", "style", "svg",
     "textarea",
 }
+_MAX_DECODE_ROUNDS = 5
+
+
+def _decode_fixed_point(value: str) -> str | None:
+    """Decode percent escapes until stable, rejecting excessive nesting."""
+    current = value
+    for _ in range(_MAX_DECODE_ROUNDS):
+        decoded = unquote(current)
+        if decoded == current:
+            return decoded
+        current = decoded
+    return current if unquote(current) == current else None
+
+
+def _safe_relative_path(path: str) -> bool:
+    decoded = _decode_fixed_point(path)
+    if decoded is None:
+        return False
+    if (
+        decoded.startswith("//")
+        or "\\" in decoded
+        or any(ord(char) < 32 for char in decoded)
+        or urlparse(decoded).scheme
+    ):
+        return False
+    return ".." not in PurePosixPath(decoded).parts
 
 
 def _safe_href(value: str) -> str | None:
@@ -37,10 +63,7 @@ def _safe_href(value: str) -> str | None:
         ):
             return None
         return value
-    if value.startswith(("//", "#")):
-        return None
-    decoded_path = unquote(parsed.path)
-    if ".." in PurePosixPath(decoded_path).parts:
+    if value.startswith(("//", "#")) or not _safe_relative_path(parsed.path):
         return None
     return value
 

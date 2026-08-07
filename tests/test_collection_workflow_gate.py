@@ -39,6 +39,15 @@ class CollectionWorkflowGateTests(unittest.TestCase):
         self.assertLess(verify, git_add)
         self.assertNotIn("pip install", workflow[persist:])
 
+    def test_rebase_result_is_validated_before_push(self) -> None:
+        workflow = self.workflow
+        persist = workflow.index("  persist:")
+        pull = workflow.index("pull --rebase", persist)
+        validate = workflow.index("python -I scripts/validate.py", pull)
+        push = workflow.index("push origin", validate)
+        self.assertLess(pull, validate)
+        self.assertLess(validate, push)
+
     def test_write_permission_is_scoped_to_persist_job(self) -> None:
         self.assertEqual(self.workflow.count("contents: write"), 1)
         persist = self.workflow.index("  persist:")

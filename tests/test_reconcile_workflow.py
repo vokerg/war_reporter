@@ -33,8 +33,7 @@ class ReconcileWorkflowTests(unittest.TestCase):
             "git add -- tasks",
             "git commit",
             "git push",
-            "materialize",
-            "reconcile_repository.py",
+            "python scripts/reconcile_repository.py",
         ):
             with self.subTest(forbidden=forbidden):
                 self.assertNotIn(forbidden, workflow)

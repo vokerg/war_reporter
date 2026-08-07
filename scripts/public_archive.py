@@ -30,6 +30,32 @@ def _provenance_url(value: Any) -> str:
     ).geturl()
 
 
+def _safe_public_media_url(value: Any) -> str | None:
+    raw = str(value or "").strip()
+    if not raw or any(ord(char) < 32 for char in raw):
+        return None
+    parsed = urlparse(raw)
+    if (
+        parsed.scheme not in {"http", "https"}
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+    ):
+        return None
+    return raw
+
+
+def _safe_public_media(values: Any) -> list[str]:
+    if not isinstance(values, list):
+        return []
+    result: list[str] = []
+    for value in values:
+        safe = _safe_public_media_url(value)
+        if safe is not None and safe not in result:
+            result.append(safe)
+    return result
+
+
 def _redacted_public_url(value: Any, platform: str) -> str:
     parsed = urlparse(str(value or ""))
     if parsed.scheme not in {"http", "https"} or not parsed.hostname:
@@ -61,13 +87,15 @@ def harden_public_projection(
     item: dict[str, Any],
     settings: dict[str, Any],
 ) -> dict[str, Any]:
-    """Remove content-derived metadata for permanently redacted records."""
+    """Apply final URL/content hardening before a record enters public storage."""
+    result = dict(projected)
+    result["media"] = _safe_public_media(projected.get("media"))
+
     redact_tags = {str(tag) for tag in settings.get("public_redact_tags", [])}
     item_tags = {str(tag) for tag in item.get("tags", [])}
     if not redact_tags.intersection(item_tags):
-        return projected
+        return result
 
-    result = dict(projected)
     base_raw = projected.get("raw")
     platform = (
         dict(base_raw.get("platform", {}))

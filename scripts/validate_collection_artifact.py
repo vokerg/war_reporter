@@ -6,21 +6,28 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 import stat
 from pathlib import Path
 from typing import Any
 
 try:
+    from .collection_artifact_contract import (
+        ALLOWED_ROOTS,
+        MANIFEST_SCHEMA,
+        artifact_path_allowed,
+        configured_paths,
+    )
     from .common import ROOT, atomic_json, load_json
     from .validate import validate
 except ImportError:
+    from collection_artifact_contract import (
+        ALLOWED_ROOTS,
+        MANIFEST_SCHEMA,
+        artifact_path_allowed,
+        configured_paths,
+    )
     from common import ROOT, atomic_json, load_json
     from validate import validate
-
-
-MANIFEST_SCHEMA = "war-reporter-collection-artifact-v1"
-ALLOWED_ROOTS = {"data", "reports"}
 
 
 def _file_sha256(path: Path) -> str:
@@ -31,26 +38,35 @@ def _file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def artifact_files(root: Path) -> list[Path]:
+def artifact_files(root: Path, settings: dict[str, Any]) -> list[Path]:
     files: list[Path] = []
     for name in sorted(ALLOWED_ROOTS):
         base = root / name
-        if not base.exists():
+        try:
+            base_mode = base.lstat().st_mode
+        except FileNotFoundError:
             continue
+        if stat.S_ISLNK(base_mode):
+            raise ValueError(f"artifact root is a symlink: {name}")
+        if not stat.S_ISDIR(base_mode):
+            raise ValueError(f"artifact root is not a directory: {name}")
         for path in sorted(base.rglob("*")):
-            relative = path.relative_to(root)
+            relative = path.relative_to(root).as_posix()
             mode = path.lstat().st_mode
             if stat.S_ISLNK(mode):
                 raise ValueError(f"artifact contains symlink: {relative}")
-            if path.is_dir():
+            if stat.S_ISDIR(mode):
                 continue
-            if not path.is_file():
+            if not stat.S_ISREG(mode):
                 raise ValueError(f"artifact contains special file: {relative}")
+            if not artifact_path_allowed(relative, settings):
+                raise ValueError(f"unexpected artifact file: {relative}")
             files.append(path)
     return files
 
 
 def validate_artifact(root: Path = ROOT) -> dict[str, Any]:
+    root = root.resolve()
     errors = validate(root)
     if errors:
         raise ValueError("artifact validation failed:\n" + "\n".join(errors))
@@ -58,14 +74,15 @@ def validate_artifact(root: Path = ROOT) -> dict[str, Any]:
     settings = load_json(root / "config/settings.json", default={})
     if not isinstance(settings, dict):
         raise ValueError("missing config/settings.json")
-    state_file = settings.get("state_file", "data/state.json")
-    state = load_json(root / str(state_file), default={})
+    configured = configured_paths(settings)
+    state_file = configured["state_file"]
+    state = load_json(root / state_file, default={})
     if not isinstance(state, dict):
         raise ValueError("state file must contain an object")
 
     rows: list[dict[str, Any]] = []
     total_bytes = 0
-    for path in artifact_files(root):
+    for path in artifact_files(root, settings):
         relative = path.relative_to(root).as_posix()
         size = path.stat().st_size
         total_bytes += size
@@ -77,7 +94,7 @@ def validate_artifact(root: Path = ROOT) -> dict[str, Any]:
             }
         )
 
-    if not any(row["path"] == str(state_file) for row in rows):
+    if not any(row["path"] == state_file for row in rows):
         raise ValueError("validated artifact is missing the configured state file")
 
     return {
@@ -91,14 +108,15 @@ def validate_artifact(root: Path = ROOT) -> dict[str, Any]:
 
 
 def write_manifest(root: Path, output: Path) -> dict[str, Any]:
+    root = root.resolve()
     manifest = validate_artifact(root)
     output_path = output if output.is_absolute() else root / output
+    output_path = output_path.resolve()
     if output_path == root or root not in output_path.parents:
         raise ValueError("manifest output must stay inside the artifact root")
-    if output_path.parts[: len(root.parts) + 1] == (*root.parts, "data"):
-        raise ValueError("manifest must not be written inside data/")
-    if output_path.parts[: len(root.parts) + 1] == (*root.parts, "reports"):
-        raise ValueError("manifest must not be written inside reports/")
+    relative = output_path.relative_to(root)
+    if relative.parts[0] in ALLOWED_ROOTS:
+        raise ValueError("manifest must stay outside data/ and reports/")
     atomic_json(output_path, manifest)
     return manifest
 
@@ -113,7 +131,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
     try:
-        manifest = write_manifest(args.root.resolve(), args.output)
+        manifest = write_manifest(args.root, args.output)
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(str(exc))
         return 1

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import stat
 from pathlib import Path
@@ -22,16 +23,25 @@ try:
         configured_paths,
     )
 except ImportError:
-    from collection_artifact_contract import (
-        ALLOWED_ROOTS,
-        FILE_FIELDS,
-        HEX_64,
-        MANIFEST_FIELDS,
-        MANIFEST_SCHEMA,
-        RUN_STATUSES,
-        artifact_path_allowed,
-        configured_paths,
+    contract_path = Path(__file__).resolve().with_name(
+        "collection_artifact_contract.py"
     )
+    spec = importlib.util.spec_from_file_location(
+        "_war_reporter_collection_artifact_contract",
+        contract_path,
+    )
+    if spec is None or spec.loader is None:
+        raise ImportError("cannot load collection artifact contract")
+    contract = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(contract)
+    ALLOWED_ROOTS = contract.ALLOWED_ROOTS
+    FILE_FIELDS = contract.FILE_FIELDS
+    HEX_64 = contract.HEX_64
+    MANIFEST_FIELDS = contract.MANIFEST_FIELDS
+    MANIFEST_SCHEMA = contract.MANIFEST_SCHEMA
+    RUN_STATUSES = contract.RUN_STATUSES
+    artifact_path_allowed = contract.artifact_path_allowed
+    configured_paths = contract.configured_paths
 
 
 def _sha256(path: Path) -> str:

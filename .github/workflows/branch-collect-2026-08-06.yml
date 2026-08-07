@@ -1,5 +1,5 @@
 name: One-off full branch collection 2026-08-06
-# rerun: isolated-verifier-v3
+# rerun: supported-post-rebase-validator-v4
 on:
   push:
     branches:
@@ -102,5 +102,5 @@ jobs:
           git commit -m "data: collect all sources for 2026-08-06"
           auth_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
           git -c http.extraheader="$auth_header" pull --rebase origin "${GITHUB_REF_NAME}"
-          python -I scripts/validate.py
+          python -m scripts.validate
           git -c http.extraheader="$auth_header" push origin "HEAD:${GITHUB_REF_NAME}"

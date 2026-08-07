@@ -89,7 +89,7 @@ jobs:
           auth_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
           for attempt in 1 2 3; do
             if git -c http.extraheader="$auth_header" pull --rebase origin "${GITHUB_REF_NAME}"; then
-              if python -I scripts/validate.py \
+              if python -m scripts.validate \
                 && git -c http.extraheader="$auth_header" push origin "HEAD:${GITHUB_REF_NAME}"; then
                 exit 0
               fi

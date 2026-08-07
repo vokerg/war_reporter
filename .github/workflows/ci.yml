@@ -24,6 +24,12 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - run: python -m scripts.build_report 2026-08-05
       - run: python -m scripts.build_site
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site-preview-${{ github.sha }}
+          path: site
+          if-no-files-found: error
+          retention-days: 7
   source-smoke:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -79,6 +85,7 @@ jobs:
             data/state.json
             data/errors
           if-no-files-found: warn
+          retention-days: 7
       - name: Require collector success
         if: steps.collect.outcome != 'success'
         run: exit 1

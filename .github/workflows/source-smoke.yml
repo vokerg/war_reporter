@@ -5,7 +5,7 @@ on:
       sources:
         description: Comma-separated non-X source ids
         required: false
-        default: "ua-general-staff-tg,bellingcat-rss,ua-president-web"
+        default: "ua-general-staff-tg,bellingcat-rss,cit-web"
       include_x:
         description: Also test X account and recent-search adapters
         required: false
@@ -40,7 +40,7 @@ jobs:
         run: |
           sources="$SMOKE_SOURCES"
           if [ -z "$sources" ]; then
-            sources="ua-general-staff-tg,bellingcat-rss,ua-president-web"
+            sources="ua-general-staff-tg,bellingcat-rss,cit-web"
           fi
           python -m scripts.collect \
             --force \
@@ -63,7 +63,7 @@ jobs:
           } or {
               "ua-general-staff-tg",
               "bellingcat-rss",
-              "ua-president-web",
+              "cit-web",
           }
           state = json.loads(Path("data/state.json").read_text(encoding="utf-8"))
           failures = []

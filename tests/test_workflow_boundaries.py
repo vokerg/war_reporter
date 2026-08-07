@@ -33,7 +33,7 @@ class WorkflowBoundaryTests(unittest.TestCase):
         self.assertNotIn("pip install", deploy_block)
         self.assertNotIn("actions/checkout", deploy_block)
 
-    def test_x_secret_is_isolated_from_non_x_smoke(self) -> None:
+    def test_x_secret_is_isolated_from_non_x_manual_smoke(self) -> None:
         text = (WORKFLOWS / "source-smoke.yml").read_text()
         non_x_block, x_block = text.split("\n  x:\n", 1)
         self.assertNotIn("X_BEARER_TOKEN", non_x_block)
@@ -43,6 +43,26 @@ class WorkflowBoundaryTests(unittest.TestCase):
         self.assertIn("x-discovery-1", x_block)
         self.assertIn("name: non-x-source-smoke", non_x_block)
         self.assertIn("name: x-source-smoke", x_block)
+
+    def test_pr_x_smoke_scopes_secret_to_collection_step(self) -> None:
+        text = (WORKFLOWS / "ci.yml").read_text()
+        before_x, x_block = text.split("\n  x-source-smoke:\n", 1)
+        self.assertNotIn("X_BEARER_TOKEN", before_x)
+        self.assertEqual(
+            x_block.count(
+                "X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}"
+            ),
+            1,
+        )
+        self.assertIn(
+            "github.event.pull_request.head.repo.full_name == github.repository",
+            x_block,
+        )
+        self.assertIn("x_max_pages", x_block)
+        self.assertIn("ua-general-staff-x,x-discovery-1", x_block)
+        self.assertIn("name: x-source-smoke", x_block)
+        self.assertNotIn("contents: write", x_block)
+        self.assertNotIn("data/raw", x_block)
 
 
 if __name__ == "__main__":

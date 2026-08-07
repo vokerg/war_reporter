@@ -51,36 +51,9 @@
     "(Russia OR Россия) (Kursk OR Курск OR Belgorod OR Белгород OR Crimea OR Крым) (drone OR БПЛА OR explosion OR взрыв OR attack OR атака) -is:retweet"
   ],
   "collection_delay_hours": 0,
-  "collection_delay_by_group": {
-    "official-ua": 24,
-    "official-ru": 24,
-    "ru-milbloggers": 72,
-    "x-discovery": 72
-  },
-  "collection_delay_by_tag": {
-    "frontline": 72,
-    "operations": 72,
-    "operational-position": 72,
-    "precise-location": 72,
-    "map": 72,
-    "maps": 72,
-    "deep-strikes": 72,
-    "strikes": 24
-  },
-  "collection_delay_by_source": {
-    "deepstate-map": 72,
-    "liveuamap-web": 72,
-    "warspotting-web": 72,
-    "geoconfirmed-x": 72,
-    "black-bird-x": 72,
-    "frontelligence-x": 72,
-    "defmon-x": 72,
-    "andrew-perpetua-x": 72,
-    "tatarigami-x": 72,
-    "special-kherson-cat-x": 72,
-    "brady-africk-x": 72,
-    "pasi-paroinen-x": 72
-  },
+  "collection_delay_by_group": {},
+  "collection_delay_by_tag": {},
+  "collection_delay_by_source": {},
   "web_max_links": 12,
   "public_excerpt_chars": 1200,
   "public_media_limit": 8,

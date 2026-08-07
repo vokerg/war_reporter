@@ -43,7 +43,7 @@ class CollectionWorkflowGateTests(unittest.TestCase):
         workflow = self.workflow
         persist = workflow.index("  persist:")
         pull = workflow.index("pull --rebase", persist)
-        validate = workflow.index("python -I scripts/validate.py", pull)
+        validate = workflow.index("python -m scripts.validate", pull)
         push = workflow.index("push origin", validate)
         self.assertLess(pull, validate)
         self.assertLess(validate, push)

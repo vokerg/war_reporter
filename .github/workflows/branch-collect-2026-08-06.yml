@@ -1,5 +1,5 @@
 name: One-off full branch collection 2026-08-06
-# rerun: supported-post-rebase-validator-v4
+# rerun: no-delay-72h-v1
 on:
   push:
     branches:
@@ -40,7 +40,7 @@ jobs:
         run: >-
           python -m scripts.collect
           --force
-          --lookback-hours 36
+          --lookback-hours 72
           --workers 32
       - name: Build 2026-08-06 daily snapshot
         if: always()

@@ -19,8 +19,8 @@ _DMS = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 _MGRS = re.compile(
-    r"\b(?:[1-5]?\d|60)[C-HJ-NP-X][A-HJ-NP-Z]{2}"
-    r"\s*\d{4,10}\b",
+    r"\b(?:[1-5]?\d|60)[C-HJ-NP-X]\s*[A-HJ-NP-Z]{2}"
+    r"(?:\s*\d{2,5}){2}\b",
     re.IGNORECASE,
 )
 _COORDINATE_WORD = re.compile(

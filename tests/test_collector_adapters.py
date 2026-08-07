@@ -44,10 +44,13 @@ class WebAdapterIntegrationTests(unittest.TestCase):
             "request_timeout_seconds": 5,
             "web_max_links": 2,
         }
-        with patch(
-            "scripts.collector_adapters.safe_get",
-            return_value=FakeResponse(),
-        ):
+
+        def fake_get(*_args, **_kwargs):
+            return FakeResponse()
+
+        # Patch the function's actual global namespace. This remains stable even
+        # when the adapter is re-exported through the public collector facade.
+        with patch.dict(collect_web.__globals__, {"safe_get": fake_get}):
             rows = collect_web(
                 source,
                 settings,

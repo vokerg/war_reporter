@@ -15,7 +15,7 @@ Use these entrypoints:
 - `python -m scripts.continuous_loop` for service mode;
 - `python -m scripts.validate`, `python -m scripts.build_report` and `python -m scripts.build_site` for explicit validation/rendering.
 
-Do not call `scripts.collector_runtime.run_collection()` as an operational shortcut and do not write collector records with `append_unique()` directly. The runtime now enforces the same archive boundary, but the facade is the supported CLI/API compatibility surface and is where test patch points live.
+Do not call `scripts.collector_runtime.run_collection()` as an operational shortcut and do not write collector records with `append_unique()` directly. The runtime enforces the same archive boundary, but the facade is the supported CLI/API compatibility surface and is where test patch points live.
 
 ## Public-repository invariant
 
@@ -24,7 +24,7 @@ Do not call `scripts.collector_runtime.run_collection()` as an operational short
 Every stored record uses one of two policies:
 
 - `public_excerpt_v1`: bounded text/media, provenance and a content fingerprint;
-- `public_redacted_v1`: no title, text, HTML, media, content lengths or content fingerprint; only minimal provenance/platform identifiers.
+- `public_redacted_v1`: no title, author, text, HTML, media, content lengths or content fingerprint; only minimal content-neutral provenance/platform identifiers.
 
 The final hardening boundary is `scripts.public_archive.harden_public_projection()`, called inside collector runtime persistence. Do not add a second persistence path around it.
 
@@ -33,7 +33,7 @@ The final hardening boundary is `scripts.public_archive.harden_public_projection
 1. work on a dedicated branch;
 2. run `python -m scripts.validate`;
 3. run a targeted source smoke first, for example:
-   `python -m scripts.collect --force --lookback-hours 168 --sources ua-general-staff-tg,bellingcat-rss,ua-president-web`;
+   `python -m scripts.collect --force --lookback-hours 168 --sources ua-general-staff-tg,bellingcat-rss,cit-web`;
 4. inspect `data/state.json`, `data/errors/`, generated `site/status.json` and `site/status/index.html`;
 5. run `python -m scripts.continuous_loop --once` only after the targeted smoke is understood;
 6. inspect the generated digest, source pages, status page and outbound links;
@@ -44,7 +44,17 @@ Only `ok` or `idle` is clean. `partial`, `blocked`, `failed`, stale status, a no
 
 ## X evidence
 
-Non-X smoke jobs must not receive `X_BEARER_TOKEN`. X coverage is tested only in the opt-in X smoke job and must cover both a watched account (`ua-general-staff-x`) and recent search (`x-discovery-1`). Without inspected X smoke evidence, describe X as configured but unproven, or explicitly disable it.
+Non-X jobs must never receive `X_BEARER_TOKEN`. Same-repository pull requests use a separate X job that checks both a watched account (`ua-general-staff-x`) and recent search (`x-discovery-1`), with the secret scoped only to the collection step and pagination bounded for smoke use.
+
+While X sources/search queries remain enabled, a missing secret is a red configuration blocker, not a green skip. Without inspected account and search evidence, describe X as configured but unproven, or explicitly disable X and remove its working-coverage claim.
+
+The manual `Source smoke test` workflow is a post-merge/default-branch rerun surface; do not rely on a branch-only `workflow_dispatch` file as pre-merge evidence.
+
+## Artifact and deployment evidence
+
+A ZIP site preview proves the generated static payload, not the deployed GitHub Pages service. Record preview digest/link checks separately from the production deployment commit, project-subpath behavior and environment status.
+
+Scheduled collection output may reach the write-capable persistence job only through the strict collection-artifact manifest/path/hash gate. Do not upload arbitrary files under `data/` or `reports/`, bypass the verifier, or push output that was not revalidated after rebase.
 
 ## Continuous mode
 
@@ -80,6 +90,6 @@ A collector/publication change is done only when:
 - public output matches `schemas/raw-item.schema.json` and, when applicable, `schemas/public-status.schema.json`;
 - no full HTML/raw payload, content-derived redaction side channel, credential or unsafe error detail reaches public output;
 - one representative Telegram/RSS/web smoke run has been inspected;
-- X account/search smoke has been inspected whenever X coverage is claimed;
-- documentation, `data/state.json`, `status.json` and the deployed UI agree;
-- the PR remains draft until the above evidence is recorded.
+- X account/search smoke has been inspected whenever X remains enabled or working X coverage is claimed;
+- documentation, `data/state.json`, `status.json`, preview artifacts and the deployed UI are described without conflating them;
+- the PR remains draft until required evidence and external configuration decisions are recorded.

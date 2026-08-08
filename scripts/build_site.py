@@ -76,6 +76,7 @@ def page(
 ) -> str:
     nav = (
         f"<a href='{prefix}index.html'>Отчёты</a>"
+        f"<a href='{prefix}summaries/index.html'>Сводки</a>"
         f"<a href='{prefix}raw/index.html'>Сырые материалы</a>"
         f"<a href='{prefix}maps/index.html'>Карты из источников</a>"
         f"<a href='{prefix}status/index.html'>Статус сбора</a>"
@@ -270,6 +271,15 @@ def read_day_items(raw_root: Path, day: str) -> list[dict[str, Any]]:
     return items
 
 
+def render_markdown(path: Path) -> str:
+    rendered = markdown.markdown(
+        path.read_text(encoding="utf-8"),
+        extensions=["tables", "sane_lists"],
+        output_format="html5",
+    )
+    return sanitize_report_html(rendered)
+
+
 def build_site(root: Path) -> Path:
     settings = load_json(root / "config/settings.json")
     if not isinstance(settings, dict):
@@ -294,10 +304,36 @@ def build_site(root: Path) -> Path:
         if report_root.exists()
         else []
     )
-    links = "".join(
-        f"<li><a href='reports/{path.stem}.html'>{path.stem}</a></li>"
-        for path in reports
+    summary_root = root / "reports/summary"
+    summaries = (
+        sorted(summary_root.glob("*.md"), reverse=True)
+        if summary_root.exists()
+        else []
     )
+    reports_by_day = {path.stem: path for path in reports}
+    summaries_by_day = {path.stem: path for path in summaries}
+    report_days = sorted(
+        set(reports_by_day) | set(summaries_by_day),
+        reverse=True,
+    )
+
+    links: list[str] = []
+    for day in report_days:
+        day_links: list[str] = []
+        if day in summaries_by_day:
+            day_links.append(
+                f"<a href='summaries/{day}.html'>Сводка</a>"
+            )
+        if day in reports_by_day:
+            day_links.append(
+                f"<a href='reports/{day}.html'>Дайджест источников</a>"
+            )
+        links.append(
+            f"<li><strong>{html.escape(day)}</strong> · "
+            + " · ".join(day_links)
+            + "</li>"
+        )
+
     run_status = str(public_status["run"]["status"])
     stale = bool(public_status["freshness"]["stale"])
     status_class = html.escape(run_status, quote=True)
@@ -307,10 +343,14 @@ def build_site(root: Path) -> Path:
         f"состояние устарело: {'да' if stale else 'нет'}. "
         "<a href='status/index.html'>Подробности</a></p>"
     )
+    reports_body = (
+        "<h2>Дневные отчёты</h2>"
+        + (f"<ul>{''.join(links)}</ul>" if links else "<p>Отчётов пока нет.</p>")
+    )
     (site / "index.html").write_text(
         page(
             "War Reporter",
-            status_summary + f"<ul>{links}</ul>",
+            status_summary + reports_body,
             prefix="",
         ),
         encoding="utf-8",
@@ -319,16 +359,46 @@ def build_site(root: Path) -> Path:
     report_site = site / "reports"
     report_site.mkdir(exist_ok=True)
     for path in reports:
-        text = path.read_text(encoding="utf-8")
-        rendered = markdown.markdown(
-            text,
-            extensions=["tables", "sane_lists"],
-            output_format="html5",
-        )
-        rendered = sanitize_report_html(rendered)
-        body = f"<main class='report'>{rendered}</main>"
+        summary_link = ""
+        if path.stem in summaries_by_day:
+            summary_link = (
+                f"<p><a href='../summaries/{path.stem}.html'>"
+                "Читать сводку дня</a></p>"
+            )
+        body = summary_link + f"<main class='report'>{render_markdown(path)}</main>"
         (report_site / f"{path.stem}.html").write_text(
             page(path.stem, body, prefix="../"),
+            encoding="utf-8",
+        )
+
+    summary_site = site / "summaries"
+    summary_site.mkdir(exist_ok=True)
+    summary_links = "".join(
+        f"<li><a href='{path.stem}.html'>{path.stem}</a></li>"
+        for path in summaries
+    )
+    (summary_site / "index.html").write_text(
+        page(
+            "Сводки",
+            (
+                "<p>Редакционные сводки, подготовленные ChatGPT-агентом "
+                "по полному дневному дайджесту источников.</p>"
+                + (f"<ul>{summary_links}</ul>" if summary_links else "<p>Сводок пока нет.</p>")
+            ),
+            prefix="../",
+        ),
+        encoding="utf-8",
+    )
+    for path in summaries:
+        digest_link = ""
+        if path.stem in reports_by_day:
+            digest_link = (
+                f"<p><a href='../reports/{path.stem}.html'>"
+                "Открыть полный дайджест источников</a></p>"
+            )
+        body = digest_link + f"<main class='report'>{render_markdown(path)}</main>"
+        (summary_site / f"{path.stem}.html").write_text(
+            page(f"Сводка — {path.stem}", body, prefix="../"),
             encoding="utf-8",
         )
 

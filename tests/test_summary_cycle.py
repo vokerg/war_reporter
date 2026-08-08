@@ -100,6 +100,21 @@ class SummaryCycleTests(unittest.TestCase):
         self.assertIn("A chat collection cycle is complete only after", agents)
         self.assertIn("does not invoke ChatGPT", agents)
 
+    def test_operator_contract_supports_historical_summary_without_collection(self) -> None:
+        operator = (ROOT / "docs/chat-operator.md").read_text(encoding="utf-8")
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+
+        self.assertIn("собери 6 августа", operator)
+        self.assertIn("сводка за 2026-08-06", operator)
+        self.assertIn("Historical summary flow", operator)
+        self.assertIn("must **not** post `/collect yesterday`", operator)
+        self.assertIn("If `reports/daily/YYYY-MM-DD.md` does not exist", operator)
+        self.assertIn("no new collection was run", operator)
+
+        self.assertIn("historical summary request", agents)
+        self.assertIn("Do not post `/collect yesterday`", agents)
+        self.assertIn("If the daily digest is absent", agents)
+
 
 if __name__ == "__main__":
     unittest.main()

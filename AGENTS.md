@@ -10,9 +10,11 @@ Before operating or changing the system, read `README.md`, `SAFETY.md`, `METHODO
 
 The user-facing command `собери вчера` is an operator request, not a request to invent a new collector. Follow `docs/chat-operator.md`: add the exact comment `/collect yesterday` to permanent control issue `#155`, observe the resulting production `Collect OSINT` run, artifact verification, `persist` and updated `main` state, then read the complete generated daily report in the ChatGPT context, synthesize it and write `reports/summary/YYYY-MM-DD.md` to `main`.
 
+A request naming a concrete calendar date, such as `собери 6 августа`, `сводка за 2026-08-06` or `суммаризируй 6 августа 2026`, is a **historical summary request**, not a collection request. Resolve the date in `Europe/Kyiv`; if the year is omitted, use the most recent occurrence that is not in the future. Read the existing `reports/daily/YYYY-MM-DD.md` from `main` and create or replace only the corresponding `reports/summary/YYYY-MM-DD.md`. Do not post `/collect yesterday`, dispatch collection, change state or synthesize historical collection semantics. If the daily digest is absent, report that and stop without collection.
+
 The summary step is performed by the ChatGPT operator itself. Do not add an OpenAI API client, API key, model runtime, agent loop, shards, intermediate JSON, embeddings or a second persistence system to implement it. The operator may write only the corresponding `reports/summary/YYYY-MM-DD.md`; collection data, state and `reports/daily/` remain owned by the existing collector/persist path.
 
-A chat collection cycle is complete only after the collector result is persisted and the corresponding summary is committed. If summary generation or the summary write fails, report the persisted collection result and explicitly say that the operator cycle is incomplete; do not rerun collection just to retry synthesis.
+A chat collection cycle is complete only after the collector result is persisted and the corresponding summary is committed. A historical summary request is complete after the requested existing daily digest has been synthesized and its summary committed. If summary generation or the summary write fails after collection, report the persisted collection result and explicitly say that the operator cycle is incomplete; do not rerun collection just to retry synthesis.
 
 `статус сбора` is read-only: inspect the latest production `Collect OSINT` run and `data/state.json`; do not start a new collection or rewrite a summary merely to answer status.
 
@@ -109,4 +111,6 @@ A collector/publication change is done only when:
 - documentation, `data/state.json`, `status.json`, preview artifacts and the deployed UI are described without conflating them;
 - the PR remains draft until required evidence and external configuration decisions are recorded.
 
-For the ChatGPT operator path, end-to-end success additionally means the persisted daily digest was read, the corresponding `reports/summary/YYYY-MM-DD.md` was committed, and the user received the summary link plus the source-digest link. Pages deployment status is reported separately so a deployment problem cannot erase an otherwise valid persisted summary.
+For the `собери вчера` ChatGPT operator path, end-to-end success additionally means the persisted daily digest was read, the corresponding `reports/summary/YYYY-MM-DD.md` was committed, and the user received the summary link plus the source-digest link. Pages deployment status is reported separately so a deployment problem cannot erase an otherwise valid persisted summary.
+
+For a historical summary request, success means the requested existing daily digest was read, only the corresponding summary was created or refreshed, no collection was dispatched, and the user received both links plus an explicit note that no new collection ran.

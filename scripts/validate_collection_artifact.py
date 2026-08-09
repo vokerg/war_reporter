@@ -15,6 +15,7 @@ try:
         ALLOWED_ROOTS,
         MANIFEST_SCHEMA,
         artifact_path_allowed,
+        artifact_path_ignored,
         configured_paths,
     )
     from .common import ROOT, atomic_json, load_json
@@ -24,6 +25,7 @@ except ImportError:
         ALLOWED_ROOTS,
         MANIFEST_SCHEMA,
         artifact_path_allowed,
+        artifact_path_ignored,
         configured_paths,
     )
     from common import ROOT, atomic_json, load_json
@@ -59,6 +61,8 @@ def artifact_files(root: Path, settings: dict[str, Any]) -> list[Path]:
                 continue
             if not stat.S_ISREG(mode):
                 raise ValueError(f"artifact contains special file: {relative}")
+            if artifact_path_ignored(relative):
+                continue
             if not artifact_path_allowed(relative, settings):
                 raise ValueError(f"unexpected artifact file: {relative}")
             files.append(path)

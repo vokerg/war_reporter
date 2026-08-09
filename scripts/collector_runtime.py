@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from .collector_common import *  # noqa: F401,F403
 from .collector_adapters import *  # noqa: F401,F403
-from .common import atomic_text
+from .common import atomic_text, read_ndjson
 from .public_archive import harden_public_projection
 from .sensitivity import classify_item
 
@@ -215,6 +215,23 @@ def _previous_successful_run(state: dict[str, Any]) -> str | None:
     return iso(stamp) if stamp is not None else None
 
 
+def archive_item_ids(raw_root: Path) -> set[str]:
+    """Load the archive-wide ID set so a publication has one first-seen shard."""
+    seen: dict[str, Path] = {}
+    for path in sorted(raw_root.glob("*/*/*/items.ndjson")):
+        for row in read_ndjson([path]):
+            item_id = str(row.get("id", ""))
+            if not item_id:
+                raise ValueError(f"{path}: existing item id must not be empty")
+            previous = seen.get(item_id)
+            if previous is not None:
+                raise ValueError(
+                    f"duplicate existing item id {item_id}: {previous} and {path}"
+                )
+            seen[item_id] = path
+    return set(seen)
+
+
 def run_collection(
     root: Path = ROOT,
     *,
@@ -321,6 +338,7 @@ def run_collection(
         due.append(source)
 
     raw_root = root / settings["raw_root"]
+    seen_archive_ids = archive_item_ids(raw_root)
     errors: list[dict[str, Any]] = []
     total_added = 0
     total_withheld_recent = 0
@@ -366,7 +384,18 @@ def run_collection(
                     )
                     grouped.setdefault(path, []).append(item)
                 for path, grouped_rows in grouped.items():
-                    added += append_unique(path, grouped_rows)
+                    new_rows: list[dict[str, Any]] = []
+                    new_ids: set[str] = set()
+                    for row in grouped_rows:
+                        item_id = str(row.get("id", ""))
+                        if not item_id:
+                            raise ValueError("new item id must not be empty")
+                        if item_id in seen_archive_ids or item_id in new_ids:
+                            continue
+                        new_rows.append(row)
+                        new_ids.add(item_id)
+                    added += append_unique(path, new_rows)
+                    seen_archive_ids.update(new_ids)
                 total_added += added
                 succeeded += 1
                 per_source[source_id] = {

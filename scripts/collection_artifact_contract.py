@@ -9,6 +9,7 @@ from typing import Any
 
 MANIFEST_SCHEMA = "war-reporter-collection-artifact-v1"
 ALLOWED_ROOTS = {"data", "reports"}
+NON_ARTIFACT_PREFIXES = {"reports/summary"}
 MANIFEST_FIELDS = {
     "schema",
     "state_status",
@@ -48,6 +49,18 @@ def configured_paths(settings: dict[str, Any]) -> dict[str, str]:
                 f"collection artifact v1 requires {key}={expected}"
             )
     return values
+
+
+def artifact_path_ignored(relative: str) -> bool:
+    """Return true for repository-owned files outside collector ownership."""
+    try:
+        path = safe_relative_path(relative)
+    except ValueError:
+        return False
+    return any(
+        path == prefix or path.startswith(prefix + "/")
+        for prefix in NON_ARTIFACT_PREFIXES
+    )
 
 
 def artifact_path_allowed(relative: str, settings: dict[str, Any]) -> bool:

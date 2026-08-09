@@ -63,6 +63,13 @@ class CollectionArtifactVerifierTests(unittest.TestCase):
         value = verify_artifact(root, manifest)
         self.assertEqual(value["state_status"], "partial")
 
+    def test_operator_summary_is_ignored(self) -> None:
+        root, manifest = self.make_root()
+        (root / "reports/summary").mkdir()
+        (root / "reports/summary/2026-08-05.md").write_text("# summary\n")
+        value = verify_artifact(root, manifest)
+        self.assertEqual(value["file_count"], 2)
+
     def test_modified_file_fails(self) -> None:
         root, manifest = self.make_root()
         (root / "reports/daily/2026-08-06.md").write_text("changed")

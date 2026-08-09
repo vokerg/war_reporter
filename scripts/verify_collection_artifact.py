@@ -20,6 +20,7 @@ try:
         MANIFEST_SCHEMA,
         RUN_STATUSES,
         artifact_path_allowed,
+        artifact_path_ignored,
         configured_paths,
     )
 except ImportError:
@@ -41,6 +42,7 @@ except ImportError:
     MANIFEST_SCHEMA = contract.MANIFEST_SCHEMA
     RUN_STATUSES = contract.RUN_STATUSES
     artifact_path_allowed = contract.artifact_path_allowed
+    artifact_path_ignored = contract.artifact_path_ignored
     configured_paths = contract.configured_paths
 
 
@@ -85,6 +87,8 @@ def _artifact_paths(
                 continue
             if not stat.S_ISREG(mode):
                 raise ValueError(f"artifact contains special file: {relative}")
+            if artifact_path_ignored(relative):
+                continue
             if not artifact_path_allowed(relative, settings):
                 raise ValueError(f"unexpected artifact file: {relative}")
             result[relative] = path

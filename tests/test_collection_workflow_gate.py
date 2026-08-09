@@ -28,6 +28,13 @@ class CollectionWorkflowGateTests(unittest.TestCase):
         )
         self.assertIn("collection-artifact-manifest.json", workflow)
 
+    def test_upload_and_persist_do_not_own_operator_summaries(self) -> None:
+        workflow = self.workflow
+        self.assertIn("            reports/daily\n", workflow)
+        self.assertNotIn("            reports\n", workflow)
+        self.assertIn("git add data reports/daily", workflow)
+        self.assertNotIn("git add data reports\n", workflow)
+
     def test_write_job_verifies_before_git_add(self) -> None:
         workflow = self.workflow
         persist = workflow.index("  persist:")
@@ -35,7 +42,7 @@ class CollectionWorkflowGateTests(unittest.TestCase):
             "python -I scripts/verify_collection_artifact.py",
             persist,
         )
-        git_add = workflow.index("git add data reports", persist)
+        git_add = workflow.index("git add data reports/daily", persist)
         self.assertLess(verify, git_add)
         self.assertNotIn("pip install", workflow[persist:])
 

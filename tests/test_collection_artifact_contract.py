@@ -7,6 +7,7 @@ from pathlib import Path
 
 from scripts.collection_artifact_contract import (
     artifact_path_allowed,
+    artifact_path_ignored,
     configured_paths,
 )
 from scripts.validate_collection_artifact import artifact_files
@@ -35,6 +36,7 @@ class CollectionArtifactContractTests(unittest.TestCase):
             "data/raw/2026/8/6/items.ndjson",
             "data/raw/2026/08/06/payload.json",
             "reports/daily/latest.md",
+            "reports/summary/2026-08-06.md",
             "reports/../secret.md",
         )
         for path in allowed:
@@ -43,6 +45,11 @@ class CollectionArtifactContractTests(unittest.TestCase):
         for path in denied:
             with self.subTest(path=path):
                 self.assertFalse(artifact_path_allowed(path, settings))
+
+    def test_operator_summaries_are_explicitly_outside_artifact(self) -> None:
+        self.assertTrue(artifact_path_ignored("reports/summary/2026-08-06.md"))
+        self.assertFalse(artifact_path_ignored("reports/daily/2026-08-06.md"))
+        self.assertFalse(artifact_path_ignored("data/debug-response.html"))
 
     def test_configured_roots_cannot_escape_public_payload_roots(self) -> None:
         cases = (
@@ -56,11 +63,16 @@ class CollectionArtifactContractTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     configured_paths(settings)
 
-    def test_packager_rejects_unexpected_regular_file(self) -> None:
+    def test_packager_ignores_operator_summary_but_rejects_other_files(self) -> None:
         root = Path(tempfile.mkdtemp())
         (root / "data").mkdir()
-        (root / "reports").mkdir()
+        (root / "reports/summary").mkdir(parents=True)
         (root / "data/state.json").write_text("{}")
+        summary = root / "reports/summary/2026-08-06.md"
+        summary.write_text("# operator summary\n")
+        files = artifact_files(root, self.settings())
+        self.assertEqual(files, [root / "data/state.json"])
+
         (root / "data/debug-response.html").write_text("secret")
         with self.assertRaisesRegex(ValueError, "unexpected artifact file"):
             artifact_files(root, self.settings())

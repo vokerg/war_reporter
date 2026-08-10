@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKFLOWS = ROOT / ".github/workflows"
 CHAT_CONTROL = WORKFLOWS / "chat-control.yml"
 COLLECT = WORKFLOWS / "collect.yml"
+REPORTS = WORKFLOWS / "reports.yml"
 AGENTS = ROOT / "AGENTS.md"
 
 
@@ -32,11 +33,12 @@ class ChatControlWorkflowTests(unittest.TestCase):
             "github.event.comment.author_association == 'OWNER'", self.text
         )
 
-    def test_only_exact_yesterday_command_is_allowlisted(self) -> None:
-        self.assertIn("jq -e", self.text)
+    def test_exact_allowlisted_commands_are_parsed(self) -> None:
         self.assertIn(".comment.body", self.text)
         self.assertIn('gsub("\\r\\n"; "\\n")', self.text)
-        self.assertIn('== "/collect yesterday"', self.text)
+        self.assertIn('[[ "$body" == "/collect yesterday" ]]', self.text)
+        self.assertIn("^/backfill\\ ", self.text)
+        self.assertIn("^/weekly\\ ", self.text)
         self.assertIn('echo "Ignoring unsupported command"', self.text)
         self.assertNotIn("command=", self.text)
         self.assertNotIn("$command", self.text)
@@ -49,15 +51,29 @@ class ChatControlWorkflowTests(unittest.TestCase):
         self.assertNotIn("source ", self.text)
         self.assertNotIn("exec ", self.text)
 
-    def test_dispatch_target_and_ref_are_fixed(self) -> None:
-        endpoint = (
+    def test_dispatch_targets_and_ref_are_fixed(self) -> None:
+        collect_endpoint = (
             "repos/vokerg/war_reporter/actions/workflows/collect.yml/dispatches"
         )
-        self.assertIn(endpoint, self.text)
-        self.assertEqual(self.text.count("actions/workflows/"), 1)
-        self.assertIn("-f ref=main", self.text)
+        reports_endpoint = (
+            "repos/vokerg/war_reporter/actions/workflows/reports.yml/dispatches"
+        )
+        self.assertIn(collect_endpoint, self.text)
+        self.assertIn(reports_endpoint, self.text)
+        self.assertEqual(self.text.count("actions/workflows/"), 2)
+        self.assertGreaterEqual(self.text.count("-f ref=main"), 2)
         self.assertNotIn("workflow=${", self.text)
         self.assertNotIn("ref=${", self.text)
+
+    def test_report_workflow_has_bounded_manual_inputs(self) -> None:
+        text = REPORTS.read_text(encoding="utf-8")
+        self.assertIn("workflow_dispatch:", text)
+        self.assertIn("- backfill", text)
+        self.assertIn("- weekly", text)
+        self.assertIn("description: \"Start date (YYYY-MM-DD)\"", text)
+        self.assertIn("description: \"End date (YYYY-MM-DD)\"", text)
+        self.assertIn("python -m scripts.validate", text)
+        self.assertIn("git add reports/daily reports/weekly", text)
 
     def test_untrusted_gate_has_no_write_token(self) -> None:
         gate_block, dispatch_block = self.text.split("\n  dispatch:\n", 1)

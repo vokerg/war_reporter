@@ -1,0 +1,79 @@
+name: Build reports
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Report mode"
+        required: true
+        type: choice
+        options:
+          - backfill
+          - weekly
+      start:
+        description: "Start date (YYYY-MM-DD)"
+        required: true
+        type: string
+      end:
+        description: "End date (YYYY-MM-DD)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: war-reporter-reports
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Validate input dates
+        env:
+          START: ${{ inputs.start }}
+          END: ${{ inputs.end }}
+        run: |
+          python - <<'PY'
+          import os
+          from datetime import date
+          start = date.fromisoformat(os.environ["START"])
+          end = date.fromisoformat(os.environ["END"])
+          if end < start:
+              raise SystemExit("end date precedes start date")
+          PY
+      - name: Build requested reports
+        env:
+          MODE: ${{ inputs.mode }}
+          START: ${{ inputs.start }}
+          END: ${{ inputs.end }}
+        run: python -m scripts.build_period_reports "$MODE" --from "$START" --to "$END"
+      - run: python -m scripts.validate
+      - name: Persist reports
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODE: ${{ inputs.mode }}
+          START: ${{ inputs.start }}
+          END: ${{ inputs.end }}
+        run: |
+          git config user.name "war-reporter-bot"
+          git config user.email "war-reporter-bot@users.noreply.github.com"
+          git add reports/daily reports/weekly
+          if git diff --cached --quiet; then
+            echo "No report changes"
+            exit 0
+          fi
+          git commit -m "reports: ${MODE} ${START}..${END}"
+          auth_header="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c http.extraheader="$auth_header" pull --rebase origin "${GITHUB_REF_NAME}"
+          python -m scripts.validate
+          git -c http.extraheader="$auth_header" push origin "HEAD:${GITHUB_REF_NAME}"

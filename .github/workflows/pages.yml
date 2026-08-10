@@ -13,6 +13,7 @@ on:
       - "scripts/common.py"
       - "scripts/build_report.py"
       - "scripts/build_site.py"
+      - "scripts/build_weekly_site.py"
       - "scripts/html_safety.py"
       - "scripts/public_status.py"
       - "SAFETY.md"
@@ -38,6 +39,7 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python -m scripts.validate
       - run: python -m scripts.build_site
+      - run: python -m scripts.build_weekly_site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

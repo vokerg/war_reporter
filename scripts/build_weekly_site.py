@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import html
 import re
+from datetime import date, timedelta
 from pathlib import Path
 
 try:
@@ -16,19 +17,48 @@ except ImportError:
     from common import ROOT, load_json
 
 
-SUMMARY_LINK_RE = re.compile(r"href=['\"]\.\./summary/(\d{4}-\d{2}-\d{2})\.md['\"]")
-DAILY_LINK_RE = re.compile(r"href=['\"]\.\./daily/(\d{4}-\d{2}-\d{2})\.md['\"]")
 SUMMARY_NAV_RE = re.compile(
     r"(<a href='([^']*)summaries/index\.html'>Сводки</a>)"
 )
 
 
-def render_weekly_markdown(path: Path) -> str:
-    """Render repository markdown and translate repository-relative report links."""
-    rendered = render_markdown(path)
-    rendered = SUMMARY_LINK_RE.sub(r"href='../summaries/\1.html'", rendered)
-    rendered = DAILY_LINK_RE.sub(r"href='../reports/\1.html'", rendered)
-    return rendered
+def period_days(path: Path) -> list[str]:
+    """Return a bounded inclusive day range encoded in a weekly filename."""
+    parts = path.stem.split("_")
+    if len(parts) != 2:
+        return []
+    try:
+        first = date.fromisoformat(parts[0])
+        last = date.fromisoformat(parts[1])
+    except ValueError:
+        return []
+    if last < first or (last - first).days > 31:
+        return []
+    days: list[str] = []
+    current = first
+    while current <= last:
+        days.append(current.isoformat())
+        current += timedelta(days=1)
+    return days
+
+
+def period_navigation_html(path: Path) -> str:
+    """Generate trusted links outside sanitized report Markdown."""
+    days = period_days(path)
+    if not days:
+        return ""
+    links = "".join(
+        "<li>"
+        f"{html.escape(day)} — "
+        f"<a href='../summaries/{html.escape(day, quote=True)}.html'>сводка</a> · "
+        f"<a href='../reports/{html.escape(day, quote=True)}.html'>источники</a>"
+        "</li>"
+        for day in days
+    )
+    return (
+        "<section class='card'><h2>Дни этой недели</h2>"
+        f"<ul>{links}</ul></section>"
+    )
 
 
 def weekly_index_body(reports: list[Path]) -> str:
@@ -100,7 +130,10 @@ def build_weekly_site(root: Path) -> Path:
     )
 
     for path in reports:
-        body = f"<main class='report'>{render_weekly_markdown(path)}</main>"
+        body = (
+            period_navigation_html(path)
+            + f"<main class='report'>{render_markdown(path)}</main>"
+        )
         (weekly_site / f"{path.stem}.html").write_text(
             page(
                 f"Недельная сводка — {path.stem.replace('_', ' — ')}",

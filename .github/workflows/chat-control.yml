@@ -16,19 +16,40 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       supported: ${{ steps.command.outputs.supported }}
+      workflow: ${{ steps.command.outputs.workflow }}
+      mode: ${{ steps.command.outputs.mode }}
+      start: ${{ steps.command.outputs.start }}
+      end: ${{ steps.command.outputs.end }}
     steps:
       - name: Parse exact command
         id: command
         shell: bash
         run: |
           set -euo pipefail
-          if jq -e '(.comment.body | gsub("\r\n"; "\n")) == "/collect yesterday"' \
-            "$GITHUB_EVENT_PATH" >/dev/null; then
+          body="$(jq -r '.comment.body | gsub("\r\n"; "\n")' "$GITHUB_EVENT_PATH")"
+          if [[ "$body" == "/collect yesterday" ]]; then
             echo "supported=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Ignoring unsupported command"
-            echo "supported=false" >> "$GITHUB_OUTPUT"
+            echo "workflow=collect.yml" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+          if [[ "$body" =~ ^/backfill\ ([0-9]{4}-[0-9]{2}-[0-9]{2})\.\.([0-9]{4}-[0-9]{2}-[0-9]{2})$ ]]; then
+            echo "supported=true" >> "$GITHUB_OUTPUT"
+            echo "workflow=reports.yml" >> "$GITHUB_OUTPUT"
+            echo "mode=backfill" >> "$GITHUB_OUTPUT"
+            echo "start=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+            echo "end=${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [[ "$body" =~ ^/weekly\ ([0-9]{4}-[0-9]{2}-[0-9]{2})\.\.([0-9]{4}-[0-9]{2}-[0-9]{2})$ ]]; then
+            echo "supported=true" >> "$GITHUB_OUTPUT"
+            echo "workflow=reports.yml" >> "$GITHUB_OUTPUT"
+            echo "mode=weekly" >> "$GITHUB_OUTPUT"
+            echo "start=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+            echo "end=${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "Ignoring unsupported command"
+          echo "supported=false" >> "$GITHUB_OUTPUT"
 
   dispatch:
     needs: gate
@@ -37,11 +58,24 @@ jobs:
     permissions:
       actions: write
     steps:
-      - name: Dispatch production collector
+      - name: Dispatch requested workflow
         env:
           GH_TOKEN: ${{ github.token }}
+          WORKFLOW: ${{ needs.gate.outputs.workflow }}
+          MODE: ${{ needs.gate.outputs.mode }}
+          START: ${{ needs.gate.outputs.start }}
+          END: ${{ needs.gate.outputs.end }}
         run: |
           set -euo pipefail
-          gh api --method POST \
-            repos/vokerg/war_reporter/actions/workflows/collect.yml/dispatches \
-            -f ref=main
+          if [[ "$WORKFLOW" == "collect.yml" ]]; then
+            gh api --method POST \
+              repos/vokerg/war_reporter/actions/workflows/collect.yml/dispatches \
+              -f ref=main
+          else
+            gh api --method POST \
+              repos/vokerg/war_reporter/actions/workflows/reports.yml/dispatches \
+              -f ref=main \
+              -f inputs[mode]="$MODE" \
+              -f inputs[start]="$START" \
+              -f inputs[end]="$END"
+          fi

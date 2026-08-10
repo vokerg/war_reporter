@@ -73,7 +73,9 @@ class ChatControlWorkflowTests(unittest.TestCase):
         self.assertIn("description: \"Start date (YYYY-MM-DD)\"", text)
         self.assertIn("description: \"End date (YYYY-MM-DD)\"", text)
         self.assertIn("python -m scripts.validate", text)
-        self.assertIn("git add reports/daily reports/weekly", text)
+        self.assertIn("git add reports/daily", text)
+        self.assertIn("if [[ -d reports/weekly ]]; then", text)
+        self.assertIn("git add reports/weekly", text)
 
     def test_untrusted_gate_has_no_write_token(self) -> None:
         gate_block, dispatch_block = self.text.split("\n  dispatch:\n", 1)

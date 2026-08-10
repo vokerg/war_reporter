@@ -67,7 +67,10 @@ jobs:
         run: |
           git config user.name "war-reporter-bot"
           git config user.email "war-reporter-bot@users.noreply.github.com"
-          git add reports/daily reports/weekly
+          git add reports/daily
+          if [[ -d reports/weekly ]]; then
+            git add reports/weekly
+          fi
           if git diff --cached --quiet; then
             echo "No report changes"
             exit 0

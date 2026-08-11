@@ -124,7 +124,7 @@ class SummaryContextRankingTests(unittest.TestCase):
 
         self.assertIn("Киев/область", context)
         self.assertIn("Публикаций в cluster: **3**", context)
-        self.assertIn("Кандидатных event clusters после coalescing: **1**", context)
+        self.assertIn("Situation clusters: **1**", context)
 
     def test_primary_list_limits_single_topic_domination(self) -> None:
         rows = []
@@ -181,7 +181,7 @@ class SummaryContextRankingTests(unittest.TestCase):
         primary = context.split("### Telegram pulse watchlist", 1)[0]
 
         self.assertIn("Фронт — Покровск", primary)
-        self.assertLessEqual(primary.count("####") , 8)
+        self.assertLessEqual(primary.count("####"), 8)
         self.assertLessEqual(primary.count("Дальние и воздушные удары —"), 4)
 
 

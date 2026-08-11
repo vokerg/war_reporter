@@ -35,13 +35,18 @@ def row(
 
 
 class SummaryContextEditorialGuardTests(unittest.TestCase):
-    def test_biographical_old_death_is_not_current_donetsk_casualty(self) -> None:
+    def test_biographical_old_death_with_historical_strike_is_not_current_casualty(self) -> None:
         memorial = row(
             "bio",
             "Donetsk Oblast Administration",
             "official-ua",
             "ukrainian",
-            "Старший солдат Олександр поліг 14 травня 2022 року в Маріуполі. Захиснику назавжди 35 років. Олександр народився у Маріуполі та навчався у коледжі.",
+            (
+                "Старший солдат Олександр поліг 14 травня 2022 року в Маріуполі. "
+                "Тоді російська авіація завдала удару по позиціях захисників. "
+                "Захиснику назавжди 35 років. Олександр народився у Маріуполі "
+                "та навчався у коледжі."
+            ),
             trust="primary",
         )
         context = render_summary_context("2026-08-05", [memorial], {})

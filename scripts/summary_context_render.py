@@ -86,6 +86,13 @@ MATERIAL_EFFECT_RE = re.compile(
     r"\bпожеж\w*|\bпожар\w*",
     re.IGNORECASE,
 )
+MEMORIAL_RE = re.compile(
+    r"\bпам.?ят\w*|\bпамяти\b|\bмемориал\w*|\bвшанув\w*|\bпочтил\w*|"
+    r"\bназавжди\b|\bгодовщин\w*|\bрічниц\w*|"
+    r"(?:поліг|загинув|погиб)\b.{0,80}\b20\d{2}\b|"
+    r"\bнародився\b.{0,160}\b(?:навчався|служив|здобув)\b",
+    re.IGNORECASE,
+)
 CURRENT_WAR_CONTEXT_RE = re.compile(
     r"\bukrain\w*|\bукраїн\w*|\bукраин\w*|\bвсу\b|\bзсу\b|\bсво\b|"
     r"\boccupation\w*|\boccupied\b|\bокупован\w*|\bоккупирован\w*",
@@ -210,18 +217,21 @@ def _strict_candidate(
     text = item.text
     current_context = bool(CURRENT_WAR_CONTEXT_RE.search(text))
     contextualized = bool(locations) or current_context or item.group == "official-ua"
+    memorial = bool(MEMORIAL_RE.search(text))
 
     if topic == "civilian-harm":
+        if memorial and not STRICT_STRIKE_RE.search(text):
+            return False
         if not CASUALTY_RE.search(text) or not contextualized:
             return False
-        # Historical commemorations and unrelated deaths should not become war
-        # casualties merely because the text contains "Russian" and "killed".
         return bool(locations) or current_context or bool(STRICT_STRIKE_RE.search(text))
     if topic == "strikes":
         return contextualized and bool(STRICT_STRIKE_RE.search(text))
     if topic == "air-defence":
         return contextualized and bool(STRICT_AIRDEF_RE.search(text))
     if topic == "frontline":
+        if memorial:
+            return False
         return contextualized and bool(STRICT_FRONTLINE_RE.search(text))
     if topic == "energy":
         return contextualized and bool(STRICT_INFRA_RE.search(text))
@@ -273,9 +283,9 @@ def _build_situation_clusters(
     The lower-level normalizer is intentionally permissive for recall. This
     production pass applies a second, word-boundary-aware relevance gate and
     groups by editorial topic plus explicit geography. Multi-location roundups
-    cannot bridge single-location streams. Operational items with no explicit
-    location are isolated by source family unless they have a stable semantic
-    signature; this avoids one giant unlocated bucket.
+    cannot bridge single-location streams. Unlocated operational publications
+    are isolated by source family to prevent unrelated stories from collapsing
+    into one national bucket.
     """
     prepared = [prepare_item(item) for item in items]
     relevance_counts = Counter(row.relevance for row in prepared)
@@ -291,8 +301,8 @@ def _build_situation_clusters(
             continue
         relevance_counts["accepted"] += 1
         semantic = _semantic_signature(item, topic)
-        if not locations and not semantic and topic not in {"support", "investigations"}:
-            semantic = (f"source:{item.source_family}",)
+        if not locations and topic not in {"support", "investigations"}:
+            semantic = semantic + (f"source:{item.source_family}",)
         key = (topic, locations, semantic)
         cluster = buckets.get(key)
         if cluster is None:
@@ -341,6 +351,12 @@ def _is_weak_unlocated(cluster: EventCluster) -> bool:
     return _unique_source_families(cluster) < 2
 
 
+def _insufficient_primary_evidence(cluster: EventCluster) -> bool:
+    if cluster.topic not in {"frontline", "air-defence"}:
+        return False
+    return evidence_score(cluster)[0] < 3.0
+
+
 def _effective_editorial_rank(cluster: EventCluster, temporal: Any) -> float:
     importance = importance_score(cluster)
     evidence = evidence_score(cluster)[0]
@@ -362,6 +378,8 @@ def _effective_editorial_rank(cluster: EventCluster, temporal: Any) -> float:
         score -= 1.2
     if _is_weak_unlocated(cluster):
         score -= 1.5
+    if _insufficient_primary_evidence(cluster):
+        score -= 1.0
     return max(0.0, min(10.0, score))
 
 
@@ -374,7 +392,12 @@ def _select_primary(
     selected: list[tuple[EventCluster, Any]] = []
     topic_counts: Counter[str] = Counter()
     for cluster, temporal in assessed:
-        if _is_routine_alert(cluster) or _is_broad_roundup(cluster) or _is_weak_unlocated(cluster):
+        if (
+            _is_routine_alert(cluster)
+            or _is_broad_roundup(cluster)
+            or _is_weak_unlocated(cluster)
+            or _insufficient_primary_evidence(cluster)
+        ):
             continue
         if topic_counts[cluster.topic] >= max_per_topic:
             continue
@@ -509,6 +532,8 @@ def render_summary_context(
                 notes.append("broad roundup")
             if _is_weak_unlocated(cluster):
                 notes.append("unlocated single-source")
+            if _insufficient_primary_evidence(cluster):
+                notes.append("thin evidence")
             note = " · " + ", ".join(notes) if notes else ""
             lines.append(
                 f"- **{markdown_escape(_display_title(cluster))}** · "
@@ -522,11 +547,13 @@ def render_summary_context(
         "### Правила чтения контекста",
         "",
         "- Первый relevance gate максимизирует recall; strict editorial gate повторно проверяет war-сигналы с границами слов и отсекает ложные совпадения вроде `удар` внутри `государственный`.",
+        "- Memorial/obituary/hero-history posts не трактуются как новое событие суток без отдельного текущего strike signal.",
         "- `Evidence mix` — эвристика разнообразия типов источников, а не число независимых подтверждений.",
         "- `Telegram pulse` измеряет интенсивность и ширину обсуждения, а не достоверность.",
         "- Production clustering использует topic + explicit geographic signature; multi-location roundups не могут цепочкой склеивать разные театры.",
-        "- Оперативные публикации без явной географии и устойчивой semantic signature не объединяются между разными source families.",
+        "- Оперативные публикации без явной географии не объединяются между разными source families.",
         "- Поток рутинных предупреждений о движении целей не конкурирует за top-rank с подтверждёнными последствиями и многоканальными событиями.",
+        "- Frontline/PVO clusters с `thin` evidence остаются ниже primary, даже если их повторяет один информационный лагерь.",
         "- В primary top-N действует ограничение на доминирование одной темы; это редакционный diversity guard, а не оценка истины.",
         "- `NEW/ESCALATING/CONTINUING/DECLINING` сравнивают кластер с эвристически похожими событиями предыдущих дней.",
         "- Итоговая редакционная сводка должна сохранять атрибуцию спорных и односторонних утверждений.",

@@ -8,25 +8,29 @@ from urllib.parse import quote, urlparse
 try:
     from .common import clean_text
     from .summary_context import (
+        EQUIPMENT_ANCHORS,
         EventCluster,
+        PreparedItem,
         TOPIC_LABELS,
         _sample_items,
         assess_temporal,
-        build_event_clusters,
         evidence_score,
         importance_score,
+        prepare_item,
         telegram_pulse,
     )
 except ImportError:
     from common import clean_text
     from summary_context import (
+        EQUIPMENT_ANCHORS,
         EventCluster,
+        PreparedItem,
         TOPIC_LABELS,
         _sample_items,
         assess_temporal,
-        build_event_clusters,
         evidence_score,
         importance_score,
+        prepare_item,
         telegram_pulse,
     )
 
@@ -44,6 +48,7 @@ DISPLAY_LOCATION_PATTERNS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ("crimea", "Крым", (r"\bcrimea\w*\b", r"крым\w*", r"крим\w*")),
     ("kursk", "Курская область", (r"\bkursk\w*\b", r"курск\w*")),
     ("belgorod", "Белгородская область", (r"\bbelgorod\w*\b", r"белгород\w*")),
+    ("sevastopol", "Севастополь", (r"\bsevastopol\w*\b", r"севастопол\w*")),
     ("konstantynivka", "Константиновка", (r"\bkonstant\w*\b", r"константинов\w*", r"костянтинів\w*")),
     ("pokrovsk", "Покровск", (r"\bpokrovsk\w*\b", r"покровск\w*", r"покровськ\w*")),
     ("chasiv-yar", "Часов Яр", (r"\bchasiv yar\b", r"часов\w*\s+яр\w*", r"часів\w*\s+яр\w*")),
@@ -52,7 +57,16 @@ DISPLAY_LOCATION_PATTERNS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ("chernihiv", "Чернигов/область", (r"\bchernihiv\w*\b", r"черніг\w*", r"черниг\w*")),
     ("mykolaiv", "Николаев/область", (r"\bmykolaiv\w*\b", r"миколаїв\w*", r"николаев\w*")),
     ("poltava", "Полтавская область", (r"\bpoltava\w*\b", r"полтав\w*")),
+    ("tula", "Тульская область", (r"\btula\w*\b", r"тульск\w*")),
+    ("rostov", "Ростовская область", (r"\brostov\w*\b", r"ростов\w*")),
+    ("krasnodar", "Краснодарский край", (r"\bkrasnodar\w*\b", r"краснодар\w*")),
 )
+
+CORE_TEMPORAL_LOCATIONS = {
+    "kyiv", "odesa", "kharkiv", "sumy", "kherson", "zaporizhzhia", "dnipro",
+    "donetsk", "luhansk", "crimea", "kursk", "belgorod", "sevastopol",
+    "konstantynivka", "pokrovsk", "chasiv-yar", "kupiansk", "sloviansk",
+}
 
 ROUTINE_ALERT_RE = re.compile(
     r"повітрян\w+\s+тривог|воздушн\w+\s+тревог|air raid|"
@@ -92,7 +106,7 @@ def _excerpt(value: str, limit: int = 240) -> str:
     return markdown_escape(text)
 
 
-def _representative_line(item: Any) -> str:
+def _representative_line(item: PreparedItem) -> str:
     source = markdown_escape(
         clean_text(
             str(item.raw.get("source_name") or item.raw.get("source") or "unknown")
@@ -111,8 +125,11 @@ def _representative_line(item: Any) -> str:
     )
 
 
-def _detected_locations(cluster: EventCluster) -> dict[str, str]:
-    text = clean_text(" ".join(item.text for item in cluster.items)).casefold()
+def _item_location_map(item: PreparedItem) -> dict[str, str]:
+    source = clean_text(
+        str(item.raw.get("source_name") or item.raw.get("source") or "")
+    )
+    text = clean_text(f"{source} {item.text}").casefold()
     found: dict[str, str] = {}
     for key, label, patterns in DISPLAY_LOCATION_PATTERNS:
         if any(re.search(pattern, text, flags=re.IGNORECASE) for pattern in patterns):
@@ -120,39 +137,67 @@ def _detected_locations(cluster: EventCluster) -> dict[str, str]:
     return found
 
 
-def _display_title(cluster: EventCluster) -> str:
-    locations = _detected_locations(cluster)
-    labels = list(locations.values())[:2]
-    suffix = ", ".join(labels) if labels else "без устойчивой геопривязки"
-    return f"{TOPIC_LABELS.get(cluster.topic, cluster.topic)} — {suffix}"
+def _cluster_location_map(cluster: EventCluster) -> dict[str, str]:
+    counts: Counter[str] = Counter()
+    labels: dict[str, str] = {}
+    for item in cluster.items:
+        for key, label in _item_location_map(item).items():
+            counts[key] += 1
+            labels[key] = label
+    if not counts:
+        return {}
+    # Only display locations materially represented inside the cluster rather than
+    # every place mentioned once in a roundup article.
+    threshold = max(1, int(len(cluster.items) * 0.2))
+    stable = [key for key, count in counts.most_common() if count >= threshold]
+    if not stable:
+        stable = [counts.most_common(1)[0][0]]
+    return {key: labels[key] for key in stable[:3]}
 
 
-def _coalesce_clusters(clusters: list[EventCluster]) -> list[EventCluster]:
-    """Merge same-topic, same-single-location fragments before editorial ranking.
+def _semantic_signature(item: PreparedItem) -> tuple[str, ...]:
+    equipment = tuple(sorted(set(item.anchors) & EQUIPMENT_ANCHORS))
+    if equipment:
+        return equipment
+    if item.topic == "civilian-harm":
+        return ("casualties",)
+    return ()
 
-    The lower-level lexical clustering intentionally stays conservative. This pass
-    reconnects split alert/update fragments for one place without allowing broad
-    multi-location posts to bridge otherwise unrelated theatres.
+
+def _build_situation_clusters(
+    items: Iterable[dict[str, Any]],
+) -> tuple[list[EventCluster], dict[str, int]]:
+    """Build stable daily situation clusters without fuzzy single-linkage drift.
+
+    Publications are grouped by topic plus their explicit geographic signature.
+    Multi-location roundups remain separate from single-location event streams.
+    This intentionally trades some recall for cluster purity and explainability.
     """
-    buckets: dict[tuple[str, str], EventCluster] = {}
-    passthrough: list[EventCluster] = []
-    for cluster in clusters:
-        locations = _detected_locations(cluster)
-        if len(locations) != 1:
-            passthrough.append(cluster)
-            continue
-        location = next(iter(locations))
-        key = (cluster.topic, location)
-        target = buckets.get(key)
-        if target is None:
-            target = EventCluster(topic=cluster.topic)
-            buckets[key] = target
-        for item in cluster.items:
-            target.add(item)
-        # For locations already known by the lower-level temporal matcher, inject
-        # the normalized key so Ukrainian case inflections do not erase history.
-        target.anchor_union.add(location)
-    return passthrough + list(buckets.values())
+    prepared = [prepare_item(item) for item in items]
+    relevance_counts = Counter(row.relevance for row in prepared)
+    candidates = [
+        row for row in prepared if row.relevance in {"relevant", "peripheral"}
+    ]
+    buckets: dict[tuple[str, tuple[str, ...], tuple[str, ...]], EventCluster] = {}
+    for item in candidates:
+        locations = tuple(sorted(_item_location_map(item)))
+        semantic = _semantic_signature(item)
+        key = (item.topic, locations, semantic)
+        cluster = buckets.get(key)
+        if cluster is None:
+            cluster = EventCluster(topic=item.topic)
+            buckets[key] = cluster
+        cluster.add(item)
+        for location in locations:
+            if location in CORE_TEMPORAL_LOCATIONS:
+                cluster.anchor_union.add(location)
+    return list(buckets.values()), dict(relevance_counts)
+
+
+def _display_title(cluster: EventCluster) -> str:
+    locations = list(_cluster_location_map(cluster).values())[:2]
+    suffix = ", ".join(locations) if locations else "без устойчивой геопривязки"
+    return f"{TOPIC_LABELS.get(cluster.topic, cluster.topic)} — {suffix}"
 
 
 def _unique_source_families(cluster: EventCluster) -> int:
@@ -162,8 +207,6 @@ def _unique_source_families(cluster: EventCluster) -> int:
 def _is_routine_alert(cluster: EventCluster) -> bool:
     if cluster.topic not in {"strikes", "air-defence"}:
         return False
-    if not cluster.items:
-        return False
     texts = [item.text for item in cluster.items if item.text]
     if not texts:
         return False
@@ -171,6 +214,12 @@ def _is_routine_alert(cluster: EventCluster) -> bool:
         return False
     alert_hits = sum(bool(ROUTINE_ALERT_RE.search(text)) for text in texts)
     return alert_hits / len(texts) >= 0.5 and _unique_source_families(cluster) <= 3
+
+
+def _is_broad_roundup(cluster: EventCluster) -> bool:
+    location_sets = [set(_item_location_map(item)) for item in cluster.items]
+    multi = sum(len(locations) >= 3 for locations in location_sets)
+    return bool(location_sets) and multi / len(location_sets) >= 0.5
 
 
 def _effective_editorial_rank(cluster: EventCluster, temporal: Any) -> float:
@@ -190,6 +239,8 @@ def _effective_editorial_rank(cluster: EventCluster, temporal: Any) -> float:
         score -= 0.4
     if _is_routine_alert(cluster):
         score -= 3.0
+    if _is_broad_roundup(cluster):
+        score -= 1.2
     return max(0.0, min(10.0, score))
 
 
@@ -202,7 +253,7 @@ def _select_primary(
     selected: list[tuple[EventCluster, Any]] = []
     topic_counts: Counter[str] = Counter()
     for cluster, temporal in assessed:
-        if _is_routine_alert(cluster):
+        if _is_routine_alert(cluster) or _is_broad_roundup(cluster):
             continue
         if topic_counts[cluster.topic] >= max_per_topic:
             continue
@@ -222,10 +273,9 @@ def render_summary_context(
     max_pulse_watch: int = 6,
 ) -> str:
     """Render deterministic, change-oriented context with untrusted text escaped."""
-    raw_current_clusters, relevance_counts = build_event_clusters(current_items)
-    current_clusters = _coalesce_clusters(raw_current_clusters)
+    current_clusters, relevance_counts = _build_situation_clusters(current_items)
     history_clusters = {
-        day: _coalesce_clusters(build_event_clusters(items)[0])
+        day: _build_situation_clusters(items)[0]
         for day, items in history_items_by_day.items()
     }
 
@@ -262,15 +312,14 @@ def render_summary_context(
         ),
         "",
         f"- День: **{markdown_escape(target_day)}**",
-        f"- Кандидатных event clusters после coalescing: **{len(current_clusters)}**",
-        f"- Исходных candidate fragments: **{len(raw_current_clusters)}**",
+        f"- Situation clusters: **{len(current_clusters)}**",
         f"- Relevant публикаций: **{relevance_counts.get('relevant', 0)}**",
         f"- Peripheral публикаций: **{relevance_counts.get('peripheral', 0)}**",
         f"- Отфильтровано как off-topic: **{relevance_counts.get('irrelevant', 0)}**",
         f"- Redacted записей, не использованных для синтеза: **{relevance_counts.get('redacted', 0)}**",
         f"- Исторический baseline: **{len(history_clusters)} дн.**",
         "",
-        "### Приоритетные event clusters",
+        "### Приоритетные situation clusters",
         "",
     ]
 
@@ -330,12 +379,17 @@ def render_summary_context(
         ]
         for cluster, temporal in pulse_watch:
             pulse_value, pulse_label, tg_families, tg_posts, _ = telegram_pulse(cluster)
-            alert_note = " · routine alert stream" if _is_routine_alert(cluster) else ""
+            notes = []
+            if _is_routine_alert(cluster):
+                notes.append("routine alert stream")
+            if _is_broad_roundup(cluster):
+                notes.append("broad roundup")
+            note = " · " + ", ".join(notes) if notes else ""
             lines.append(
                 f"- **{markdown_escape(_display_title(cluster))}** · "
                 f"`{markdown_escape(temporal.status)}` · pulse "
                 f"**{markdown_escape(pulse_label)} {pulse_value:.1f}/10** · "
-                f"{tg_families} channels / {tg_posts} posts{alert_note}"
+                f"{tg_families} channels / {tg_posts} posts{note}"
             )
         lines.append("")
 
@@ -344,6 +398,7 @@ def render_summary_context(
         "",
         "- `Evidence mix` — эвристика разнообразия типов источников, а не число независимых подтверждений.",
         "- `Telegram pulse` измеряет интенсивность и ширину обсуждения, а не достоверность.",
+        "- Production clustering использует topic + explicit geographic signature; multi-location roundups не могут цепочкой склеивать разные театры.",
         "- Поток рутинных предупреждений о движении целей не конкурирует за top-rank с подтверждёнными последствиями и многоканальными событиями.",
         "- В primary top-N действует ограничение на доминирование одной темы; это редакционный diversity guard, а не оценка истины.",
         "- `NEW/ESCALATING/CONTINUING/DECLINING` сравнивают кластер с эвристически похожими событиями предыдущих дней.",

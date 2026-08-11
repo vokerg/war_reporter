@@ -8,7 +8,6 @@ from urllib.parse import quote, urlparse
 try:
     from .common import clean_text
     from .summary_context import (
-        EQUIPMENT_ANCHORS,
         EventCluster,
         PreparedItem,
         TOPIC_LABELS,
@@ -22,7 +21,6 @@ try:
 except ImportError:
     from common import clean_text
     from summary_context import (
-        EQUIPMENT_ANCHORS,
         EventCluster,
         PreparedItem,
         TOPIC_LABELS,
@@ -49,6 +47,7 @@ DISPLAY_LOCATION_PATTERNS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ("kursk", "Курская область", (r"\bkursk\w*\b", r"курск\w*")),
     ("belgorod", "Белгородская область", (r"\bbelgorod\w*\b", r"белгород\w*")),
     ("sevastopol", "Севастополь", (r"\bsevastopol\w*\b", r"севастопол\w*")),
+    ("black-sea", "Чёрное море", (r"\bblack sea\b", r"черн\w+\s+мор\w+", r"чорн\w+\s+мор\w+")),
     ("konstantynivka", "Константиновка", (r"\bkonstant\w*\b", r"константинов\w*", r"костянтинів\w*")),
     ("pokrovsk", "Покровск", (r"\bpokrovsk\w*\b", r"покровск\w*", r"покровськ\w*")),
     ("chasiv-yar", "Часов Яр", (r"\bchasiv yar\b", r"часов\w*\s+яр\w*", r"часів\w*\s+яр\w*")),
@@ -65,7 +64,7 @@ DISPLAY_LOCATION_PATTERNS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
 CORE_TEMPORAL_LOCATIONS = {
     "kyiv", "odesa", "kharkiv", "sumy", "kherson", "zaporizhzhia", "dnipro",
     "donetsk", "luhansk", "crimea", "kursk", "belgorod", "sevastopol",
-    "konstantynivka", "pokrovsk", "chasiv-yar", "kupiansk", "sloviansk",
+    "black-sea", "konstantynivka", "pokrovsk", "chasiv-yar", "kupiansk", "sloviansk",
 }
 
 ROUTINE_ALERT_RE = re.compile(
@@ -76,15 +75,54 @@ ROUTINE_ALERT_RE = re.compile(
     re.IGNORECASE,
 )
 CASUALTY_RE = re.compile(
-    r"постраждал\w*|поран\w*|загин\w*|загибл\w*|погиб\w*|ранен\w*|"
+    r"\bпостраждал\w*|\bпоран\w*|\bзагин\w*|\bзагибл\w*|\bпогиб\w*|\bранен\w*|"
     r"\bkilled\b|\bwounded\b|\bcasualt\w*",
     re.IGNORECASE,
 )
 MATERIAL_EFFECT_RE = re.compile(
-    r"постраждал\w*|поран\w*|загин\w*|загибл\w*|погиб\w*|ранен\w*|"
-    r"пошкод\w*|поврежд\w*|зруйн\w*|разруш\w*|влучан\w*|попадан\w*|"
+    r"\bпостраждал\w*|\bпоран\w*|\bзагин\w*|\bзагибл\w*|\bпогиб\w*|\bранен\w*|"
+    r"\bпошкод\w*|\bповрежд\w*|\bзруйн\w*|\bразруш\w*|\bвлучан\w*|\bпопадан\w*|"
     r"\bkilled\b|\bwounded\b|\bdamage\w*|\bdestroy\w*|\bimpact\w*|"
-    r"пожеж\w*|пожар\w*",
+    r"\bпожеж\w*|\bпожар\w*",
+    re.IGNORECASE,
+)
+CURRENT_WAR_CONTEXT_RE = re.compile(
+    r"\bukrain\w*|\bукраїн\w*|\bукраин\w*|\bвсу\b|\bзсу\b|\bсво\b|"
+    r"\boccupation\w*|\boccupied\b|\bокупован\w*|\bоккупирован\w*",
+    re.IGNORECASE,
+)
+STRICT_STRIKE_RE = re.compile(
+    r"\bdrone\w*|\buav\w*|\bmissile\w*|\brocket\w*|\bstrike\w*|\battack\w*|"
+    r"\bбпла\b|\bдрон\w*|\bбезпілот\w*|\bбеспилот\w*|\bракет\w*|"
+    r"\bудар\w*|\bатак\w*|\bобстріл\w*|\bобстрел\w*|\bавіаудар\w*|\bавиаудар\w*",
+    re.IGNORECASE,
+)
+STRICT_FRONTLINE_RE = re.compile(
+    r"\bfrontline\b|\badvance\w*|\bassault\w*|\bbattle\w*|\bcombat\w*|"
+    r"\bфронт\w*|\bнаступ\w*|\bпродвиж\w*|\bштурм\w*|\bбо[йи]\b|\bбоїв\b|\bбоев\b|"
+    r"\bоборон\w*|\bконтрол\w*|\bосвобод\w*|\bзахоп\w*",
+    re.IGNORECASE,
+)
+STRICT_AIRDEF_RE = re.compile(
+    r"\bair defen[cs]e\b|\bпво\b|\bпротиповітр\w*|\bs-?400\b|\bс-?400\b|"
+    r"\bpatriot\b|\bpantsir\b|\bпанцир\w*|\btor\b|\bтор\b",
+    re.IGNORECASE,
+)
+STRICT_INFRA_RE = re.compile(
+    r"\brefiner\w*|\bнпз\b|\bнефтеперераб\w*|\bнафтоперероб\w*|"
+    r"\brailway\w*|\brailroad\w*|\bжелезнодорож\w*|\bзалізнич\w*|"
+    r"\bports?\b|\bпорт\w*|\benergy\b|\bэнергет\w*|\bенергет\w*",
+    re.IGNORECASE,
+)
+STRICT_NAVAL_RE = re.compile(
+    r"\bblack sea\b|черн\w+\s+мор\w+|чорн\w+\s+мор\w+|"
+    r"\bnaval drone\w*|\bsea drone\w*|\bморск\w+\s+(?:дрон\w*|беспилот\w*|катер\w*)|"
+    r"\bморськ\w+\s+(?:дрон\w*|безпілот\w*|катер\w*)|\bкорабл\w*|\bсудн\w*",
+    re.IGNORECASE,
+)
+STRICT_SUPPORT_RE = re.compile(
+    r"\bsanctions?\b|\bсанкц\w*|\bmilitary aid\b|\bweapons? package\b|"
+    r"\bвоенн\w+\s+помощ\w*|\bвійськов\w+\s+допомог\w*|\bpatriot\b",
     re.IGNORECASE,
 )
 
@@ -159,30 +197,85 @@ def _cluster_location_map(cluster: EventCluster) -> dict[str, str]:
 
 
 def _editorial_topic(item: PreparedItem) -> str:
-    # The lower-level multilingual anchors are deliberately conservative; this
-    # editorial correction catches common Ukrainian casualty forms explicitly.
     if CASUALTY_RE.search(item.text):
         return "civilian-harm"
     return item.topic
 
 
+def _strict_candidate(
+    item: PreparedItem,
+    topic: str,
+    locations: tuple[str, ...],
+) -> bool:
+    text = item.text
+    current_context = bool(CURRENT_WAR_CONTEXT_RE.search(text))
+    contextualized = bool(locations) or current_context or item.group == "official-ua"
+
+    if topic == "civilian-harm":
+        if not CASUALTY_RE.search(text) or not contextualized:
+            return False
+        # Historical commemorations and unrelated deaths should not become war
+        # casualties merely because the text contains "Russian" and "killed".
+        return bool(locations) or current_context or bool(STRICT_STRIKE_RE.search(text))
+    if topic == "strikes":
+        return contextualized and bool(STRICT_STRIKE_RE.search(text))
+    if topic == "air-defence":
+        return contextualized and bool(STRICT_AIRDEF_RE.search(text))
+    if topic == "frontline":
+        return contextualized and bool(STRICT_FRONTLINE_RE.search(text))
+    if topic == "energy":
+        return contextualized and bool(STRICT_INFRA_RE.search(text))
+    if topic == "naval":
+        return contextualized and bool(STRICT_NAVAL_RE.search(text))
+    if topic == "support":
+        return bool(STRICT_SUPPORT_RE.search(text)) and (
+            current_context or item.group in {"official-ua", "international-media", "analysts"}
+        )
+    if topic == "investigations":
+        return item.group in {"osint", "analysts"} and (
+            contextualized or bool(STRICT_STRIKE_RE.search(text)) or bool(STRICT_FRONTLINE_RE.search(text))
+        )
+    return False
+
+
 def _semantic_signature(item: PreparedItem, topic: str) -> tuple[str, ...]:
-    equipment = tuple(sorted(set(item.anchors) & EQUIPMENT_ANCHORS))
-    if equipment:
-        return equipment
+    text = item.text
     if topic == "civilian-harm":
         return ("casualties",)
+    equipment: list[str] = []
+    patterns = (
+        ("refinery", r"\brefiner\w*|\bнпз\b|\bнефтеперераб\w*|\bнафтоперероб\w*"),
+        ("railway", r"\brailway\w*|\brailroad\w*|\bжелезнодорож\w*|\bзалізнич\w*"),
+        ("port", r"\bports?\b|\bпорт\w*"),
+        ("s400", r"\bs-?400\b|\bс-?400\b"),
+        ("patriot", r"\bpatriot\b"),
+        ("pantsir", r"\bpantsir\b|\bпанцир\w*"),
+        ("tor", r"\btor\b|\bтор\b"),
+    )
+    for key, pattern in patterns:
+        if re.search(pattern, text, flags=re.IGNORECASE):
+            equipment.append(key)
+    if equipment:
+        return tuple(sorted(equipment))
+    if topic == "support":
+        if re.search(r"\bsanctions?\b|\bсанкц\w*", text, flags=re.IGNORECASE):
+            return ("sanctions",)
+        if STRICT_SUPPORT_RE.search(text):
+            return ("aid",)
     return ()
 
 
 def _build_situation_clusters(
     items: Iterable[dict[str, Any]],
 ) -> tuple[list[EventCluster], dict[str, int]]:
-    """Build stable daily situation clusters without fuzzy single-linkage drift.
+    """Build conservative daily situation clusters for editorial navigation.
 
-    Publications are grouped by editorial topic plus their explicit geographic
-    signature. Multi-location roundups remain separate from single-location
-    event streams. This trades some recall for purity and explainability.
+    The lower-level normalizer is intentionally permissive for recall. This
+    production pass applies a second, word-boundary-aware relevance gate and
+    groups by editorial topic plus explicit geography. Multi-location roundups
+    cannot bridge single-location streams. Operational items with no explicit
+    location are isolated by source family unless they have a stable semantic
+    signature; this avoids one giant unlocated bucket.
     """
     prepared = [prepare_item(item) for item in items]
     relevance_counts = Counter(row.relevance for row in prepared)
@@ -193,7 +286,13 @@ def _build_situation_clusters(
     for item in candidates:
         topic = _editorial_topic(item)
         locations = tuple(sorted(_item_location_map(item)))
+        if not _strict_candidate(item, topic, locations):
+            relevance_counts["strict_filtered"] += 1
+            continue
+        relevance_counts["accepted"] += 1
         semantic = _semantic_signature(item, topic)
+        if not locations and not semantic and topic not in {"support", "investigations"}:
+            semantic = (f"source:{item.source_family}",)
         key = (topic, locations, semantic)
         cluster = buckets.get(key)
         if cluster is None:
@@ -234,6 +333,14 @@ def _is_broad_roundup(cluster: EventCluster) -> bool:
     return bool(location_sets) and multi / len(location_sets) >= 0.5
 
 
+def _is_weak_unlocated(cluster: EventCluster) -> bool:
+    if _cluster_location_map(cluster):
+        return False
+    if cluster.topic in {"support", "investigations"}:
+        return False
+    return _unique_source_families(cluster) < 2
+
+
 def _effective_editorial_rank(cluster: EventCluster, temporal: Any) -> float:
     importance = importance_score(cluster)
     evidence = evidence_score(cluster)[0]
@@ -253,6 +360,8 @@ def _effective_editorial_rank(cluster: EventCluster, temporal: Any) -> float:
         score -= 3.0
     if _is_broad_roundup(cluster):
         score -= 1.2
+    if _is_weak_unlocated(cluster):
+        score -= 1.5
     return max(0.0, min(10.0, score))
 
 
@@ -265,7 +374,7 @@ def _select_primary(
     selected: list[tuple[EventCluster, Any]] = []
     topic_counts: Counter[str] = Counter()
     for cluster, temporal in assessed:
-        if _is_routine_alert(cluster) or _is_broad_roundup(cluster):
+        if _is_routine_alert(cluster) or _is_broad_roundup(cluster) or _is_weak_unlocated(cluster):
             continue
         if topic_counts[cluster.topic] >= max_per_topic:
             continue
@@ -325,9 +434,11 @@ def render_summary_context(
         "",
         f"- День: **{markdown_escape(target_day)}**",
         f"- Situation clusters: **{len(current_clusters)}**",
-        f"- Relevant публикаций: **{relevance_counts.get('relevant', 0)}**",
-        f"- Peripheral публикаций: **{relevance_counts.get('peripheral', 0)}**",
-        f"- Отфильтровано как off-topic: **{relevance_counts.get('irrelevant', 0)}**",
+        f"- Accepted публикаций после strict gate: **{relevance_counts.get('accepted', 0)}**",
+        f"- Strict-filtered ложных/слабых кандидатов: **{relevance_counts.get('strict_filtered', 0)}**",
+        f"- Relevant публикаций до strict gate: **{relevance_counts.get('relevant', 0)}**",
+        f"- Peripheral публикаций до strict gate: **{relevance_counts.get('peripheral', 0)}**",
+        f"- Отфильтровано как off-topic первым gate: **{relevance_counts.get('irrelevant', 0)}**",
         f"- Redacted записей, не использованных для синтеза: **{relevance_counts.get('redacted', 0)}**",
         f"- Исторический baseline: **{len(history_clusters)} дн.**",
         "",
@@ -396,6 +507,8 @@ def render_summary_context(
                 notes.append("routine alert stream")
             if _is_broad_roundup(cluster):
                 notes.append("broad roundup")
+            if _is_weak_unlocated(cluster):
+                notes.append("unlocated single-source")
             note = " · " + ", ".join(notes) if notes else ""
             lines.append(
                 f"- **{markdown_escape(_display_title(cluster))}** · "
@@ -408,9 +521,11 @@ def render_summary_context(
     lines += [
         "### Правила чтения контекста",
         "",
+        "- Первый relevance gate максимизирует recall; strict editorial gate повторно проверяет war-сигналы с границами слов и отсекает ложные совпадения вроде `удар` внутри `государственный`.",
         "- `Evidence mix` — эвристика разнообразия типов источников, а не число независимых подтверждений.",
         "- `Telegram pulse` измеряет интенсивность и ширину обсуждения, а не достоверность.",
         "- Production clustering использует topic + explicit geographic signature; multi-location roundups не могут цепочкой склеивать разные театры.",
+        "- Оперативные публикации без явной географии и устойчивой semantic signature не объединяются между разными source families.",
         "- Поток рутинных предупреждений о движении целей не конкурирует за top-rank с подтверждёнными последствиями и многоканальными событиями.",
         "- В primary top-N действует ограничение на доминирование одной темы; это редакционный diversity guard, а не оценка истины.",
         "- `NEW/ESCALATING/CONTINUING/DECLINING` сравнивают кластер с эвристически похожими событиями предыдущих дней.",

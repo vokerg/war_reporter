@@ -52,7 +52,7 @@ class SummaryContextFalsePositiveTests(unittest.TestCase):
         self.assertIn("Accepted публикаций после strict gate: **0**", context)
         self.assertNotIn("#### 1.", context)
 
-    def test_current_ukraine_strike_still_passes_strict_gate(self) -> None:
+    def test_current_ukraine_strike_passes_gate_but_unlocated_single_source_is_not_primary(self) -> None:
         strike = row(
             "strike",
             "Минобороны России заявило об ударе беспилотниками по объектам на Украине.",
@@ -60,7 +60,8 @@ class SummaryContextFalsePositiveTests(unittest.TestCase):
         )
         context = render_summary_context("2026-08-05", [strike], {})
         self.assertIn("Accepted публикаций после strict gate: **1**", context)
-        self.assertIn("Дальние и воздушные удары", context)
+        self.assertIn("Situation clusters: **1**", context)
+        self.assertNotIn("#### 1.", context)
 
 
 if __name__ == "__main__":

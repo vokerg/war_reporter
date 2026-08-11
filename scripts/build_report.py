@@ -20,7 +20,7 @@ try:
         parse_time,
         read_ndjson,
     )
-    from .summary_context import render_summary_context
+    from .summary_context_render import render_summary_context
 except ImportError:
     from common import (
         ROOT,
@@ -29,7 +29,7 @@ except ImportError:
         parse_time,
         read_ndjson,
     )
-    from summary_context import render_summary_context
+    from summary_context_render import render_summary_context
 
 SECTION_ORDER = [
     ("frontline", "Фронт и наземные операции"),

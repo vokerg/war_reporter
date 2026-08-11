@@ -20,6 +20,7 @@ try:
         parse_time,
         read_ndjson,
     )
+    from .summary_context import render_summary_context
 except ImportError:
     from common import (
         ROOT,
@@ -28,6 +29,7 @@ except ImportError:
         parse_time,
         read_ndjson,
     )
+    from summary_context import render_summary_context
 
 SECTION_ORDER = [
     ("frontline", "Фронт и наземные операции"),
@@ -61,9 +63,7 @@ def item_time(item: dict[str, Any]) -> datetime | None:
     )
 
 
-def item_day(
-    item: dict[str, Any], timezone: ZoneInfo
-) -> str | None:
+def item_day(item: dict[str, Any], timezone: ZoneInfo) -> str | None:
     stamp = item_time(item)
     return stamp.astimezone(timezone).date().isoformat() if stamp else None
 
@@ -91,6 +91,52 @@ def raw_paths_for_local_day(
         )
         current += timedelta(days=1)
     return paths
+
+
+def load_items_for_local_day(
+    root: Path,
+    raw_root: str,
+    target_day: str,
+    timezone: ZoneInfo,
+) -> list[dict[str, Any]]:
+    by_id: dict[str, dict[str, Any]] = {}
+    for row in read_ndjson(
+        raw_paths_for_local_day(root, raw_root, target_day, timezone)
+    ):
+        if item_day(row, timezone) != target_day:
+            continue
+        item_id = str(row.get("id", ""))
+        if item_id:
+            by_id[item_id] = row
+    rows = list(by_id.values())
+    rows.sort(
+        key=lambda row: (
+            row.get("published_at")
+            or row.get("collected_at")
+            or "",
+            -len(row.get("text") or ""),
+        ),
+        reverse=True,
+    )
+    return rows
+
+
+def load_summary_history(
+    root: Path,
+    raw_root: str,
+    target_day: str,
+    timezone: ZoneInfo,
+    *,
+    history_days: int = 7,
+) -> dict[str, list[dict[str, Any]]]:
+    target = date.fromisoformat(target_day)
+    history: dict[str, list[dict[str, Any]]] = {}
+    for offset in range(1, history_days + 1):
+        day = (target - timedelta(days=offset)).isoformat()
+        rows = load_items_for_local_day(root, raw_root, day, timezone)
+        if rows:
+            history[day] = rows
+    return history
 
 
 def choose_section(item: dict[str, Any]) -> str:
@@ -123,9 +169,7 @@ def markdown_url(value: Any) -> str | None:
     return quote(url, safe=":/%?&=#@+~!$,;'*-._")
 
 
-def is_sensitive(
-    item: dict[str, Any], settings: dict[str, Any]
-) -> bool:
+def is_sensitive(item: dict[str, Any], settings: dict[str, Any]) -> bool:
     sensitive_tags = set(settings.get("sensitive_tags", []))
     return bool(
         sensitive_tags.intersection(str(tag) for tag in item.get("tags", []))
@@ -141,21 +185,14 @@ def is_permanently_redacted(
     )
 
 
-def render_item(
-    item: dict[str, Any], settings: dict[str, Any]
-) -> str:
+def render_item(item: dict[str, Any], settings: dict[str, Any]) -> str:
     source = markdown_escape(
         str(item.get("source_name") or item.get("source") or "")
     )
     trust = markdown_escape(str(item.get("trust", "unknown")))
-    perspective = markdown_escape(
-        str(item.get("perspective", "unknown"))
-    )
+    perspective = markdown_escape(str(item.get("perspective", "unknown")))
     published = markdown_escape(
-        str(
-            item.get("published_at")
-            or "время публикации не указано"
-        )
+        str(item.get("published_at") or "время публикации не указано")
     )
     url = markdown_url(item.get("url"))
     raw_id = markdown_escape(str(item.get("id", "")))
@@ -173,47 +210,24 @@ def render_item(
         summary = text[:700] + ("…" if len(text) > 700 else "")
         label = title or summary or "(материал без текста)"
     note_line = (
-        f"\n  \n  _{markdown_escape('; '.join(notes))}_"
-        if notes
-        else ""
+        f"\n  \n  _{markdown_escape('; '.join(notes))}_" if notes else ""
     )
-    original = (
-        f"[Оригинал]({url})" if url else "Оригинал недоступен"
-    )
+    original = f"[Оригинал]({url})" if url else "Оригинал недоступен"
     return (
-        f"- **{source}** · `{perspective}` · trust `{trust}` · "
-        f"{published}\n"
+        f"- **{source}** · `{perspective}` · trust `{trust}` · {published}\n"
         f"  \n  {markdown_escape(label)}"
         f"{note_line}\n"
         f"  \n  {original} · raw id `{raw_id}`"
     )
 
 
-def build_report(
-    root: Path, target_day: str
-) -> tuple[Path, str]:
+def build_report(root: Path, target_day: str) -> tuple[Path, str]:
     settings = load_json(root / "config/settings.json")
     if not isinstance(settings, dict):
         raise ValueError("missing config/settings.json")
     timezone = report_timezone(settings)
-    raw_paths = raw_paths_for_local_day(
+    items = load_items_for_local_day(
         root, settings["raw_root"], target_day, timezone
-    )
-    by_id: dict[str, dict[str, Any]] = {}
-    for row in read_ndjson(raw_paths):
-        if item_day(row, timezone) == target_day:
-            item_id = str(row.get("id", ""))
-            if item_id:
-                by_id[item_id] = row
-    items = list(by_id.values())
-    items.sort(
-        key=lambda row: (
-            row.get("published_at")
-            or row.get("collected_at")
-            or "",
-            -len(row.get("text") or ""),
-        ),
-        reverse=True,
     )
 
     by_section: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -221,19 +235,12 @@ def build_report(
         by_section[choose_section(item)].append(item)
 
     sources = Counter(
-        str(row.get("source_name") or row.get("source"))
-        for row in items
+        str(row.get("source_name") or row.get("source")) for row in items
     )
-    platforms = Counter(
-        str(row.get("platform", "unknown")) for row in items
-    )
-    groups = Counter(
-        str(row.get("group", "other")) for row in items
-    )
+    platforms = Counter(str(row.get("platform", "unknown")) for row in items)
+    groups = Counter(str(row.get("group", "other")) for row in items)
     sensitive = sum(is_permanently_redacted(row, settings) for row in items)
-    state = load_json(
-        root / settings["state_file"], default={}
-    )
+    state = load_json(root / settings["state_file"], default={})
     if not isinstance(state, dict):
         state = {}
 
@@ -257,8 +264,7 @@ def build_report(
             "- Платформы: **"
             + (
                 ", ".join(
-                    f"{key}: {value}"
-                    for key, value in platforms.most_common()
+                    f"{key}: {value}" for key, value in platforms.most_common()
                 )
                 or "нет данных"
             )
@@ -268,8 +274,7 @@ def build_report(
             "- Группы: **"
             + (
                 ", ".join(
-                    f"{key}: {value}"
-                    for key, value in groups.most_common()
+                    f"{key}: {value}" for key, value in groups.most_common()
                 )
                 or "нет данных"
             )
@@ -300,15 +305,21 @@ def build_report(
             "",
             (
                 "Запустите `python -m scripts.collect "
-                "--lookback-hours 72 --force`, затем повторите "
-                "генерацию."
+                "--lookback-hours 72 --force`, затем повторите генерацию."
             ),
             "",
         ]
     else:
-        for key, title in SECTION_ORDER + [
-            ("other", "Прочие материалы")
-        ]:
+        history = load_summary_history(
+            root,
+            settings["raw_root"],
+            target_day,
+            timezone,
+        )
+        lines += render_summary_context(target_day, items, history).splitlines()
+        lines.append("")
+
+        for key, title in SECTION_ORDER + [("other", "Прочие материалы")]:
             rows = by_section.get(key, [])
             if not rows:
                 continue
@@ -327,9 +338,7 @@ def build_report(
         ]
         lines.append("")
 
-    output = (
-        root / settings["report_root"] / f"{target_day}.md"
-    )
+    output = root / settings["report_root"] / f"{target_day}.md"
     output.parent.mkdir(parents=True, exist_ok=True)
     content = "\n".join(lines).rstrip() + "\n"
     output.write_text(content, encoding="utf-8")
@@ -349,11 +358,7 @@ def main(argv: list[str] | None = None) -> int:
             local_today(settings) - timedelta(days=1)
         ).isoformat()
         path, _ = build_report(args.root, target_day)
-    except (
-        OSError,
-        ValueError,
-        json.JSONDecodeError,
-    ) as exc:
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
         print(f"report build failed: {exc}")
         return 1
     print(path)

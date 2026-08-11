@@ -4,7 +4,7 @@
 
 War Reporter collection is intentionally unchanged by this layer. The collector continues to persist attributable public source projections and `reports/daily/YYYY-MM-DD.md` remains the complete source ledger.
 
-The summary intelligence layer exists only to make the editorial synthesis input tractable and useful. It converts the publication stream into candidate events before ChatGPT writes `reports/summary/YYYY-MM-DD.md`.
+The summary intelligence layer exists only to make the editorial synthesis input tractable and useful. It converts the publication stream into stable daily situation clusters before ChatGPT writes `reports/summary/YYYY-MM-DD.md`.
 
 The target question is no longer only "what did configured sources publish today?". The summary should primarily answer:
 
@@ -39,12 +39,14 @@ public source projections
         v                              v
 complete source ledger          summary intelligence layer
 reports/daily/...               relevance filtering
-                               -> canonicalization
-                               -> candidate event clustering
+                               -> multilingual normalization
+                               -> topic classification
+                               -> explicit geographic signature
+                               -> daily situation clusters
                                -> evidence mix
                                -> Telegram pulse
                                -> temporal comparison
-                               -> editorial ranking
+                               -> materiality-aware ranking
                                       |
                                       v
                               pre-synthesis context
@@ -59,31 +61,36 @@ The pre-synthesis context is embedded near the top of the existing daily digest.
 
 Source membership must never determine topic relevance by itself.
 
-A Russian milblogger post about wildfires in France, Iran or another unrelated conflict remains in the source ledger but must not enter summary event clustering merely because the source belongs to `ru-milbloggers`.
+A Russian milblogger post about wildfires in France, Iran or another unrelated conflict remains in the source ledger but must not enter summary clustering merely because the source belongs to `ru-milbloggers`.
 
 The first implementation uses conservative multilingual war-context and action anchors. The output classes are:
 
-- `relevant`: direct war development suitable for event clustering;
+- `relevant`: direct war development suitable for situation clustering;
 - `peripheral`: contextual diplomacy/politics that can surface at lower priority;
 - `irrelevant`: kept in the ledger but omitted from synthesis context;
 - `redacted`: content-neutral public projection; never synthesized.
 
 False negatives are preferable to turning a high-volume source group into an automatic topic label. The full ledger remains available for audit and correction.
 
-## Candidate event clusters
+## Situation clusters
 
-The unit of synthesis is a candidate event, not a publication.
+The unit of synthesis is a **daily situation cluster**, not a publication and not a fuzzy global claim graph.
 
-The deterministic layer canonicalizes common Russian, Ukrainian and English aliases for major locations and event concepts. It then groups compatible publications using:
+The first prototype used conservative lexical similarity between candidate events. A real-day quality pass on 2026-08-05 exposed a failure mode: single-linkage-style accumulation could let broad roundups bridge unrelated places and gradually contaminate a large cluster.
 
-- event topic;
-- shared location/equipment anchors;
-- multilingual canonical anchors;
-- bounded lexical similarity.
+Production grouping therefore uses a simpler and more explainable rule:
 
-This is deliberately a candidate-clustering heuristic, not an assertion that all grouped publications describe exactly the same fact. ChatGPT must preserve disagreements and attribution inside a cluster.
+- topic;
+- explicit geographic signature found in the publication text/source identity;
+- a small semantic signature for equipment/infrastructure classes when useful.
 
-The first implementation aims to reduce roughly one thousand daily publications to tens of event candidates and then expose a small ranked set plus a Telegram watchlist.
+Publications with one location are grouped with the same topic/location stream. Multi-location roundups keep their own signature and cannot bridge single-location clusters. Unlocated material remains explicitly unlocated instead of inheriting geography from neighboring posts.
+
+This deliberately trades some recall for cluster purity. For a daily executive summary, several clean situation clusters are preferable to one large but ambiguous semantic cluster.
+
+Multilingual canonicalization remains useful for normalization and temporal comparison, but lexical similarity is not allowed to override an explicit geographic mismatch in the production grouping path.
+
+The implementation aims to reduce roughly one thousand daily publications to tens of situation clusters and then expose a small ranked set plus a Telegram watchlist.
 
 ## Evidence and pulse are separate axes
 
@@ -93,7 +100,7 @@ There is no single universal source weight.
 
 Evidence mix answers:
 
-> What kinds of sources are represented around this candidate event?
+> What kinds of sources are represented around this situation cluster?
 
 The heuristic gives the strongest structural weight to OSINT, specialist analysis and established media, while retaining official sources as authoritative for their own statements. Low-trust milbloggers contribute much less to evidence strength.
 
@@ -105,7 +112,7 @@ OSINT therefore raises the structural evidence signal without suppressing faster
 
 Telegram pulse answers a different question:
 
-> How broad and intense is discussion of this event across Telegram right now?
+> How broad and intense is discussion of this development across Telegram right now?
 
 Pulse is based primarily on:
 
@@ -117,18 +124,32 @@ Repeated posts from one channel are capped. A single channel posting twelve time
 
 Pulse is not truth and never increases a claim's factual status by itself.
 
+## Routine alerts
+
+Target-movement warnings and air-raid alerts are valuable as pulse data but are usually poor executive-summary units by themselves.
+
+A stream dominated by phrases such as target course, direction, threat or shelter warning is classified as routine alert chatter when it has no reported material effects and only a narrow source-family footprint.
+
+Routine alert streams:
+
+- remain visible in the complete source ledger;
+- may appear in the Telegram pulse watchlist when genuinely broad;
+- do not compete directly for primary top-rank against casualties, damage, territorial developments or multi-source material events.
+
+This prevents dozens of individually `NEW` Air Force alerts from displacing the actual combined attack they describe.
+
 ## Temporal delta
 
-Current event candidates are compared with heuristically similar event clusters from up to seven preceding report days.
+Current situation clusters are compared with structurally similar clusters from up to seven preceding report days.
 
 The initial states are:
 
-- `NEW`: no comparable recent event cluster;
+- `NEW`: no comparable recent situation cluster;
 - `ESCALATING`: current pulse is materially above the matched recent baseline;
 - `CONTINUING`: similar pattern and intensity remain present;
 - `DECLINING`: current pulse is materially below the matched recent baseline.
 
-Future iterations may add `REVERSAL` and `DISPUTED` only when the implementation can identify those states without pretending that lexical heuristics establish operational truth.
+Future iterations may add `REVERSAL` and `DISPUTED` only when the implementation can identify those states without pretending that heuristics establish operational truth.
 
 Temporal status is a navigation aid. It does not independently establish that the underlying event occurred.
 
@@ -141,13 +162,15 @@ Ranking intentionally separates four concepts:
 - **pulse**: current information-space intensity;
 - **evidence mix**: structural strength/diversity of source types.
 
-Importance and novelty dominate ranking. Pulse can surface an emerging signal but cannot make routine repetition the top story merely through volume. Evidence mix breaks ties and helps prioritize candidates with better verification structure.
+`NEW` is not automatically the most important state. Materiality, evidence structure and multi-channel pulse can outrank novelty alone. Source-family breadth provides a bounded bonus, while routine alerts and broad multi-location roundups receive penalties in primary selection.
 
-The exact first-pass coefficients are implementation heuristics and should be tuned against observed reports, not treated as epistemic probabilities.
+Primary top-N also has a per-topic diversity guard so that one high-volume category cannot consume the entire executive context.
+
+The coefficients are editorial heuristics and must be tuned against observed historical reports. They are not epistemic probabilities.
 
 ## Daily digest contract
 
-The automatic daily digest now has two layers:
+The automatic daily digest has two layers:
 
 1. a compact `Контекст для редакционного синтеза` section near the top;
 2. the existing complete attributable source ledger below it.
@@ -155,8 +178,8 @@ The automatic daily digest now has two layers:
 The context includes:
 
 - relevance/off-topic counts;
-- candidate event count;
-- top event candidates by editorial rank;
+- situation-cluster count;
+- top material situation clusters by editorial rank;
 - importance and novelty;
 - evidence mix;
 - Telegram pulse;
@@ -165,6 +188,8 @@ The context includes:
 - a pulse watchlist for lower-ranked but rapidly discussed candidates.
 
 `public_redacted_v1` records are counted but never contribute content.
+
+All untrusted source names and excerpts are Markdown-escaped before inclusion. Original links are rendered only when they are valid `http`/`https` URLs.
 
 ## ChatGPT summary contract
 
@@ -187,12 +212,19 @@ The summary must not repeat deterministic scores as if they were probabilities. 
 Regression coverage must include at least:
 
 - off-topic material from a war-focused Telegram source is excluded from context;
-- cross-language publications about one event can cluster;
+- cross-language publications about one development can normalize consistently;
 - one channel cannot manufacture high Telegram pulse through repeated posts;
 - multi-channel, cross-perspective Telegram activity can surface as high pulse;
 - OSINT improves evidence mix independently of pulse;
 - historical matching distinguishes new from escalating/continuing patterns;
 - redacted content never enters pre-synthesis excerpts;
+- untrusted Markdown/HTML cannot alter context structure;
+- routine alert fragments do not outrank material multi-source developments;
+- Ukrainian geographic inflections are normalized for grouping;
+- multi-location roundups cannot bridge otherwise separate local clusters;
+- one topic cannot monopolize primary top-N;
 - the complete source ledger remains present after context insertion.
 
-Future quality work should add corpus-based golden tests for cluster purity, missed-event rate, source concentration, novelty ranking and summary usefulness on real historical days.
+Real historical days are part of the acceptance surface. A synthetic green test suite is not enough if the generated top clusters remain editorially incoherent.
+
+Future quality work should add corpus-based golden tests for cluster purity, missed-event rate, source concentration, novelty ranking and summary usefulness across several historical days.

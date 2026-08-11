@@ -39,7 +39,7 @@ DISPLAY_LOCATION_PATTERNS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ("kyiv", "Киев/область", (r"\bkyiv\w*\b", r"\bkiev\w*\b", r"ки[єї]в\w*", r"киев\w*")),
     ("odesa", "Одесса/область", (r"\bodes[as]\w*\b", r"одес\w*", r"одещ\w*")),
     ("kharkiv", "Харьков/область", (r"\bkharkiv\w*\b", r"харьков\w*", r"харків\w*", r"харков\w*")),
-    ("sumy", "Сумская область", (r"\bsumy\w*\b", r"сумщ\w*", r"сумск\w*", r"сумськ\w*")),
+    ("sumy", "Сумская область", (r"\bsumy\w*\b", r"сумщ\w*", r"сумск\w*", r"сумськ\w*", r"\bсумах\b")),
     ("kherson", "Херсон/область", (r"\bkherson\w*\b", r"херсон\w*")),
     ("zaporizhzhia", "Запорожье/область", (r"\bzapori\w*\b", r"запорож\w*", r"запоріж\w*")),
     ("dnipro", "Днепропетровская область", (r"\bdnipro\w*\b", r"днепр\w*", r"дніпр\w*")),
@@ -75,8 +75,13 @@ ROUTINE_ALERT_RE = re.compile(
     r"залишайтеся в укритт|оставайтесь в укрыт|не ігноруйте тривог",
     re.IGNORECASE,
 )
+CASUALTY_RE = re.compile(
+    r"постраждал\w*|поран\w*|загин\w*|загибл\w*|погиб\w*|ранен\w*|"
+    r"\bkilled\b|\bwounded\b|\bcasualt\w*",
+    re.IGNORECASE,
+)
 MATERIAL_EFFECT_RE = re.compile(
-    r"постраждал\w*|поран\w*|загин\w*|погиб\w*|ранен\w*|"
+    r"постраждал\w*|поран\w*|загин\w*|загибл\w*|погиб\w*|ранен\w*|"
     r"пошкод\w*|поврежд\w*|зруйн\w*|разруш\w*|влучан\w*|попадан\w*|"
     r"\bkilled\b|\bwounded\b|\bdamage\w*|\bdestroy\w*|\bimpact\w*|"
     r"пожеж\w*|пожар\w*",
@@ -146,8 +151,6 @@ def _cluster_location_map(cluster: EventCluster) -> dict[str, str]:
             labels[key] = label
     if not counts:
         return {}
-    # Only display locations materially represented inside the cluster rather than
-    # every place mentioned once in a roundup article.
     threshold = max(1, int(len(cluster.items) * 0.2))
     stable = [key for key, count in counts.most_common() if count >= threshold]
     if not stable:
@@ -155,11 +158,19 @@ def _cluster_location_map(cluster: EventCluster) -> dict[str, str]:
     return {key: labels[key] for key in stable[:3]}
 
 
-def _semantic_signature(item: PreparedItem) -> tuple[str, ...]:
+def _editorial_topic(item: PreparedItem) -> str:
+    # The lower-level multilingual anchors are deliberately conservative; this
+    # editorial correction catches common Ukrainian casualty forms explicitly.
+    if CASUALTY_RE.search(item.text):
+        return "civilian-harm"
+    return item.topic
+
+
+def _semantic_signature(item: PreparedItem, topic: str) -> tuple[str, ...]:
     equipment = tuple(sorted(set(item.anchors) & EQUIPMENT_ANCHORS))
     if equipment:
         return equipment
-    if item.topic == "civilian-harm":
+    if topic == "civilian-harm":
         return ("casualties",)
     return ()
 
@@ -169,9 +180,9 @@ def _build_situation_clusters(
 ) -> tuple[list[EventCluster], dict[str, int]]:
     """Build stable daily situation clusters without fuzzy single-linkage drift.
 
-    Publications are grouped by topic plus their explicit geographic signature.
-    Multi-location roundups remain separate from single-location event streams.
-    This intentionally trades some recall for cluster purity and explainability.
+    Publications are grouped by editorial topic plus their explicit geographic
+    signature. Multi-location roundups remain separate from single-location
+    event streams. This trades some recall for purity and explainability.
     """
     prepared = [prepare_item(item) for item in items]
     relevance_counts = Counter(row.relevance for row in prepared)
@@ -180,12 +191,13 @@ def _build_situation_clusters(
     ]
     buckets: dict[tuple[str, tuple[str, ...], tuple[str, ...]], EventCluster] = {}
     for item in candidates:
+        topic = _editorial_topic(item)
         locations = tuple(sorted(_item_location_map(item)))
-        semantic = _semantic_signature(item)
-        key = (item.topic, locations, semantic)
+        semantic = _semantic_signature(item, topic)
+        key = (topic, locations, semantic)
         cluster = buckets.get(key)
         if cluster is None:
-            cluster = EventCluster(topic=item.topic)
+            cluster = EventCluster(topic=topic)
             buckets[key] = cluster
         cluster.add(item)
         for location in locations:
@@ -306,7 +318,7 @@ def render_summary_context(
         (
             "> Детерминированный pre-synthesis слой поверх сохранённой публичной "
             "проекции. Он фильтрует нерелевантный шум, группирует публикации в "
-            "кандидатные события и отдельно показывает evidence mix, Telegram pulse "
+            "ситуационные кластеры и отдельно показывает evidence mix, Telegram pulse "
             "и изменение относительно предыдущих дней. Это не независимая "
             "верификация и не заменяет атрибуцию в итоговой сводке."
         ),

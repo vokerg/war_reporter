@@ -11,8 +11,8 @@ try:
         EventCluster,
         PreparedItem,
         TOPIC_LABELS,
+        TemporalAssessment,
         _sample_items,
-        assess_temporal,
         evidence_score,
         importance_score,
         prepare_item,
@@ -24,8 +24,8 @@ except ImportError:
         EventCluster,
         PreparedItem,
         TOPIC_LABELS,
+        TemporalAssessment,
         _sample_items,
-        assess_temporal,
         evidence_score,
         importance_score,
         prepare_item,
@@ -34,38 +34,44 @@ except ImportError:
 
 
 DISPLAY_LOCATION_PATTERNS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
-    ("kyiv", "Киев/область", (r"\bkyiv\w*\b", r"\bkiev\w*\b", r"ки[єї]в\w*", r"киев\w*")),
-    ("odesa", "Одесса/область", (r"\bodes[as]\w*\b", r"одес\w*", r"одещ\w*")),
-    ("kharkiv", "Харьков/область", (r"\bkharkiv\w*\b", r"харьков\w*", r"харків\w*", r"харков\w*")),
-    ("sumy", "Сумская область", (r"\bsumy\w*\b", r"сумщ\w*", r"сумск\w*", r"сумськ\w*", r"\bсумах\b")),
-    ("kherson", "Херсон/область", (r"\bkherson\w*\b", r"херсон\w*")),
-    ("zaporizhzhia", "Запорожье/область", (r"\bzapori\w*\b", r"запорож\w*", r"запоріж\w*")),
-    ("dnipro", "Днепропетровская область", (r"\bdnipro\w*\b", r"днепр\w*", r"дніпр\w*")),
-    ("donetsk", "Донецкая область", (r"\bdonetsk\w*\b", r"донец\w*", r"донець\w*")),
-    ("luhansk", "Луганская область", (r"\bluhansk\w*\b", r"\blugansk\w*\b", r"луган\w*")),
-    ("crimea", "Крым", (r"\bcrimea\w*\b", r"крым\w*", r"крим\w*")),
-    ("kursk", "Курская область", (r"\bkursk\w*\b", r"курск\w*")),
-    ("belgorod", "Белгородская область", (r"\bbelgorod\w*\b", r"белгород\w*")),
-    ("sevastopol", "Севастополь", (r"\bsevastopol\w*\b", r"севастопол\w*")),
-    ("black-sea", "Чёрное море", (r"\bblack sea\b", r"черн\w+\s+мор\w+", r"чорн\w+\s+мор\w+")),
-    ("konstantynivka", "Константиновка", (r"\bkonstant\w*\b", r"константинов\w*", r"костянтинів\w*")),
-    ("pokrovsk", "Покровск", (r"\bpokrovsk\w*\b", r"покровск\w*", r"покровськ\w*")),
-    ("chasiv-yar", "Часов Яр", (r"\bchasiv yar\b", r"часов\w*\s+яр\w*", r"часів\w*\s+яр\w*")),
-    ("kupiansk", "Купянск", (r"\bkupiansk\w*\b", r"\bkupyansk\w*\b", r"купянск\w*", r"куп.?янськ\w*")),
-    ("sloviansk", "Славянск", (r"\bsloviansk\w*\b", r"\bslavyansk\w*\b", r"славянск\w*", r"слов.?янськ\w*")),
-    ("chernihiv", "Чернигов/область", (r"\bchernihiv\w*\b", r"черніг\w*", r"черниг\w*")),
-    ("mykolaiv", "Николаев/область", (r"\bmykolaiv\w*\b", r"миколаїв\w*", r"николаев\w*")),
-    ("poltava", "Полтавская область", (r"\bpoltava\w*\b", r"полтав\w*")),
-    ("tula", "Тульская область", (r"\btula\w*\b", r"тульск\w*")),
-    ("rostov", "Ростовская область", (r"\brostov\w*\b", r"ростов\w*")),
-    ("krasnodar", "Краснодарский край", (r"\bkrasnodar\w*\b", r"краснодар\w*")),
+    ("kyiv", "Киев/область", (r"\bkyiv\w*\b", r"\bkiev\w*\b", r"\bки[єї]в\w*", r"\bкиев\w*")),
+    ("odesa", "Одесса/область", (r"\bodes[as]\w*\b", r"\bодес\w*", r"\bодещ\w*")),
+    ("kharkiv", "Харьков/область", (r"\bkharkiv\w*\b", r"\bхарьков\w*", r"\bхарків\w*", r"\bхарков\w*")),
+    (
+        "sumy",
+        "Сумская область",
+        (
+            r"\bsumy\w*\b",
+            r"\bсуми\b",
+            r"\bсумы\b",
+            r"\bсумщ\w*",
+            r"\bсумск\w*",
+            r"\bсумськ\w*",
+            r"\bсумах\b",
+        ),
+    ),
+    ("kherson", "Херсон/область", (r"\bkherson\w*\b", r"\bхерсон\w*")),
+    ("zaporizhzhia", "Запорожье/область", (r"\bzapori\w*\b", r"\bзапорож\w*", r"\bзапоріж\w*")),
+    ("dnipro", "Днепропетровская область", (r"\bdnipro\w*\b", r"\bднепр\w*", r"\bдніпр\w*")),
+    ("donetsk", "Донецкая область", (r"\bdonetsk\w*\b", r"\bдонец\w*", r"\bдонець\w*")),
+    ("luhansk", "Луганская область", (r"\bluhansk\w*\b", r"\blugansk\w*\b", r"\bлуган\w*")),
+    ("crimea", "Крым", (r"\bcrimea\w*\b", r"\bкрым\w*", r"\bкрим\w*")),
+    ("kursk", "Курская область", (r"\bkursk\w*\b", r"\bкурск\w*")),
+    ("belgorod", "Белгородская область", (r"\bbelgorod\w*\b", r"\bбелгород\w*")),
+    ("sevastopol", "Севастополь", (r"\bsevastopol\w*\b", r"\bсевастопол\w*")),
+    ("black-sea", "Чёрное море", (r"\bblack sea\b", r"\bчерн\w+\s+мор\w+", r"\bчорн\w+\s+мор\w+")),
+    ("konstantynivka", "Константиновка", (r"\bkonstant\w*\b", r"\bконстантинов\w*", r"\bкостянтинів\w*")),
+    ("pokrovsk", "Покровск", (r"\bpokrovsk\w*\b", r"\bпокровск\w*", r"\bпокровськ\w*")),
+    ("chasiv-yar", "Часов Яр", (r"\bchasiv yar\b", r"\bчасов\w*\s+яр\w*", r"\bчасів\w*\s+яр\w*")),
+    ("kupiansk", "Купянск", (r"\bkupiansk\w*\b", r"\bkupyansk\w*\b", r"\bкупянск\w*", r"\bкуп.?янськ\w*")),
+    ("sloviansk", "Славянск", (r"\bsloviansk\w*\b", r"\bslavyansk\w*\b", r"\bславянск\w*", r"\bслов.?янськ\w*")),
+    ("chernihiv", "Чернигов/область", (r"\bchernihiv\w*\b", r"\bчерніг\w*", r"\bчерниг\w*")),
+    ("mykolaiv", "Николаев/область", (r"\bmykolaiv\w*\b", r"\bмиколаїв\w*", r"\bниколаев\w*")),
+    ("poltava", "Полтавская область", (r"\bpoltava\w*\b", r"\bполтав\w*")),
+    ("tula", "Тульская область", (r"\btula\w*\b", r"\bтульск\w*")),
+    ("rostov", "Ростовская область", (r"\brostov\w*\b", r"\bростов\w*")),
+    ("krasnodar", "Краснодарский край", (r"\bkrasnodar\w*\b", r"\bкраснодар\w*")),
 )
-
-CORE_TEMPORAL_LOCATIONS = {
-    "kyiv", "odesa", "kharkiv", "sumy", "kherson", "zaporizhzhia", "dnipro",
-    "donetsk", "luhansk", "crimea", "kursk", "belgorod", "sevastopol",
-    "black-sea", "konstantynivka", "pokrovsk", "chasiv-yar", "kupiansk", "sloviansk",
-}
 
 ROUTINE_ALERT_RE = re.compile(
     r"повітрян\w+\s+тривог|воздушн\w+\s+тревог|air raid|"
@@ -122,13 +128,19 @@ STRICT_INFRA_RE = re.compile(
     re.IGNORECASE,
 )
 STRICT_NAVAL_RE = re.compile(
-    r"\bblack sea\b|черн\w+\s+мор\w+|чорн\w+\s+мор\w+|"
+    r"\bblack sea\b|\bчерн\w+\s+мор\w+|\bчорн\w+\s+мор\w+|"
     r"\bnaval drone\w*|\bsea drone\w*|\bморск\w+\s+(?:дрон\w*|беспилот\w*|катер\w*)|"
     r"\bморськ\w+\s+(?:дрон\w*|безпілот\w*|катер\w*)|\bкорабл\w*|\bсудн\w*",
     re.IGNORECASE,
 )
-STRICT_SUPPORT_RE = re.compile(
-    r"\bsanctions?\b|\bсанкц\w*|\bmilitary aid\b|\bweapons? package\b|"
+STRICT_SANCTIONS_RE = re.compile(
+    r"\bsanctions\b|\bsanctioned\b|"
+    r"\bсанкци(?:и|й|ями|ях|он\w*)\b|"
+    r"\bсанкці(?:ї|й|ями|ях|йн\w*)\b",
+    re.IGNORECASE,
+)
+STRICT_AID_RE = re.compile(
+    r"\bmilitary aid\b|\bweapons? package\b|"
     r"\bвоенн\w+\s+помощ\w*|\bвійськов\w+\s+допомог\w*|\bpatriot\b",
     re.IGNORECASE,
 )
@@ -151,9 +163,16 @@ def markdown_escape(value: str) -> str:
 
 
 def markdown_url(value: Any) -> str | None:
-    url = str(value or "")
+    url = str(value or "").strip()
+    if not url or any(ord(char) < 32 for char in url):
+        return None
     parsed = urlparse(url)
-    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+    if (
+        parsed.scheme not in {"http", "https"}
+        or not parsed.hostname
+        or parsed.username is not None
+        or parsed.password is not None
+    ):
         return None
     return quote(url, safe=":/%?&=#@+~!$,;'*-._")
 
@@ -182,8 +201,9 @@ def _representative_line(item: PreparedItem) -> str:
 
 
 def _item_location_map(item: PreparedItem) -> dict[str, str]:
-    source = clean_text(str(item.raw.get("source_name") or item.raw.get("source") or ""))
-    text = clean_text(f"{source} {item.text}").casefold()
+    # Geography must come from the publication body, not the display name of
+    # the channel/outlet. A local authority can repost a national story.
+    text = clean_text(item.text).casefold()
     return {
         key: label
         for key, label, patterns in DISPLAY_LOCATION_PATTERNS
@@ -192,23 +212,40 @@ def _item_location_map(item: PreparedItem) -> dict[str, str]:
 
 
 def _cluster_location_map(cluster: EventCluster) -> dict[str, str]:
+    if not cluster.items:
+        return {}
+    maps = [_item_location_map(item) for item in cluster.items]
+    common = set(maps[0])
+    for mapping in maps[1:]:
+        common.intersection_update(mapping)
+    if common:
+        first = maps[0]
+        return {key: first[key] for key in first if key in common}
     counts: Counter[str] = Counter()
     labels: dict[str, str] = {}
-    for item in cluster.items:
-        for key, label in _item_location_map(item).items():
+    for mapping in maps:
+        for key, label in mapping.items():
             counts[key] += 1
             labels[key] = label
     if not counts:
         return {}
-    threshold = max(1, int(len(cluster.items) * 0.2))
-    stable = [key for key, count in counts.most_common() if count >= threshold]
-    if not stable:
-        stable = [counts.most_common(1)[0][0]]
-    return {key: labels[key] for key in stable[:3]}
+    key = counts.most_common(1)[0][0]
+    return {key: labels[key]}
 
 
 def _editorial_topic(item: PreparedItem) -> str:
-    return "civilian-harm" if CASUALTY_RE.search(item.text) else item.topic
+    # Keep event identity ahead of impact facets. Otherwise the same strike is
+    # split into "strikes" and "civilian-harm" solely because one publication
+    # mentions casualties.
+    if CASUALTY_RE.search(item.text):
+        if STRICT_STRIKE_RE.search(item.text):
+            return "strikes"
+        return "civilian-harm"
+    return item.topic
+
+
+def _has_support_signal(text: str) -> bool:
+    return bool(STRICT_SANCTIONS_RE.search(text) or STRICT_AID_RE.search(text))
 
 
 def _strict_candidate(item: PreparedItem, topic: str, locations: tuple[str, ...]) -> bool:
@@ -236,7 +273,7 @@ def _strict_candidate(item: PreparedItem, topic: str, locations: tuple[str, ...]
     if topic == "naval":
         return contextualized and bool(STRICT_NAVAL_RE.search(text))
     if topic == "support":
-        return bool(STRICT_SUPPORT_RE.search(text)) and (
+        return _has_support_signal(text) and (
             current_context
             or item.group in {"official-ua", "international-media", "analysts"}
         )
@@ -262,9 +299,9 @@ def _semantic_signature(item: PreparedItem, topic: str) -> tuple[str, ...]:
     if equipment:
         return equipment
     if topic == "support":
-        if re.search(r"\bsanctions?\b|\bсанкц\w*", item.text, flags=re.IGNORECASE):
+        if STRICT_SANCTIONS_RE.search(item.text):
             return ("sanctions",)
-        if STRICT_SUPPORT_RE.search(item.text):
+        if STRICT_AID_RE.search(item.text):
             return ("aid",)
     return ()
 
@@ -293,9 +330,6 @@ def _build_situation_clusters(
         key = (topic, locations, semantic)
         cluster = buckets.setdefault(key, EventCluster(topic=topic))
         cluster.add(item)
-        for location in locations:
-            if location in CORE_TEMPORAL_LOCATIONS:
-                cluster.anchor_union.add(location)
 
     return list(buckets.values()), dict(counts)
 
@@ -303,7 +337,12 @@ def _build_situation_clusters(
 def _display_title(cluster: EventCluster) -> str:
     labels = list(_cluster_location_map(cluster).values())[:2]
     suffix = ", ".join(labels) if labels else "без устойчивой геопривязки"
-    return f"{TOPIC_LABELS.get(cluster.topic, cluster.topic)} — {suffix}"
+    topic_label = (
+        "Потери и гражданские последствия"
+        if cluster.topic == "civilian-harm"
+        else TOPIC_LABELS.get(cluster.topic, cluster.topic)
+    )
+    return f"{topic_label} — {suffix}"
 
 
 def _unique_source_families(cluster: EventCluster) -> int:
@@ -337,11 +376,72 @@ def _is_weak_unlocated(cluster: EventCluster) -> bool:
 
 def _insufficient_primary_evidence(cluster: EventCluster) -> bool:
     score = evidence_score(cluster)[0]
-    if cluster.topic in {"frontline", "air-defence", "naval"}:
+    if cluster.topic in {"frontline", "air-defence", "naval", "support"}:
         return score < 3.0
-    if cluster.topic == "support":
+    if cluster.topic == "energy":
         return score < 1.5
     return False
+
+
+def _jaccard(left: Iterable[str], right: Iterable[str]) -> float:
+    a = set(left)
+    b = set(right)
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
+
+
+def _temporal_match_score(current: EventCluster, historical: EventCluster) -> float:
+    if current.topic != historical.topic:
+        paired = {current.topic, historical.topic}
+        if not paired <= {"strikes", "civilian-harm", "air-defence", "energy"}:
+            return 0.0
+
+    current_locations = set(_cluster_location_map(current))
+    historical_locations = set(_cluster_location_map(historical))
+    if current_locations and historical_locations:
+        if not current_locations.intersection(historical_locations):
+            return 0.0
+        location = 1.0
+    else:
+        location = 0.0
+
+    anchors = _jaccard(current.anchor_union, historical.anchor_union)
+    tokens = _jaccard(current.token_union, historical.token_union)
+    return 0.55 * location + 0.30 * anchors + 0.15 * tokens
+
+
+def _assess_temporal(
+    cluster: EventCluster,
+    history_by_day: dict[str, list[EventCluster]],
+) -> TemporalAssessment:
+    matched_pulses: list[float] = []
+    matched_days = 0
+    for clusters in history_by_day.values():
+        day_matches = [
+            candidate
+            for candidate in clusters
+            if _temporal_match_score(cluster, candidate) >= 0.48
+        ]
+        if not day_matches:
+            continue
+        matched_days += 1
+        best = max(
+            day_matches,
+            key=lambda candidate: _temporal_match_score(cluster, candidate),
+        )
+        matched_pulses.append(telegram_pulse(best)[0])
+
+    if not matched_pulses:
+        return TemporalAssessment("NEW", 9.0, None, 0)
+
+    baseline = sum(matched_pulses) / len(matched_pulses)
+    current = telegram_pulse(cluster)[0]
+    if baseline > 0 and current >= baseline * 1.8 and current - baseline >= 1.0:
+        return TemporalAssessment("ESCALATING", 7.0, baseline, matched_days)
+    if baseline > 0 and current <= baseline * 0.55 and baseline - current >= 1.0:
+        return TemporalAssessment("DECLINING", 4.0, baseline, matched_days)
+    return TemporalAssessment("CONTINUING", 2.0, baseline, matched_days)
 
 
 def _effective_editorial_rank(cluster: EventCluster, temporal: Any) -> float:
@@ -410,10 +510,13 @@ def render_summary_context(
     }
 
     assessed = [
-        (cluster, assess_temporal(cluster, history_clusters))
+        (cluster, _assess_temporal(cluster, history_clusters))
         for cluster in current_clusters
     ]
-    assessed.sort(key=lambda pair: _effective_editorial_rank(pair[0], pair[1]), reverse=True)
+    assessed.sort(
+        key=lambda pair: _effective_editorial_rank(pair[0], pair[1]),
+        reverse=True,
+    )
 
     primary = _select_primary(assessed, max_primary)
     primary_ids = {id(cluster) for cluster, _ in primary}
@@ -463,7 +566,8 @@ def render_summary_context(
             else "нет сопоставимого события"
         )
         group_summary = ", ".join(
-            f"{markdown_escape(group)}: {count}" for group, count in groups.most_common()
+            f"{markdown_escape(group)}: {count}"
+            for group, count in groups.most_common()
         ) or "нет данных"
         lines += [
             f"#### {index}. {markdown_escape(_display_title(cluster))} · `{markdown_escape(temporal.status)}`",
@@ -523,16 +627,17 @@ def render_summary_context(
     lines += [
         "### Правила чтения контекста",
         "",
-        "- Первый relevance gate максимизирует recall; strict editorial gate повторно проверяет war-сигналы с границами слов и отсекает ложные совпадения вроде `удар` внутри `государственный`.",
+        "- Первый relevance gate максимизирует recall; strict editorial gate повторно проверяет war-сигналы с границами слов и отсекает ложные совпадения.",
         "- Memorial/obituary/hero-history posts не трактуются как новое событие суток, даже если внутри биографии описан исторический удар.",
+        "- Удар и его последствия в одной географии остаются одним event-centric strike cluster; casualty-only updates остаются отдельной категорией.",
         "- `Evidence mix` — эвристика разнообразия типов источников, а не число независимых подтверждений.",
         "- `Telegram pulse` измеряет интенсивность и ширину обсуждения, а не достоверность.",
-        "- Production clustering использует topic + explicit geographic signature; multi-location roundups не могут цепочкой склеивать разные театры.",
+        "- Production clustering использует topic + explicit geographic signature; география берётся из текста публикации, а не из имени канала.",
         "- Оперативные публикации без явной географии не объединяются между разными source families.",
         "- Поток рутинных предупреждений о движении целей не конкурирует за top-rank с подтверждёнными последствиями и многоканальными событиями.",
-        "- Frontline/PVO/naval clusters с `thin` evidence остаются ниже primary; слабый support-сигнал также не поднимается только за счёт novelty.",
+        "- Frontline/PVO/naval/support clusters с `thin` evidence остаются ниже primary; одиночный low-trust energy claim также не поднимается.",
         "- В primary top-N действует ограничение на доминирование одной темы; это редакционный diversity guard, а не оценка истины.",
-        "- `NEW/ESCALATING/CONTINUING/DECLINING` сравнивают кластер с эвристически похожими событиями предыдущих дней.",
+        "- `NEW/ESCALATING/CONTINUING/DECLINING` описывают изменение информационного сигнала относительно эвристически похожих кластеров предыдущих дней, а не доказанное оперативное изменение.",
         "- Итоговая редакционная сводка должна сохранять атрибуцию спорных и односторонних утверждений.",
         "",
     ]

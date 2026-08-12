@@ -53,6 +53,20 @@ class SummaryContextSelfReviewTests(unittest.TestCase):
         self.assertNotIn("Военная помощь и дипломатия", context)
         self.assertNotIn("Крым", context)
 
+    def test_russian_legal_authorization_is_not_geopolitical_sanctions(self) -> None:
+        legal = row(
+            "legal",
+            "Wire Service",
+            "international-media",
+            "mixed",
+            "Суд санкционировал обыск по делу, связанному с гражданином Украины.",
+            platform="rss",
+            trust="high",
+        )
+        context = render_summary_context("2026-08-05", [legal], {})
+        self.assertIn("Accepted публикаций после strict gate: **0**", context)
+        self.assertNotIn("Военная помощь и дипломатия", context)
+
     def test_strike_and_casualty_reporting_share_one_event_cluster(self) -> None:
         rows = [
             row(

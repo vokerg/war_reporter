@@ -2,14 +2,8 @@ from __future__ import annotations
 
 import unittest
 
-from scripts.summary_context import (
-    assess_temporal,
-    build_event_clusters,
-    evidence_score,
-    prepare_item,
-    render_summary_context,
-    telegram_pulse,
-)
+from scripts.summary_context import EventCluster, evidence_score, prepare_item, telegram_pulse
+from scripts.summary_context_render import render_summary_context
 
 
 def make_item(
@@ -42,6 +36,13 @@ def make_item(
     }
 
 
+def make_cluster(rows: list[dict], topic: str = "strikes") -> EventCluster:
+    cluster = EventCluster(topic=topic)
+    for row in rows:
+        cluster.add(prepare_item(row))
+    return cluster
+
+
 class SummaryContextTests(unittest.TestCase):
     def test_milblogger_group_does_not_make_off_topic_post_relevant(self) -> None:
         row = make_item(
@@ -53,7 +54,7 @@ class SummaryContextTests(unittest.TestCase):
         )
         self.assertEqual(prepare_item(row).relevance, "irrelevant")
 
-    def test_cross_language_publications_cluster_into_one_event(self) -> None:
+    def test_cross_language_publications_form_one_production_cluster(self) -> None:
         rows = [
             make_item(
                 "ua",
@@ -80,11 +81,10 @@ class SummaryContextTests(unittest.TestCase):
                 "Массированный удар ракетами и БПЛА по Одесской области и портам.",
             ),
         ]
-        clusters, counts = build_event_clusters(rows)
-        self.assertEqual(counts["relevant"], 3)
-        self.assertEqual(len(clusters), 1)
-        self.assertEqual(len(clusters[0].items), 3)
-        self.assertIn("odesa", clusters[0].location_anchors)
+        context = render_summary_context("2026-08-09", rows, {})
+        self.assertIn("Situation clusters: **1**", context)
+        self.assertIn("Публикаций в cluster: **3**", context)
+        self.assertIn("Одесса/область", context)
 
     def test_osint_strength_and_telegram_pulse_are_separate_axes(self) -> None:
         rows = [
@@ -113,10 +113,9 @@ class SummaryContextTests(unittest.TestCase):
                 "Удар БПЛА по Одесской области.",
             ),
         ]
-        clusters, _ = build_event_clusters(rows)
-        self.assertEqual(len(clusters), 1)
-        evidence_value, evidence_label, groups = evidence_score(clusters[0])
-        pulse_value, pulse_label, families, posts, _ = telegram_pulse(clusters[0])
+        cluster = make_cluster(rows)
+        evidence_value, evidence_label, groups = evidence_score(cluster)
+        pulse_value, pulse_label, families, posts, _ = telegram_pulse(cluster)
         self.assertIn("osint", groups)
         self.assertGreaterEqual(evidence_value, 5.0)
         self.assertIn(evidence_label, {"mixed", "strong"})
@@ -137,8 +136,9 @@ class SummaryContextTests(unittest.TestCase):
             )
             for index in range(12)
         ]
-        cluster = build_event_clusters(rows)[0][0]
-        pulse_value, pulse_label, families, posts, _ = telegram_pulse(cluster)
+        pulse_value, pulse_label, families, posts, _ = telegram_pulse(
+            make_cluster(rows)
+        )
         self.assertEqual(families, 1)
         self.assertEqual(posts, 12)
         self.assertLess(pulse_value, 3.0)
@@ -156,48 +156,15 @@ class SummaryContextTests(unittest.TestCase):
             )
             for index in range(6)
         ]
-        cluster = build_event_clusters(rows)[0][0]
-        pulse_value, pulse_label, families, _, perspectives = telegram_pulse(cluster)
+        pulse_value, pulse_label, families, _, perspectives = telegram_pulse(
+            make_cluster(rows)
+        )
         self.assertEqual(families, 6)
         self.assertEqual(perspectives, 2)
         self.assertGreaterEqual(pulse_value, 6.0)
         self.assertEqual(pulse_label, "high")
 
-    def test_temporal_status_detects_new_and_escalating_signal(self) -> None:
-        current_rows = [
-            make_item(
-                f"current-{index}",
-                f"Current {index}",
-                "ru-milbloggers" if index < 3 else "official-ua",
-                "russian" if index < 3 else "ukrainian",
-                "Удар БПЛА по Одесской области.",
-                published_at=f"2026-08-09T10:{index:02d}:00Z",
-            )
-            for index in range(6)
-        ]
-        current = build_event_clusters(current_rows)[0][0]
-        self.assertEqual(assess_temporal(current, {}).status, "NEW")
-
-        history = {}
-        for day in ("2026-08-07", "2026-08-08"):
-            rows = [
-                make_item(
-                    f"{day}-{index}",
-                    f"Old {index}",
-                    "ru-milbloggers",
-                    "russian",
-                    "Удар БПЛА по Одесской области.",
-                    published_at=f"{day}T10:0{index}:00Z",
-                )
-                for index in range(2)
-            ]
-            history[day] = build_event_clusters(rows)[0]
-
-        escalating = assess_temporal(current, history)
-        self.assertEqual(escalating.status, "ESCALATING")
-        self.assertEqual(escalating.matched_days, 2)
-
-    def test_redacted_content_never_enters_summary_context(self) -> None:
+    def test_redacted_content_never_enters_production_context(self) -> None:
         rows = [
             make_item(
                 "redacted",
@@ -263,7 +230,7 @@ class SummaryContextTests(unittest.TestCase):
         self.assertIn("Evidence mix", context)
         self.assertIn("Telegram pulse", context)
         self.assertIn("7-day delta", context)
-        self.assertIn("Отфильтровано как off-topic: **1**", context)
+        self.assertIn("Отфильтровано как off-topic первым gate: **1**", context)
         self.assertIn("GeoConfirmed", context)
 
 

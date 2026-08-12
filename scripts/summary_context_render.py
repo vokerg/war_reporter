@@ -37,19 +37,7 @@ DISPLAY_LOCATION_PATTERNS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ("kyiv", "Киев/область", (r"\bkyiv\w*\b", r"\bkiev\w*\b", r"\bки[єї]в\w*", r"\bкиев\w*")),
     ("odesa", "Одесса/область", (r"\bodes[as]\w*\b", r"\bодес\w*", r"\bодещ\w*")),
     ("kharkiv", "Харьков/область", (r"\bkharkiv\w*\b", r"\bхарьков\w*", r"\bхарків\w*", r"\bхарков\w*")),
-    (
-        "sumy",
-        "Сумская область",
-        (
-            r"\bsumy\w*\b",
-            r"\bсуми\b",
-            r"\bсумы\b",
-            r"\bсумщ\w*",
-            r"\bсумск\w*",
-            r"\bсумськ\w*",
-            r"\bсумах\b",
-        ),
-    ),
+    ("sumy", "Сумская область", (r"\bsumy\w*\b", r"\bсуми\b", r"\bсумы\b", r"\bсумщ\w*", r"\bсумск\w*", r"\bсумськ\w*", r"\bсумах\b")),
     ("kherson", "Херсон/область", (r"\bkherson\w*\b", r"\bхерсон\w*")),
     ("zaporizhzhia", "Запорожье/область", (r"\bzapori\w*\b", r"\bзапорож\w*", r"\bзапоріж\w*")),
     ("dnipro", "Днепропетровская область", (r"\bdnipro\w*\b", r"\bднепр\w*", r"\bдніпр\w*")),
@@ -201,8 +189,6 @@ def _representative_line(item: PreparedItem) -> str:
 
 
 def _item_location_map(item: PreparedItem) -> dict[str, str]:
-    # Geography must come from the publication body, not the display name of
-    # the channel/outlet. A local authority can repost a national story.
     text = clean_text(item.text).casefold()
     return {
         key: label
@@ -234,9 +220,6 @@ def _cluster_location_map(cluster: EventCluster) -> dict[str, str]:
 
 
 def _editorial_topic(item: PreparedItem) -> str:
-    # Keep event identity ahead of impact facets. Otherwise the same strike is
-    # split into "strikes" and "civilian-harm" solely because one publication
-    # mentions casualties.
     if CASUALTY_RE.search(item.text):
         if STRICT_STRIKE_RE.search(item.text):
             return "strikes"
@@ -252,15 +235,11 @@ def _strict_candidate(item: PreparedItem, topic: str, locations: tuple[str, ...]
     text = item.text
     if MEMORIAL_RE.search(text):
         return False
-
     current_context = bool(CURRENT_WAR_CONTEXT_RE.search(text))
     contextualized = bool(locations) or current_context or item.group == "official-ua"
-
     if topic == "civilian-harm":
-        return (
-            bool(CASUALTY_RE.search(text))
-            and contextualized
-            and (bool(locations) or current_context or bool(STRICT_STRIKE_RE.search(text)))
+        return bool(CASUALTY_RE.search(text)) and contextualized and (
+            bool(locations) or current_context or bool(STRICT_STRIKE_RE.search(text))
         )
     if topic == "strikes":
         return contextualized and bool(STRICT_STRIKE_RE.search(text))
@@ -274,8 +253,7 @@ def _strict_candidate(item: PreparedItem, topic: str, locations: tuple[str, ...]
         return contextualized and bool(STRICT_NAVAL_RE.search(text))
     if topic == "support":
         return _has_support_signal(text) and (
-            current_context
-            or item.group in {"official-ua", "international-media", "analysts"}
+            current_context or item.group in {"official-ua", "international-media", "analysts"}
         )
     if topic == "investigations":
         return item.group in {"osint", "analysts"} and (
@@ -289,32 +267,30 @@ def _strict_candidate(item: PreparedItem, topic: str, locations: tuple[str, ...]
 def _semantic_signature(item: PreparedItem, topic: str) -> tuple[str, ...]:
     if topic == "civilian-harm":
         return ("casualties",)
-    equipment = tuple(
+    if topic == "support":
+        if STRICT_SANCTIONS_RE.search(item.text):
+            return ("sanctions",)
+        if STRICT_AID_RE.search(item.text):
+            return ("aid",)
+        return ()
+    if topic not in {"energy", "air-defence", "naval"}:
+        return ()
+    return tuple(
         sorted(
             key
             for key, pattern in EQUIPMENT_PATTERNS
             if re.search(pattern, item.text, flags=re.IGNORECASE)
         )
     )
-    if equipment:
-        return equipment
-    if topic == "support":
-        if STRICT_SANCTIONS_RE.search(item.text):
-            return ("sanctions",)
-        if STRICT_AID_RE.search(item.text):
-            return ("aid",)
-    return ()
 
 
 def _build_situation_clusters(
     items: Iterable[dict[str, Any]],
 ) -> tuple[list[EventCluster], dict[str, int]]:
-    """Build conservative daily situation clusters for editorial navigation."""
     prepared = [prepare_item(item) for item in items]
     counts = Counter(row.relevance for row in prepared)
     candidates = [row for row in prepared if row.relevance in {"relevant", "peripheral"}]
     buckets: dict[tuple[str, tuple[str, ...], tuple[str, ...]], EventCluster] = {}
-
     for item in candidates:
         topic = _editorial_topic(item)
         locations = tuple(sorted(_item_location_map(item)))
@@ -322,27 +298,19 @@ def _build_situation_clusters(
             counts["strict_filtered"] += 1
             continue
         counts["accepted"] += 1
-
         semantic = _semantic_signature(item, topic)
         if not locations and topic not in {"support", "investigations"}:
             semantic = semantic + (f"source:{item.source_family}",)
-
         key = (topic, locations, semantic)
         cluster = buckets.setdefault(key, EventCluster(topic=topic))
         cluster.add(item)
-
     return list(buckets.values()), dict(counts)
 
 
 def _display_title(cluster: EventCluster) -> str:
     labels = list(_cluster_location_map(cluster).values())[:2]
     suffix = ", ".join(labels) if labels else "без устойчивой геопривязки"
-    topic_label = (
-        "Потери и гражданские последствия"
-        if cluster.topic == "civilian-harm"
-        else TOPIC_LABELS.get(cluster.topic, cluster.topic)
-    )
-    return f"{topic_label} — {suffix}"
+    return f"{TOPIC_LABELS.get(cluster.topic, cluster.topic)} — {suffix}"
 
 
 def _unique_source_families(cluster: EventCluster) -> int:
@@ -396,7 +364,6 @@ def _temporal_match_score(current: EventCluster, historical: EventCluster) -> fl
         paired = {current.topic, historical.topic}
         if not paired <= {"strikes", "civilian-harm", "air-defence", "energy"}:
             return 0.0
-
     current_locations = set(_cluster_location_map(current))
     historical_locations = set(_cluster_location_map(historical))
     if current_locations and historical_locations:
@@ -405,7 +372,6 @@ def _temporal_match_score(current: EventCluster, historical: EventCluster) -> fl
         location = 1.0
     else:
         location = 0.0
-
     anchors = _jaccard(current.anchor_union, historical.anchor_union)
     tokens = _jaccard(current.token_union, historical.token_union)
     return 0.55 * location + 0.30 * anchors + 0.15 * tokens
@@ -426,15 +392,10 @@ def _assess_temporal(
         if not day_matches:
             continue
         matched_days += 1
-        best = max(
-            day_matches,
-            key=lambda candidate: _temporal_match_score(cluster, candidate),
-        )
+        best = max(day_matches, key=lambda candidate: _temporal_match_score(cluster, candidate))
         matched_pulses.append(telegram_pulse(best)[0])
-
     if not matched_pulses:
         return TemporalAssessment("NEW", 9.0, None, 0)
-
     baseline = sum(matched_pulses) / len(matched_pulses)
     current = telegram_pulse(cluster)[0]
     if baseline > 0 and current >= baseline * 1.8 and current - baseline >= 1.0:
@@ -502,22 +463,16 @@ def render_summary_context(
     max_primary: int = 14,
     max_pulse_watch: int = 6,
 ) -> str:
-    """Render deterministic, change-oriented context with untrusted text escaped."""
     current_clusters, counts = _build_situation_clusters(current_items)
     history_clusters = {
         day: _build_situation_clusters(items)[0]
         for day, items in history_items_by_day.items()
     }
-
     assessed = [
         (cluster, _assess_temporal(cluster, history_clusters))
         for cluster in current_clusters
     ]
-    assessed.sort(
-        key=lambda pair: _effective_editorial_rank(pair[0], pair[1]),
-        reverse=True,
-    )
-
+    assessed.sort(key=lambda pair: _effective_editorial_rank(pair[0], pair[1]), reverse=True)
     primary = _select_primary(assessed, max_primary)
     primary_ids = {id(cluster) for cluster, _ in primary}
     pulse_watch = sorted(
@@ -566,8 +521,7 @@ def render_summary_context(
             else "нет сопоставимого события"
         )
         group_summary = ", ".join(
-            f"{markdown_escape(group)}: {count}"
-            for group, count in groups.most_common()
+            f"{markdown_escape(group)}: {count}" for group, count in groups.most_common()
         ) or "нет данных"
         lines += [
             f"#### {index}. {markdown_escape(_display_title(cluster))} · `{markdown_escape(temporal.status)}`",
@@ -633,6 +587,7 @@ def render_summary_context(
         "- `Evidence mix` — эвристика разнообразия типов источников, а не число независимых подтверждений.",
         "- `Telegram pulse` измеряет интенсивность и ширину обсуждения, а не достоверность.",
         "- Production clustering использует topic + explicit geographic signature; география берётся из текста публикации, а не из имени канала.",
+        "- Target/equipment details не раскалывают обычный strike cluster; semantic hard-key применяется только там, где он определяет класс события.",
         "- Оперативные публикации без явной географии не объединяются между разными source families.",
         "- Поток рутинных предупреждений о движении целей не конкурирует за top-rank с подтверждёнными последствиями и многоканальными событиями.",
         "- Frontline/PVO/naval/support clusters с `thin` evidence остаются ниже primary; одиночный low-trust energy claim также не поднимается.",

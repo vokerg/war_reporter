@@ -123,7 +123,7 @@ STRICT_NAVAL_RE = re.compile(
 )
 STRICT_SANCTIONS_RE = re.compile(
     r"\bsanctions\b|\bsanctioned\b|"
-    r"\bсанкци(?:и|й|ями|ях|он\w*)\b|"
+    r"\bсанкци(?:и|й|ями|ях|онн\w*)\b|"
     r"\bсанкці(?:ї|й|ями|ях|йн\w*)\b",
     re.IGNORECASE,
 )
@@ -364,8 +364,8 @@ def _temporal_match_score(current: EventCluster, historical: EventCluster) -> fl
         paired = {current.topic, historical.topic}
         if not paired <= {"strikes", "civilian-harm", "air-defence", "energy"}:
             return 0.0
-    current_locations = set(_cluster_location_map(current))
-    historical_locations = set(_cluster_location_map(historical))
+    current_locations = current.location_anchors
+    historical_locations = historical.location_anchors
     if current_locations and historical_locations:
         if not current_locations.intersection(historical_locations):
             return 0.0

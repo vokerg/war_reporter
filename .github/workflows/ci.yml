@@ -22,7 +22,11 @@ jobs:
       - run: python -m compileall -q scripts tests
       - run: python -m scripts.validate
       - run: python -m unittest discover -s tests -v
-      - run: python -m scripts.build_report 2026-08-05
+      - name: Build historical summary-intelligence acceptance days
+        run: |
+          for day in 2026-08-03 2026-08-05 2026-08-10; do
+            python -m scripts.build_report "$day"
+          done
       - run: python -m scripts.build_site
       - uses: actions/upload-artifact@v4
         with:

@@ -430,6 +430,28 @@ def _effective_editorial_rank(cluster: EventCluster, temporal: Any) -> float:
     return max(0.0, min(10.0, score))
 
 
+def _is_dominated_nested_primary(candidate: EventCluster, selected: EventCluster) -> bool:
+    if candidate.topic != selected.topic:
+        return False
+    candidate_locations = candidate.location_anchors
+    selected_locations = selected.location_anchors
+    if not candidate_locations or not selected_locations:
+        return False
+    if not selected_locations < candidate_locations:
+        return False
+
+    selected_evidence = evidence_score(selected)[0]
+    candidate_evidence = evidence_score(candidate)[0]
+    if selected_evidence < candidate_evidence:
+        return False
+
+    selected_families = _unique_source_families(selected)
+    candidate_families = _unique_source_families(candidate)
+    breadth_dominates = selected_families >= candidate_families + 2
+    volume_dominates = len(selected.items) >= max(3, 2 * len(candidate.items))
+    return breadth_dominates or volume_dominates
+
+
 def _select_primary(
     assessed: list[tuple[EventCluster, Any]],
     max_primary: int,
@@ -447,6 +469,11 @@ def _select_primary(
         ):
             continue
         if topic_counts[cluster.topic] >= max_per_topic:
+            continue
+        if any(
+            _is_dominated_nested_primary(cluster, chosen)
+            for chosen, _ in selected
+        ):
             continue
         selected.append((cluster, temporal))
         topic_counts[cluster.topic] += 1
@@ -590,6 +617,7 @@ def render_summary_context(
         "- Target/equipment details не раскалывают обычный strike cluster; semantic hard-key применяется только там, где он определяет класс события.",
         "- Оперативные публикации без явной географии не объединяются между разными source families.",
         "- Поток рутинных предупреждений о движении целей не конкурирует за top-rank с подтверждёнными последствиями и многоканальными событиями.",
+        "- Более слабый same-topic multi-location cluster не занимает второй primary slot, если его география строго включает уже выбранный сильнее поддержанный локальный cluster; сопоставимо поддержанные multi-region события сохраняются.",
         "- Frontline/PVO/naval/support clusters с `thin` evidence остаются ниже primary; одиночный low-trust energy claim также не поднимается.",
         "- В primary top-N действует ограничение на доминирование одной темы; это редакционный diversity guard, а не оценка истины.",
         "- `NEW/ESCALATING/CONTINUING/DECLINING` описывают изменение информационного сигнала относительно эвристически похожих кластеров предыдущих дней, а не доказанное оперативное изменение.",

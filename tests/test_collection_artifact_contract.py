@@ -37,6 +37,7 @@ class CollectionArtifactContractTests(unittest.TestCase):
             "data/raw/2026/08/06/payload.json",
             "reports/daily/latest.md",
             "reports/summary/2026-08-06.md",
+            "reports/weekly/2026-08-03_2026-08-09.md",
             "reports/../secret.md",
         )
         for path in allowed:
@@ -46,8 +47,11 @@ class CollectionArtifactContractTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertFalse(artifact_path_allowed(path, settings))
 
-    def test_operator_summaries_are_explicitly_outside_artifact(self) -> None:
+    def test_editorial_reports_are_explicitly_outside_artifact(self) -> None:
         self.assertTrue(artifact_path_ignored("reports/summary/2026-08-06.md"))
+        self.assertTrue(
+            artifact_path_ignored("reports/weekly/2026-08-03_2026-08-09.md")
+        )
         self.assertFalse(artifact_path_ignored("reports/daily/2026-08-06.md"))
         self.assertFalse(artifact_path_ignored("data/debug-response.html"))
 
@@ -63,13 +67,16 @@ class CollectionArtifactContractTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     configured_paths(settings)
 
-    def test_packager_ignores_operator_summary_but_rejects_other_files(self) -> None:
+    def test_packager_ignores_editorial_reports_but_rejects_other_files(self) -> None:
         root = Path(tempfile.mkdtemp())
         (root / "data").mkdir()
         (root / "reports/summary").mkdir(parents=True)
+        (root / "reports/weekly").mkdir(parents=True)
         (root / "data/state.json").write_text("{}")
         summary = root / "reports/summary/2026-08-06.md"
+        weekly = root / "reports/weekly/2026-08-03_2026-08-09.md"
         summary.write_text("# operator summary\n")
+        weekly.write_text("# operator weekly\n")
         files = artifact_files(root, self.settings())
         self.assertEqual(files, [root / "data/state.json"])
 

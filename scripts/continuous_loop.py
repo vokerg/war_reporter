@@ -7,21 +7,60 @@ import argparse
 import logging
 import signal
 import threading
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 try:
-    from .build_report import build_report, local_today
+    from .build_report import (
+        build_report,
+        local_today,
+        raw_paths_for_local_day,
+        report_timezone,
+    )
     from .build_site import build_site
     from .collect import run_collection
     from .common import ROOT, env_int, load_json
 except ImportError:
-    from build_report import build_report, local_today
+    from build_report import (
+        build_report,
+        local_today,
+        raw_paths_for_local_day,
+        report_timezone,
+    )
     from build_site import build_site
     from collect import run_collection
     from common import ROOT, env_int, load_json
 
 LOG = logging.getLogger("war-reporter.loop")
+
+
+def report_days_to_build(
+    root: Path,
+    settings: dict[str, Any],
+    today: date,
+    *,
+    recovery_days: int = 7,
+) -> list[date]:
+    """Return yesterday/today plus recent missing daily reports backed by raw data."""
+    report_root = root / str(settings["report_root"])
+    raw_root = str(settings["raw_root"])
+    timezone = report_timezone(settings)
+    days = {today - timedelta(days=1), today}
+    for offset in range(2, recovery_days + 1):
+        day = today - timedelta(days=offset)
+        report = report_root / f"{day.isoformat()}.md"
+        if report.exists():
+            continue
+        raw_paths = raw_paths_for_local_day(
+            root,
+            raw_root,
+            day.isoformat(),
+            timezone,
+        )
+        if any(path.exists() and path.stat().st_size > 0 for path in raw_paths):
+            days.add(day)
+    return sorted(days)
 
 
 def run_loop(
@@ -83,7 +122,7 @@ def run_loop(
             )
 
         today = local_today(settings, datetime.now(UTC))
-        for day in (today - timedelta(days=1), today):
+        for day in report_days_to_build(root, settings, today):
             try:
                 build_report(root, day.isoformat())
             except Exception:

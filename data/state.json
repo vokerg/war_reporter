@@ -3,30 +3,30 @@
     "X_BEARER_TOKEN is not configured"
   ],
   "errors": 39,
-  "items_added": 37,
+  "items_added": 7,
   "items_withheld_recent": 0,
   "items_withheld_undated": 0,
-  "last_run_at": "2026-08-14T20:41:24.980325Z",
+  "last_run_at": "2026-08-14T21:05:22.685492Z",
   "last_successful_run_at": null,
   "per_source": {
     "agentstvo-tg": {
-      "added": 1,
-      "checked_at": "2026-08-14T20:40:45.483585Z",
+      "added": 0,
+      "checked_at": "2026-08-14T21:04:24.272144Z",
       "fetched": 45,
-      "last_success_at": "2026-08-14T20:40:45.483594Z",
+      "last_success_at": "2026-08-14T21:04:24.272158Z",
       "status": "ok",
       "stored": 45,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "andrew-perpetua-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "ap-web": {
       "added": 11,
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 11,
       "last_success_at": "2026-08-14T06:07:05.128931Z",
       "next_due_at": "2026-08-15T06:07:05.128931Z",
@@ -36,15 +36,15 @@
       "withheld_undated": 0
     },
     "babel-rss": {
-      "checked_at": "2026-08-14T20:40:11.303423Z",
+      "checked_at": "2026-08-14T21:04:04.130827Z",
       "error": "HTTPError: http_404",
       "status": "error"
     },
     "bbc-russian-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:49.513373Z",
+      "checked_at": "2026-08-14T21:04:27.254751Z",
       "fetched": 225,
-      "last_success_at": "2026-08-14T20:40:49.513381Z",
+      "last_success_at": "2026-08-14T21:04:27.254764Z",
       "status": "ok",
       "stored": 225,
       "withheld_recent": 0,
@@ -52,44 +52,46 @@
     },
     "bbc-ukraine-rss": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:46.426610Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 6,
       "last_success_at": "2026-08-14T20:40:46.426619Z",
-      "status": "ok",
+      "next_due_at": "2026-08-14T21:40:46.426619Z",
+      "status": "skipped_cadence",
       "stored": 6,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "bellingcat-rss": {
       "added": 0,
-      "checked_at": "2026-08-14T20:39:53.302472Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 0,
       "last_success_at": "2026-08-14T20:39:53.302479Z",
-      "status": "ok",
+      "next_due_at": "2026-08-14T21:39:53.302479Z",
+      "status": "skipped_cadence",
       "stored": 0,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "benjamin-pittet-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "black-bird-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "brady-africk-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "brussinf-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:44.690842Z",
+      "checked_at": "2026-08-14T21:04:19.496906Z",
       "fetched": 5,
-      "last_success_at": "2026-08-14T20:40:44.690850Z",
+      "last_success_at": "2026-08-14T21:04:19.496914Z",
       "status": "ok",
       "stored": 5,
       "withheld_recent": 0,
@@ -97,37 +99,38 @@
     },
     "butusov-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:51.192428Z",
+      "checked_at": "2026-08-14T21:04:28.711281Z",
       "fetched": 126,
-      "last_success_at": "2026-08-14T20:40:51.192444Z",
+      "last_success_at": "2026-08-14T21:04:28.711293Z",
       "status": "ok",
       "stored": 126,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "calibre-obscura-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "censor-rss": {
-      "checked_at": "2026-08-14T20:40:35.665526Z",
+      "checked_at": "2026-08-14T21:04:04.131183Z",
       "error": "CollectionError: collection_error",
       "status": "error"
     },
     "cir-rss": {
       "added": 0,
-      "checked_at": "2026-08-14T20:39:53.952524Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 0,
       "last_success_at": "2026-08-14T20:39:53.952536Z",
-      "status": "ok",
+      "next_due_at": "2026-08-14T21:39:53.952536Z",
+      "status": "skipped_cadence",
       "stored": 0,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "cit-web": {
       "added": 1,
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 8,
       "last_success_at": "2026-08-14T06:06:35.305744Z",
       "next_due_at": "2026-08-15T06:06:35.305744Z",
@@ -137,28 +140,28 @@
       "withheld_undated": 0
     },
     "cit-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "colonelcassad-tg": {
-      "added": 4,
-      "checked_at": "2026-08-14T20:41:00.973951Z",
+      "added": 2,
+      "checked_at": "2026-08-14T21:04:36.490539Z",
       "fetched": 565,
-      "last_success_at": "2026-08-14T20:41:00.973967Z",
+      "last_success_at": "2026-08-14T21:04:36.490558Z",
       "status": "ok",
       "stored": 565,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "covert-shores-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "critical-threats-web": {
       "added": 2,
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 12,
       "last_success_at": "2026-08-14T06:06:48.803742Z",
       "next_due_at": "2026-08-15T06:06:48.803742Z",
@@ -168,28 +171,28 @@
       "withheld_undated": 0
     },
     "csis-rss": {
-      "checked_at": "2026-08-14T20:39:53.172843Z",
+      "checked_at": "2026-08-14T21:03:51.974797Z",
       "error": "HTTPError: http_404",
       "status": "error"
     },
     "cyber-boroshno-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:39:59.692142Z",
+      "checked_at": "2026-08-14T21:03:58.866912Z",
       "fetched": 16,
-      "last_success_at": "2026-08-14T20:39:59.692151Z",
+      "last_success_at": "2026-08-14T21:03:58.866923Z",
       "status": "ok",
       "stored": 16,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "dara-massicot-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "deepstate-map": {
       "added": 0,
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 1,
       "last_success_at": "2026-08-14T06:05:48.008289Z",
       "next_due_at": "2026-08-15T06:05:48.008289Z",
@@ -200,49 +203,50 @@
     },
     "deepstate-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:39:57.542747Z",
+      "checked_at": "2026-08-14T21:03:56.832892Z",
       "fetched": 18,
-      "last_success_at": "2026-08-14T20:39:57.542755Z",
+      "last_success_at": "2026-08-14T21:03:56.832903Z",
       "status": "ok",
       "stored": 18,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "defence-express-rss": {
-      "checked_at": "2026-08-14T20:39:57.542943Z",
+      "checked_at": "2026-08-14T21:03:52.472609Z",
       "error": "HTTPError: http_404",
       "status": "error"
     },
     "defmon-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "dw-rss": {
       "added": 1,
-      "checked_at": "2026-08-14T20:40:57.123576Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 18,
       "last_success_at": "2026-08-14T20:40:57.123591Z",
-      "status": "ok",
+      "next_due_at": "2026-08-14T21:40:57.123591Z",
+      "status": "skipped_cadence",
       "stored": 18,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "eu-council-rss": {
-      "checked_at": "2026-08-14T20:39:53.430949Z",
+      "checked_at": "2026-08-14T21:03:52.037155Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "eyes-on-russia": {
-      "checked_at": "2026-08-14T20:39:52.936662Z",
+      "checked_at": "2026-08-14T21:03:51.925371Z",
       "error": "CollectionError: collection_error",
       "status": "error"
     },
     "fighterbomber-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:38.381001Z",
+      "checked_at": "2026-08-14T21:04:14.611209Z",
       "fetched": 0,
-      "last_success_at": "2026-08-14T20:40:38.381010Z",
+      "last_success_at": "2026-08-14T21:04:14.611217Z",
       "status": "ok",
       "stored": 0,
       "withheld_recent": 0,
@@ -250,39 +254,40 @@
     },
     "france24-rss": {
       "added": 1,
-      "checked_at": "2026-08-14T20:41:00.257833Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 29,
       "last_success_at": "2026-08-14T20:41:00.257849Z",
-      "status": "ok",
+      "next_due_at": "2026-08-14T21:41:00.257849Z",
+      "status": "skipped_cadence",
       "stored": 29,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "franz-gady-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "frontelligence-web": {
-      "checked_at": "2026-08-14T20:39:52.933590Z",
+      "checked_at": "2026-08-14T21:03:51.868755Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "frontelligence-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "geoconfirmed-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "grey-zone-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:50.330769Z",
+      "checked_at": "2026-08-14T21:04:24.962714Z",
       "fetched": 0,
-      "last_success_at": "2026-08-14T20:40:50.330773Z",
+      "last_success_at": "2026-08-14T21:04:24.962718Z",
       "status": "ok",
       "stored": 0,
       "withheld_recent": 0,
@@ -290,79 +295,80 @@
     },
     "guardian-rss": {
       "added": 8,
-      "checked_at": "2026-08-14T20:41:00.471567Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 44,
       "last_success_at": "2026-08-14T20:41:00.471584Z",
-      "status": "ok",
+      "next_due_at": "2026-08-14T21:41:00.471584Z",
+      "status": "skipped_cadence",
       "stored": 44,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "hromadske-rss": {
-      "checked_at": "2026-08-14T20:40:14.850242Z",
+      "checked_at": "2026-08-14T21:04:04.130960Z",
       "error": "HTTPError: http_404",
       "status": "error"
     },
     "iiss-rss": {
-      "checked_at": "2026-08-14T20:39:53.186643Z",
+      "checked_at": "2026-08-14T21:03:52.079939Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "informnapalm-rss": {
-      "checked_at": "2026-08-14T20:39:52.949972Z",
+      "checked_at": "2026-08-14T21:03:52.071368Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "insider-rss": {
-      "checked_at": "2026-08-14T20:39:53.475459Z",
+      "checked_at": "2026-08-14T21:03:52.233732Z",
       "error": "CollectionError: collection_error",
       "status": "error"
     },
     "istories-rss": {
-      "checked_at": "2026-08-14T20:39:54.809295Z",
+      "checked_at": "2026-08-14T21:03:53.476901Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "isw-rss": {
-      "checked_at": "2026-08-14T20:39:53.430758Z",
+      "checked_at": "2026-08-14T21:03:52.021370Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "konrad-muzyka-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "kotenok-tg": {
-      "added": 1,
-      "checked_at": "2026-08-14T20:40:50.265933Z",
+      "added": 0,
+      "checked_at": "2026-08-14T21:04:26.891126Z",
       "fetched": 101,
-      "last_success_at": "2026-08-14T20:40:50.265941Z",
+      "last_success_at": "2026-08-14T21:04:26.891146Z",
       "status": "ok",
       "stored": 101,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "kyiv-independent-rss": {
-      "checked_at": "2026-08-14T20:39:53.502045Z",
+      "checked_at": "2026-08-14T21:03:52.235751Z",
       "error": "HTTPError: http_404",
       "status": "error"
     },
     "lawrence-freedman-rss": {
-      "checked_at": "2026-08-14T20:39:53.353800Z",
+      "checked_at": "2026-08-14T21:03:51.992432Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "liveuamap-web": {
-      "checked_at": "2026-08-14T20:40:14.850106Z",
+      "checked_at": "2026-08-14T21:03:58.867088Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "magyar-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:44.365372Z",
+      "checked_at": "2026-08-14T21:04:23.934451Z",
       "fetched": 22,
-      "last_success_at": "2026-08-14T20:40:44.365386Z",
+      "last_success_at": "2026-08-14T21:04:23.934465Z",
       "status": "ok",
       "stored": 22,
       "withheld_recent": 0,
@@ -370,29 +376,30 @@
     },
     "meduza-rss": {
       "added": 8,
-      "checked_at": "2026-08-14T20:40:57.558730Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 30,
       "last_success_at": "2026-08-14T20:40:57.558747Z",
-      "status": "ok",
+      "next_due_at": "2026-08-14T21:40:57.558747Z",
+      "status": "skipped_cadence",
       "stored": 30,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "michael-kofman-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "mick-ryan-rss": {
-      "checked_at": "2026-08-14T20:39:57.543060Z",
+      "checked_at": "2026-08-14T21:03:52.369909Z",
       "error": "HTTPError: http_404",
       "status": "error"
     },
     "milinfolive-tg": {
-      "added": 1,
-      "checked_at": "2026-08-14T20:40:56.193501Z",
+      "added": 0,
+      "checked_at": "2026-08-14T21:04:31.200853Z",
       "fetched": 135,
-      "last_success_at": "2026-08-14T20:40:56.193517Z",
+      "last_success_at": "2026-08-14T21:04:31.200873Z",
       "status": "ok",
       "stored": 135,
       "withheld_recent": 0,
@@ -400,28 +407,28 @@
     },
     "militarnyi-rss": {
       "added": 0,
-      "checked_at": "2026-08-14T20:39:53.661247Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 0,
       "last_success_at": "2026-08-14T20:39:53.661255Z",
-      "status": "ok",
+      "next_due_at": "2026-08-14T21:39:53.661255Z",
+      "status": "skipped_cadence",
       "stored": 0,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "militaryland-rss": {
-      "added": 1,
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "added": 0,
+      "checked_at": "2026-08-14T21:04:24.911822Z",
       "fetched": 3,
-      "last_success_at": "2026-08-14T20:02:45.284172Z",
-      "next_due_at": "2026-08-14T21:02:45.284172Z",
-      "status": "skipped_cadence",
+      "last_success_at": "2026-08-14T21:04:24.911839Z",
+      "status": "ok",
       "stored": 3,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "molfar-web": {
       "added": 0,
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 12,
       "last_success_at": "2026-08-14T06:07:03.147495Z",
       "next_due_at": "2026-08-15T06:07:03.147495Z",
@@ -432,44 +439,45 @@
     },
     "moscow-times-rss": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:57.453185Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 43,
       "last_success_at": "2026-08-14T20:40:57.453201Z",
-      "status": "ok",
+      "next_due_at": "2026-08-14T21:40:57.453201Z",
+      "status": "skipped_cadence",
       "stored": 43,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "nato-rss": {
-      "checked_at": "2026-08-14T20:40:02.933452Z",
+      "checked_at": "2026-08-14T21:04:16.332782Z",
       "error": "HTTPError: http_404",
       "status": "error"
     },
     "necro-mancer-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "noelreports-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "novaya-europe-rss": {
-      "checked_at": "2026-08-14T20:39:59.692343Z",
+      "checked_at": "2026-08-14T21:03:52.679824Z",
       "error": "HTTPError: http_521",
       "status": "error"
     },
     "nrg8000-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "older-edda-tg": {
-      "added": 1,
-      "checked_at": "2026-08-14T20:40:46.195569Z",
+      "added": 0,
+      "checked_at": "2026-08-14T21:04:24.810592Z",
       "fetched": 38,
-      "last_success_at": "2026-08-14T20:40:46.195576Z",
+      "last_success_at": "2026-08-14T21:04:24.810611Z",
       "status": "ok",
       "stored": 38,
       "withheld_recent": 0,
@@ -477,7 +485,7 @@
     },
     "oryx-web": {
       "added": 1,
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 11,
       "last_success_at": "2026-08-14T11:31:41.906053Z",
       "next_due_at": "2026-08-15T11:31:41.906053Z",
@@ -487,25 +495,25 @@
       "withheld_undated": 0
     },
     "osinttechnical-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "pasi-paroinen-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "phillips-obrien-rss": {
-      "checked_at": "2026-08-14T20:39:53.318031Z",
+      "checked_at": "2026-08-14T21:03:52.028650Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "poddubny-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:48.967191Z",
+      "checked_at": "2026-08-14T21:04:25.951555Z",
       "fetched": 69,
-      "last_success_at": "2026-08-14T20:40:48.967205Z",
+      "last_success_at": "2026-08-14T21:04:25.951574Z",
       "status": "ok",
       "stored": 69,
       "withheld_recent": 0,
@@ -513,59 +521,61 @@
     },
     "pravda-rss": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:54.154878Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 20,
       "last_success_at": "2026-08-14T20:40:54.154893Z",
-      "status": "ok",
+      "next_due_at": "2026-08-14T21:40:54.154893Z",
+      "status": "skipped_cadence",
       "stored": 20,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "readovka-tg": {
-      "added": 1,
-      "checked_at": "2026-08-14T20:40:59.145669Z",
+      "added": 0,
+      "checked_at": "2026-08-14T21:04:32.434556Z",
       "fetched": 244,
-      "last_success_at": "2026-08-14T20:40:59.145684Z",
+      "last_success_at": "2026-08-14T21:04:32.434579Z",
       "status": "ok",
       "stored": 244,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "reuters-web": {
-      "checked_at": "2026-08-14T20:39:53.126352Z",
+      "checked_at": "2026-08-14T21:03:51.983575Z",
       "error": "HTTPError: http_401",
       "status": "error"
     },
     "rferl-rss": {
       "added": 0,
-      "checked_at": "2026-08-14T20:39:53.240774Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 0,
       "last_success_at": "2026-08-14T20:39:53.240783Z",
-      "status": "ok",
+      "next_due_at": "2026-08-14T21:39:53.240783Z",
+      "status": "skipped_cadence",
       "stored": 0,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "rob-lee-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "romanov-tg": {
-      "added": 0,
-      "checked_at": "2026-08-14T20:40:51.578531Z",
-      "fetched": 41,
-      "last_success_at": "2026-08-14T20:40:51.578546Z",
+      "added": 1,
+      "checked_at": "2026-08-14T21:04:26.268611Z",
+      "fetched": 42,
+      "last_success_at": "2026-08-14T21:04:26.268632Z",
       "status": "ok",
-      "stored": 41,
+      "stored": 42,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ru-belgorod-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:20.765471Z",
+      "checked_at": "2026-08-14T21:04:04.131086Z",
       "fetched": 0,
-      "last_success_at": "2026-08-14T20:40:20.765481Z",
+      "last_success_at": "2026-08-14T21:04:04.131092Z",
       "status": "ok",
       "stored": 0,
       "withheld_recent": 0,
@@ -573,34 +583,34 @@
     },
     "ru-bryansk-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:36.968733Z",
+      "checked_at": "2026-08-14T21:04:11.114926Z",
       "fetched": 6,
-      "last_success_at": "2026-08-14T20:40:36.968741Z",
+      "last_success_at": "2026-08-14T21:04:11.114938Z",
       "status": "ok",
       "stored": 6,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ru-kremlin-web": {
-      "checked_at": "2026-08-14T20:41:24.974081Z",
+      "checked_at": "2026-08-14T21:05:22.679028Z",
       "error": "ConnectTimeout: timeout",
       "status": "error"
     },
     "ru-kursk-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:42.754380Z",
+      "checked_at": "2026-08-14T21:04:20.279393Z",
       "fetched": 19,
-      "last_success_at": "2026-08-14T20:40:42.754388Z",
+      "last_success_at": "2026-08-14T21:04:20.279404Z",
       "status": "ok",
       "stored": 19,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ru-mid-tg": {
-      "added": 1,
-      "checked_at": "2026-08-14T20:40:50.857567Z",
+      "added": 0,
+      "checked_at": "2026-08-14T21:04:29.589491Z",
       "fetched": 133,
-      "last_success_at": "2026-08-14T20:40:50.857576Z",
+      "last_success_at": "2026-08-14T21:04:29.589512Z",
       "status": "ok",
       "stored": 133,
       "withheld_recent": 0,
@@ -608,7 +618,7 @@
     },
     "ru-mid-web": {
       "added": 2,
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 10,
       "last_success_at": "2026-08-14T06:06:53.072745Z",
       "next_due_at": "2026-08-15T06:06:53.072745Z",
@@ -619,24 +629,24 @@
     },
     "ru-mod-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:47.837138Z",
+      "checked_at": "2026-08-14T21:04:25.729651Z",
       "fetched": 139,
-      "last_success_at": "2026-08-14T20:40:47.837153Z",
+      "last_success_at": "2026-08-14T21:04:25.729662Z",
       "status": "ok",
       "stored": 139,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ru-mod-web": {
-      "checked_at": "2026-08-14T20:40:49.513534Z",
+      "checked_at": "2026-08-14T21:04:33.116557Z",
       "error": "ConnectTimeout: timeout",
       "status": "error"
     },
     "ru-ria-tg": {
-      "added": 2,
-      "checked_at": "2026-08-14T20:40:58.785201Z",
+      "added": 1,
+      "checked_at": "2026-08-14T21:04:32.780762Z",
       "fetched": 398,
-      "last_success_at": "2026-08-14T20:40:58.785217Z",
+      "last_success_at": "2026-08-14T21:04:32.780781Z",
       "status": "ok",
       "stored": 398,
       "withheld_recent": 0,
@@ -644,9 +654,9 @@
     },
     "ru-sevastopol-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:48.503428Z",
+      "checked_at": "2026-08-14T21:04:26.567569Z",
       "fetched": 120,
-      "last_success_at": "2026-08-14T20:40:48.503436Z",
+      "last_success_at": "2026-08-14T21:04:26.567588Z",
       "status": "ok",
       "stored": 120,
       "withheld_recent": 0,
@@ -654,7 +664,7 @@
     },
     "ru-tass-web": {
       "added": 1,
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 1,
       "last_success_at": "2026-08-14T06:06:44.025031Z",
       "next_due_at": "2026-08-15T06:06:44.025031Z",
@@ -665,159 +675,159 @@
     },
     "ru-zvezda-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:57.985577Z",
+      "checked_at": "2026-08-14T21:04:32.170713Z",
       "fetched": 248,
-      "last_success_at": "2026-08-14T20:40:57.985594Z",
+      "last_success_at": "2026-08-14T21:04:32.170730Z",
       "status": "ok",
       "stored": 248,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "rusi-rss": {
-      "checked_at": "2026-08-14T20:40:02.933329Z",
+      "checked_at": "2026-08-14T21:04:11.115099Z",
       "error": "HTTPError: http_404",
       "status": "error"
     },
     "russia-contingency-rss": {
-      "checked_at": "2026-08-14T20:39:52.933386Z",
+      "checked_at": "2026-08-14T21:03:51.866647Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "rvvoenkor-tg": {
-      "added": 1,
-      "checked_at": "2026-08-14T20:41:00.087474Z",
-      "fetched": 265,
-      "last_success_at": "2026-08-14T20:41:00.087491Z",
+      "added": 2,
+      "checked_at": "2026-08-14T21:04:33.674333Z",
+      "fetched": 266,
+      "last_success_at": "2026-08-14T21:04:33.674345Z",
       "status": "ok",
-      "stored": 265,
+      "stored": 266,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "rybar-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:54.040518Z",
-      "fetched": 125,
-      "last_success_at": "2026-08-14T20:40:54.040534Z",
+      "checked_at": "2026-08-14T21:04:30.374074Z",
+      "fetched": 124,
+      "last_success_at": "2026-08-14T21:04:30.374092Z",
       "status": "ok",
-      "stored": 125,
+      "stored": 124,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "samuel-bendett-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "sashakots-tg": {
-      "added": 1,
-      "checked_at": "2026-08-14T20:40:55.392670Z",
+      "added": 0,
+      "checked_at": "2026-08-14T21:04:29.038138Z",
       "fetched": 101,
-      "last_success_at": "2026-08-14T20:40:55.392686Z",
+      "last_success_at": "2026-08-14T21:04:29.038153Z",
       "status": "ok",
       "stored": 101,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "sladkov-tg": {
-      "added": 2,
-      "checked_at": "2026-08-14T20:40:49.846485Z",
+      "added": 0,
+      "checked_at": "2026-08-14T21:04:24.626471Z",
       "fetched": 14,
-      "last_success_at": "2026-08-14T20:40:49.846498Z",
+      "last_success_at": "2026-08-14T21:04:24.626484Z",
       "status": "ok",
       "stored": 14,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "special-kherson-cat-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "sternenko-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:54.510377Z",
+      "checked_at": "2026-08-14T21:04:30.132082Z",
       "fetched": 144,
-      "last_success_at": "2026-08-14T20:40:54.510393Z",
+      "last_success_at": "2026-08-14T21:04:30.132098Z",
       "status": "ok",
       "stored": 144,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "suspilne-rss": {
-      "checked_at": "2026-08-14T20:39:53.240928Z",
+      "checked_at": "2026-08-14T21:03:52.100425Z",
       "error": "HTTPError: http_404",
       "status": "error"
     },
     "svarschiki-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:50.330646Z",
+      "checked_at": "2026-08-14T21:04:24.962591Z",
       "fetched": 2,
-      "last_success_at": "2026-08-14T20:40:50.330654Z",
+      "last_success_at": "2026-08-14T21:04:24.962601Z",
       "status": "ok",
       "stored": 2,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "tatarigami-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "texty-rss": {
-      "checked_at": "2026-08-14T20:39:59.692465Z",
+      "checked_at": "2026-08-14T21:03:52.975922Z",
       "error": "HTTPError: http_404",
       "status": "error"
     },
     "two-majors-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:58.359517Z",
+      "checked_at": "2026-08-14T21:04:31.756334Z",
       "fetched": 192,
-      "last_success_at": "2026-08-14T20:40:58.359533Z",
+      "last_success_at": "2026-08-14T21:04:31.756356Z",
       "status": "ok",
       "stored": 192,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ua-air-assault-web": {
-      "checked_at": "2026-08-14T20:40:02.933080Z",
+      "checked_at": "2026-08-14T21:03:52.646424Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "ua-air-force-tg": {
       "added": 1,
-      "checked_at": "2026-08-14T20:40:59.674230Z",
-      "fetched": 949,
-      "last_success_at": "2026-08-14T20:40:59.674246Z",
+      "checked_at": "2026-08-14T21:04:34.039386Z",
+      "fetched": 945,
+      "last_success_at": "2026-08-14T21:04:34.039406Z",
       "status": "ok",
-      "stored": 949,
+      "stored": 945,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ua-border-guard-web": {
-      "checked_at": "2026-08-14T20:39:53.379512Z",
+      "checked_at": "2026-08-14T21:03:52.082562Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "ua-defence-intel-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:06.772280Z",
+      "checked_at": "2026-08-14T21:04:08.083314Z",
       "fetched": 24,
-      "last_success_at": "2026-08-14T20:40:06.772304Z",
+      "last_success_at": "2026-08-14T21:04:08.083332Z",
       "status": "ok",
       "stored": 24,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ua-defence-intel-web": {
-      "checked_at": "2026-08-14T20:39:53.018688Z",
+      "checked_at": "2026-08-14T21:03:51.989004Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "ua-dnipro-oblast-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:43.916469Z",
+      "checked_at": "2026-08-14T21:04:22.657913Z",
       "fetched": 56,
-      "last_success_at": "2026-08-14T20:40:43.916477Z",
+      "last_success_at": "2026-08-14T21:04:22.657925Z",
       "status": "ok",
       "stored": 56,
       "withheld_recent": 0,
@@ -825,9 +835,9 @@
     },
     "ua-donetsk-oblast-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:31.323077Z",
+      "checked_at": "2026-08-14T21:04:17.759530Z",
       "fetched": 46,
-      "last_success_at": "2026-08-14T20:40:31.323085Z",
+      "last_success_at": "2026-08-14T21:04:17.759541Z",
       "status": "ok",
       "stored": 46,
       "withheld_recent": 0,
@@ -835,54 +845,54 @@
     },
     "ua-dsns-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:52.384123Z",
+      "checked_at": "2026-08-14T21:04:30.926174Z",
       "fetched": 103,
-      "last_success_at": "2026-08-14T20:40:52.384136Z",
+      "last_success_at": "2026-08-14T21:04:30.926194Z",
       "status": "ok",
       "stored": 103,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ua-dsns-web": {
-      "checked_at": "2026-08-14T20:39:53.213176Z",
+      "checked_at": "2026-08-14T21:03:52.042174Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "ua-energy-web": {
-      "checked_at": "2026-08-14T20:39:53.475304Z",
+      "checked_at": "2026-08-14T21:03:52.213681Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "ua-general-staff-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:20.765208Z",
+      "checked_at": "2026-08-14T21:04:19.271702Z",
       "fetched": 60,
-      "last_success_at": "2026-08-14T20:40:20.765216Z",
+      "last_success_at": "2026-08-14T21:04:19.271713Z",
       "status": "ok",
       "stored": 60,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ua-general-staff-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "ua-kharkiv-oblast-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:41.958693Z",
+      "checked_at": "2026-08-14T21:04:23.552495Z",
       "fetched": 70,
-      "last_success_at": "2026-08-14T20:40:41.958701Z",
+      "last_success_at": "2026-08-14T21:04:23.552506Z",
       "status": "ok",
       "stored": 70,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ua-kherson-oblast-tg": {
-      "added": 1,
-      "checked_at": "2026-08-14T20:40:56.916585Z",
+      "added": 0,
+      "checked_at": "2026-08-14T21:04:33.116344Z",
       "fetched": 515,
-      "last_success_at": "2026-08-14T20:40:56.916602Z",
+      "last_success_at": "2026-08-14T21:04:33.116360Z",
       "status": "ok",
       "stored": 515,
       "withheld_recent": 0,
@@ -890,9 +900,9 @@
     },
     "ua-kyiv-city-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:35.665345Z",
+      "checked_at": "2026-08-14T21:04:21.103195Z",
       "fetched": 87,
-      "last_success_at": "2026-08-14T20:40:35.665353Z",
+      "last_success_at": "2026-08-14T21:04:21.103211Z",
       "status": "ok",
       "stored": 87,
       "withheld_recent": 0,
@@ -900,19 +910,19 @@
     },
     "ua-kyiv-oblast-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:52.868643Z",
-      "fetched": 373,
-      "last_success_at": "2026-08-14T20:40:52.868658Z",
+      "checked_at": "2026-08-14T21:04:29.852355Z",
+      "fetched": 371,
+      "last_success_at": "2026-08-14T21:04:29.852376Z",
       "status": "ok",
-      "stored": 373,
+      "stored": 371,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ua-land-forces-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:26.230046Z",
+      "checked_at": "2026-08-14T21:04:21.962116Z",
       "fetched": 41,
-      "last_success_at": "2026-08-14T20:40:26.230054Z",
+      "last_success_at": "2026-08-14T21:04:21.962128Z",
       "status": "ok",
       "stored": 41,
       "withheld_recent": 0,
@@ -920,7 +930,7 @@
     },
     "ua-mod-web": {
       "added": 0,
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 1,
       "last_success_at": "2026-08-14T06:05:51.790668Z",
       "next_due_at": "2026-08-15T06:05:51.790668Z",
@@ -930,13 +940,13 @@
       "withheld_undated": 0
     },
     "ua-mod-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "ua-navy-web": {
       "added": 0,
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 0,
       "last_success_at": "2026-08-14T06:05:51.790803Z",
       "next_due_at": "2026-08-15T06:05:51.790803Z",
@@ -947,9 +957,9 @@
     },
     "ua-odesa-oblast-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:38.380796Z",
+      "checked_at": "2026-08-14T21:04:14.605919Z",
       "fetched": 37,
-      "last_success_at": "2026-08-14T20:40:38.380811Z",
+      "last_success_at": "2026-08-14T21:04:14.605931Z",
       "status": "ok",
       "stored": 37,
       "withheld_recent": 0,
@@ -957,9 +967,9 @@
     },
     "ua-police-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:55.075819Z",
+      "checked_at": "2026-08-14T21:04:31.455346Z",
       "fetched": 142,
-      "last_success_at": "2026-08-14T20:40:55.075835Z",
+      "last_success_at": "2026-08-14T21:04:31.455367Z",
       "status": "ok",
       "stored": 142,
       "withheld_recent": 0,
@@ -967,34 +977,34 @@
     },
     "ua-president-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:11.303248Z",
+      "checked_at": "2026-08-14T21:04:16.332597Z",
       "fetched": 46,
-      "last_success_at": "2026-08-14T20:40:11.303256Z",
+      "last_success_at": "2026-08-14T21:04:16.332608Z",
       "status": "ok",
       "stored": 46,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ua-president-web": {
-      "checked_at": "2026-08-14T20:39:53.281697Z",
+      "checked_at": "2026-08-14T21:03:52.119088Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "ua-president-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "ua-prosecutor-web": {
-      "checked_at": "2026-08-14T20:39:53.126498Z",
+      "checked_at": "2026-08-14T21:03:52.105720Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "ua-railways-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:14.822421Z",
+      "checked_at": "2026-08-14T21:04:01.190465Z",
       "fetched": 8,
-      "last_success_at": "2026-08-14T20:40:14.822430Z",
+      "last_success_at": "2026-08-14T21:04:01.190476Z",
       "status": "ok",
       "stored": 8,
       "withheld_recent": 0,
@@ -1002,54 +1012,54 @@
     },
     "ua-sbu-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:02.932905Z",
+      "checked_at": "2026-08-14T21:04:04.117869Z",
       "fetched": 22,
-      "last_success_at": "2026-08-14T20:40:02.932913Z",
+      "last_success_at": "2026-08-14T21:04:04.117887Z",
       "status": "ok",
       "stored": 22,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ua-sbu-web": {
-      "checked_at": "2026-08-14T20:39:54.992763Z",
+      "checked_at": "2026-08-14T21:03:53.393454Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "ua-sof-web": {
-      "checked_at": "2026-08-14T20:40:02.933205Z",
+      "checked_at": "2026-08-14T21:03:53.357071Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "ua-sumy-oblast-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:40.204615Z",
-      "fetched": 51,
-      "last_success_at": "2026-08-14T20:40:40.204643Z",
+      "checked_at": "2026-08-14T21:04:23.126511Z",
+      "fetched": 50,
+      "last_success_at": "2026-08-14T21:04:23.126522Z",
       "status": "ok",
-      "stored": 51,
+      "stored": 50,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "ua-ukrenergo-web": {
-      "checked_at": "2026-08-14T20:39:53.145570Z",
+      "checked_at": "2026-08-14T21:03:52.077787Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "ua-unmanned-forces-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "ua-weapons-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "ua-zaporizhzhia-oblast-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:51.901805Z",
+      "checked_at": "2026-08-14T21:04:30.681581Z",
       "fetched": 357,
-      "last_success_at": "2026-08-14T20:40:51.901822Z",
+      "last_success_at": "2026-08-14T21:04:30.681600Z",
       "status": "ok",
       "stored": 357,
       "withheld_recent": 0,
@@ -1057,34 +1067,35 @@
     },
     "uk-mod-rss": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:55.603861Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "fetched": 20,
       "last_success_at": "2026-08-14T20:40:55.603876Z",
-      "status": "ok",
+      "next_due_at": "2026-08-14T21:40:55.603876Z",
+      "status": "skipped_cadence",
       "stored": 20,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "us-defense-rss": {
-      "checked_at": "2026-08-14T20:39:53.215370Z",
+      "checked_at": "2026-08-14T21:03:51.930849Z",
       "error": "CollectionError: collection_error",
       "status": "error"
     },
     "veteran-notes-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:53.507991Z",
-      "fetched": 56,
-      "last_success_at": "2026-08-14T20:40:53.508006Z",
+      "checked_at": "2026-08-14T21:04:29.254718Z",
+      "fetched": 92,
+      "last_success_at": "2026-08-14T21:04:29.254739Z",
       "status": "ok",
-      "stored": 56,
+      "stored": 92,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "voenacher-tg": {
-      "added": 1,
-      "checked_at": "2026-08-14T20:40:53.269371Z",
+      "added": 0,
+      "checked_at": "2026-08-14T21:04:28.125912Z",
       "fetched": 96,
-      "last_success_at": "2026-08-14T20:40:53.269380Z",
+      "last_success_at": "2026-08-14T21:04:28.125931Z",
       "status": "ok",
       "stored": 96,
       "withheld_recent": 0,
@@ -1092,9 +1103,9 @@
     },
     "war-on-fakes-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:54.712683Z",
+      "checked_at": "2026-08-14T21:04:27.793207Z",
       "fetched": 27,
-      "last_success_at": "2026-08-14T20:40:54.712699Z",
+      "last_success_at": "2026-08-14T21:04:27.793220Z",
       "status": "ok",
       "stored": 27,
       "withheld_recent": 0,
@@ -1102,44 +1113,44 @@
     },
     "wargonzo-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:47.140586Z",
+      "checked_at": "2026-08-14T21:04:25.320126Z",
       "fetched": 61,
-      "last_success_at": "2026-08-14T20:40:47.140600Z",
+      "last_success_at": "2026-08-14T21:04:25.320137Z",
       "status": "ok",
       "stored": 61,
       "withheld_recent": 0,
       "withheld_undated": 0
     },
     "warspotting-web": {
-      "checked_at": "2026-08-14T20:39:53.023219Z",
+      "checked_at": "2026-08-14T21:03:51.917291Z",
       "error": "HTTPError: http_403",
       "status": "error"
     },
     "wartranslated-x": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "x-discovery-1": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "x-discovery-2": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "x-discovery-3": {
-      "checked_at": "2026-08-14T20:39:52.505471Z",
+      "checked_at": "2026-08-14T21:03:51.453564Z",
       "reason": "X_BEARER_TOKEN is not configured",
       "status": "skipped_config"
     },
     "yuri-podolyaka-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:56.495077Z",
+      "checked_at": "2026-08-14T21:04:28.429872Z",
       "fetched": 68,
-      "last_success_at": "2026-08-14T20:40:56.495093Z",
+      "last_success_at": "2026-08-14T21:04:28.429890Z",
       "status": "ok",
       "stored": 68,
       "withheld_recent": 0,
@@ -1147,19 +1158,19 @@
     },
     "zhivov-tg": {
       "added": 0,
-      "checked_at": "2026-08-14T20:40:55.906370Z",
+      "checked_at": "2026-08-14T21:04:27.503429Z",
       "fetched": 80,
-      "last_success_at": "2026-08-14T20:40:55.906388Z",
+      "last_success_at": "2026-08-14T21:04:27.503452Z",
       "status": "ok",
       "stored": 80,
       "withheld_recent": 0,
       "withheld_undated": 0
     }
   },
-  "since": "2026-08-07T20:39:52.505471Z",
-  "sources_attempted": 106,
+  "since": "2026-08-07T21:03:51.453564Z",
+  "sources_attempted": 95,
   "sources_configured": 149,
-  "sources_skipped": 43,
-  "sources_succeeded": 67,
+  "sources_skipped": 54,
+  "sources_succeeded": 56,
   "status": "partial"
 }

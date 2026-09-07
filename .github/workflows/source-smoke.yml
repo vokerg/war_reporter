@@ -27,10 +27,10 @@ jobs:
     env:
       SMOKE_SOURCES: ${{ inputs.sources }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
@@ -79,7 +79,7 @@ jobs:
               raise SystemExit("; ".join(failures))
           print(json.dumps(state, ensure_ascii=False, indent=2))
           PY
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: non-x-source-smoke
@@ -99,10 +99,10 @@ jobs:
     env:
       X_SMOKE_SOURCES: ${{ inputs.x_sources }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
@@ -149,7 +149,7 @@ jobs:
               raise SystemExit("; ".join(failures))
           print(json.dumps(state, ensure_ascii=False, indent=2))
           PY
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: x-source-smoke

@@ -56,7 +56,7 @@ Agent-authored summaries must not reconstruct details that the public digest red
 7. run every validation command in `README.md`;
 8. update one PR with observed coverage, inaccessible sources and unimplemented requirements.
 
-Only `ok` or `idle` is clean. `partial`, `blocked`, `failed`, stale status, a non-zero process exit, or unreviewed smoke output is not success.
+Only `ok` or `idle` is clean collection health. `partial` remains degraded and must be reported as such even when the scheduled workflow succeeds after persisting validated partial output. `blocked`, `failed`, stale status, or unreviewed smoke output is not success.
 
 ## X evidence
 

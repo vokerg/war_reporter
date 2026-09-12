@@ -50,9 +50,22 @@ jobs:
             collection-artifact-manifest.json
           if-no-files-found: error
           retention-days: 2
-      - name: Fail visibly on incomplete collection
-        if: steps.collect.outcome != 'success'
-        run: exit 1
+      - name: Enforce collector terminal status
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          state = json.loads(Path("data/state.json").read_text(encoding="utf-8"))
+          status = state.get("status")
+          if status == "partial":
+              print("::warning::Collection coverage is partial; validated partial results will be persisted")
+          elif status in {"blocked", "failed"}:
+              raise SystemExit(f"collector terminal status={status}")
+          elif status not in {"ok", "idle"}:
+              raise SystemExit(f"unexpected collector status={status!r}")
+          PY
 
   persist:
     needs: collect

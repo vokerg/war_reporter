@@ -120,7 +120,7 @@ python -m scripts.collect \
   --sources ua-general-staff-tg,bbc-ukraine-rss,cit-web
 ```
 
-PR CI runs the same bounded Telegram/RSS/web adapters and requires each to return `status=ok` with at least one fetched item. A separate same-repository PR job checks `ua-general-staff-x` and `x-discovery-1`, bounds X pagination and scopes `X_BEARER_TOKEN` only to the collection step. While X remains enabled, a missing secret is a red configuration blocker rather than a green skip.
+PR CI runs the same bounded Telegram/RSS/web adapters and requires each to return `status=ok` with at least one fetched item. A separate same-repository PR job checks `ua-general-staff-x` and `x-discovery-1` only when `X_BEARER_TOKEN` is configured; otherwise it emits an explicit notice and skips the live X probe. A skipped X probe is not evidence that X works: X coverage remains unproven until a credentialed smoke run succeeds.
 
 The manual `Source smoke test` workflow supports later/default-branch reruns and alternate source IDs without committing its archive. A workflow file that exists only on a feature branch is not sufficient pre-merge `workflow_dispatch` evidence.
 
@@ -176,4 +176,4 @@ python -m scripts.build_site
 
 The validator rejects absolute/traversing repository paths, credentialed source URLs, source ID/platform mismatches, unsafe persisted error records and public archive rows that do not match `public_excerpt_v1` or `public_redacted_v1`.
 
-Merge readiness additionally requires a reviewed exact-current-head hosted run, a successful representative network smoke artifact, X account/search evidence whenever X remains enabled or is claimed as working, and explicit separation between preview and deployed Pages evidence.
+Merge readiness additionally requires a reviewed exact-current-head hosted run, a successful representative network smoke artifact, X account/search evidence when a change touches X or working X coverage is claimed, and explicit separation between preview and deployed Pages evidence.

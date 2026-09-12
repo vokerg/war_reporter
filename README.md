@@ -69,6 +69,9 @@ data/raw/YYYY/MM/DD/items.ndjson  public excerpt/redacted records
 data/errors/YYYY/MM/DD/errors.ndjson source-specific safe error categories
 data/state.json                   latest run, clean-run time and source health
 reports/daily/YYYY-MM-DD.md       automatic source digest
+reports/summary/YYYY-MM-DD.md     editorial daily summary
+reports/weekly/*.md               editorial weekly snapshots
+reports/monthly/YYYY-MM.md        editorial monthly snapshots
 schemas/raw-item.schema.json      public archive contract
 schemas/public-status.schema.json public status contract
 scripts/collect.py                collector facade and CLI
@@ -114,7 +117,7 @@ Successful sources are retained during a partial run, but the run remains visibl
 python -m scripts.collect \
   --force \
   --lookback-hours 168 \
-  --sources ua-general-staff-tg,bellingcat-rss,cit-web
+  --sources ua-general-staff-tg,bbc-ukraine-rss,cit-web
 ```
 
 PR CI runs the same bounded Telegram/RSS/web adapters and requires each to return `status=ok` with at least one fetched item. A separate same-repository PR job checks `ua-general-staff-x` and `x-discovery-1`, bounds X pagination and scopes `X_BEARER_TOKEN` only to the collection step. While X remains enabled, a missing secret is a red configuration blocker rather than a green skip.
@@ -147,7 +150,9 @@ python -m http.server --directory site 8000
 
 Open:
 
-- `/index.html` for daily digests;
+- `/index.html` for daily digests plus weekly/monthly navigation;
+- `/weekly/index.html` for weekly editorial snapshots;
+- `/monthly/index.html` for monthly editorial snapshots;
 - `/raw/index.html` for source cards;
 - `/maps/index.html` for delayed map-source publications;
 - `/status/index.html` for reader-facing health;

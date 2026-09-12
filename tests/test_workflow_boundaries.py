@@ -52,8 +52,10 @@ class WorkflowBoundaryTests(unittest.TestCase):
             x_block.count(
                 "X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}"
             ),
-            1,
+            2,
         )
+        self.assertIn("name: Detect X credentials", x_block)
+        self.assertIn("steps.x_config.outputs.configured == 'true'", x_block)
         self.assertIn(
             "github.event.pull_request.head.repo.full_name == github.repository",
             x_block,

@@ -28,6 +28,8 @@ jobs:
             python -m scripts.build_report "$day"
           done
       - run: python -m scripts.build_site
+      - run: python -m scripts.build_weekly_site
+      - run: python -m scripts.build_monthly_site
       - uses: actions/upload-artifact@v4
         with:
           name: site-preview-${{ github.sha }}
@@ -55,7 +57,7 @@ jobs:
           --force
           --lookback-hours 168
           --workers 3
-          --sources ua-general-staff-tg,bellingcat-rss,cit-web
+          --sources ua-general-staff-tg,bbc-ukraine-rss,cit-web
       - name: Verify non-empty adapter results
         if: always()
         run: |
@@ -65,7 +67,7 @@ jobs:
 
           expected = {
               "ua-general-staff-tg",
-              "bellingcat-rss",
+              "bbc-ukraine-rss",
               "cit-web",
           }
           state = json.loads(Path("data/state.json").read_text(encoding="utf-8"))
@@ -112,15 +114,31 @@ jobs:
     permissions:
       contents: read
     steps:
+      - id: x_config
+        name: Detect X credentials
+        env:
+          X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
+        run: |
+          if [ -n "$X_BEARER_TOKEN" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::X_BEARER_TOKEN is not configured; X live smoke is skipped"
+          fi
       - uses: actions/checkout@v4
+        if: steps.x_config.outputs.configured == 'true'
         with:
           persist-credentials: false
       - uses: actions/setup-python@v5
+        if: steps.x_config.outputs.configured == 'true'
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
+        if: steps.x_config.outputs.configured == 'true'
       - run: python -m scripts.validate
+        if: steps.x_config.outputs.configured == 'true'
       - name: Bound X smoke pagination
+        if: steps.x_config.outputs.configured == 'true'
         run: |
           python - <<'PY'
           import json
@@ -133,21 +151,18 @@ jobs:
           python -m scripts.validate
       - id: collect
         name: Collect X account and recent search
+        if: steps.x_config.outputs.configured == 'true'
         continue-on-error: true
         env:
           X_BEARER_TOKEN: ${{ secrets.X_BEARER_TOKEN }}
         run: |
-          if [ -z "$X_BEARER_TOKEN" ]; then
-            echo "X_BEARER_TOKEN repository secret is not configured" >&2
-            exit 1
-          fi
           python -m scripts.collect \
             --force \
             --lookback-hours 168 \
             --workers 2 \
             --sources ua-general-staff-x,x-discovery-1
       - name: Verify X account and discovery results
-        if: always()
+        if: steps.x_config.outputs.configured == 'true'
         run: |
           python - <<'PY'
           import json
@@ -171,7 +186,7 @@ jobs:
           print(json.dumps(state, ensure_ascii=False, indent=2))
           PY
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: steps.x_config.outputs.configured == 'true'
         with:
           name: x-source-smoke
           path: |
@@ -180,5 +195,5 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
       - name: Require X collector success
-        if: steps.collect.outcome != 'success'
+        if: steps.x_config.outputs.configured == 'true' && steps.collect.outcome != 'success'
         run: exit 1

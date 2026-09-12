@@ -16,14 +16,14 @@ class OperatorDocumentationTests(unittest.TestCase):
     def test_docs_use_proven_non_x_smoke_sources(self) -> None:
         for text in (self.readme, self.agents):
             self.assertIn(
-                "ua-general-staff-tg,bellingcat-rss,cit-web",
+                "ua-general-staff-tg,bbc-ukraine-rss,cit-web",
                 text,
             )
             self.assertNotIn("ua-president-web", text)
 
-    def test_docs_do_not_treat_missing_x_secret_as_success(self) -> None:
-        self.assertIn("missing secret is a red configuration blocker", self.readme)
-        self.assertIn("missing secret is a red configuration blocker", self.agents)
+    def test_docs_do_not_treat_skipped_x_smoke_as_success_evidence(self) -> None:
+        self.assertIn("skips the live X probe", self.readme)
+        self.assertIn("This skip is not success evidence", self.agents)
         self.assertIn("ua-general-staff-x", self.readme)
         self.assertIn("x-discovery-1", self.readme)
 

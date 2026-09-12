@@ -61,16 +61,15 @@ class CollectionWorkflowGateTests(unittest.TestCase):
         write = self.workflow.index("contents: write")
         self.assertGreater(write, persist)
 
-    def test_partial_collection_can_upload_but_remains_red(self) -> None:
+    def test_partial_collection_can_upload_without_masking_terminal_failures(self) -> None:
         workflow = self.workflow
         self.assertIn("continue-on-error: true", workflow)
-        self.assertIn(
-            "if: steps.collect.outcome != 'success'",
-            workflow,
-        )
+        self.assertIn("Enforce collector terminal status", workflow)
+        self.assertIn('status == "partial"', workflow)
+        self.assertIn('status in {"blocked", "failed"}', workflow)
         upload = workflow.index("uses: actions/upload-artifact@v4")
-        fail = workflow.index("Fail visibly on incomplete collection")
-        self.assertLess(upload, fail)
+        enforce = workflow.index("Enforce collector terminal status")
+        self.assertLess(upload, enforce)
 
 
 if __name__ == "__main__":

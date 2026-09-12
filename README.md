@@ -69,6 +69,9 @@ data/raw/YYYY/MM/DD/items.ndjson  public excerpt/redacted records
 data/errors/YYYY/MM/DD/errors.ndjson source-specific safe error categories
 data/state.json                   latest run, clean-run time and source health
 reports/daily/YYYY-MM-DD.md       automatic source digest
+reports/summary/YYYY-MM-DD.md     editorial daily summary
+reports/weekly/*.md               editorial weekly snapshots
+reports/monthly/YYYY-MM.md        editorial monthly snapshots
 schemas/raw-item.schema.json      public archive contract
 schemas/public-status.schema.json public status contract
 scripts/collect.py                collector facade and CLI
@@ -114,10 +117,10 @@ Successful sources are retained during a partial run, but the run remains visibl
 python -m scripts.collect \
   --force \
   --lookback-hours 168 \
-  --sources ua-general-staff-tg,bellingcat-rss,cit-web
+  --sources ua-general-staff-tg,bbc-ukraine-rss,cit-web
 ```
 
-PR CI runs the same bounded Telegram/RSS/web adapters and requires each to return `status=ok` with at least one fetched item. A separate same-repository PR job checks `ua-general-staff-x` and `x-discovery-1`, bounds X pagination and scopes `X_BEARER_TOKEN` only to the collection step. While X remains enabled, a missing secret is a red configuration blocker rather than a green skip.
+PR CI runs the same bounded Telegram/RSS/web adapters and requires each to return `status=ok` with at least one fetched item. A separate same-repository PR job checks `ua-general-staff-x` and `x-discovery-1` only when `X_BEARER_TOKEN` is configured; otherwise it emits an explicit notice and skips the live X probe. A skipped X probe is not evidence that X works: X coverage remains unproven until a credentialed smoke run succeeds.
 
 The manual `Source smoke test` workflow supports later/default-branch reruns and alternate source IDs without committing its archive. A workflow file that exists only on a feature branch is not sufficient pre-merge `workflow_dispatch` evidence.
 
@@ -136,7 +139,7 @@ The image excludes `.env`, Git metadata and generated/runtime data from the buil
 
 Scheduled GitHub collection runs dependencies in a read-only job, validates generated output, creates a strict path/size/SHA-256 manifest, and passes only that artifact to a minimal write job. The write job independently verifies the file set and revalidates after rebase before push. Pages build and deployment credentials are separated the same way.
 
-One source failure never terminates service mode. Scheduled collection persists structurally valid successful and partial projections, then leaves incomplete runs red.
+One source failure never terminates service mode. Scheduled collection persists structurally valid successful and partial projections. A `partial` run remains visibly degraded in `data/state.json` and the status page but does not fail the workflow; `blocked` and `failed` terminal states remain red.
 
 ## Read the source cards and status
 
@@ -147,7 +150,9 @@ python -m http.server --directory site 8000
 
 Open:
 
-- `/index.html` for daily digests;
+- `/index.html` for daily digests plus weekly/monthly navigation;
+- `/weekly/index.html` for weekly editorial snapshots;
+- `/monthly/index.html` for monthly editorial snapshots;
 - `/raw/index.html` for source cards;
 - `/maps/index.html` for delayed map-source publications;
 - `/status/index.html` for reader-facing health;
@@ -171,4 +176,4 @@ python -m scripts.build_site
 
 The validator rejects absolute/traversing repository paths, credentialed source URLs, source ID/platform mismatches, unsafe persisted error records and public archive rows that do not match `public_excerpt_v1` or `public_redacted_v1`.
 
-Merge readiness additionally requires a reviewed exact-current-head hosted run, a successful representative network smoke artifact, X account/search evidence whenever X remains enabled or is claimed as working, and explicit separation between preview and deployed Pages evidence.
+Merge readiness additionally requires a reviewed exact-current-head hosted run, a successful representative network smoke artifact, X account/search evidence when a change touches X or working X coverage is claimed, and explicit separation between preview and deployed Pages evidence.

@@ -77,6 +77,8 @@ def page(
     nav = (
         f"<a href='{prefix}index.html'>Отчёты</a>"
         f"<a href='{prefix}summaries/index.html'>Сводки</a>"
+        f"<a href='{prefix}weekly/index.html'>Недельные сводки</a>"
+        f"<a href='{prefix}monthly/index.html'>Месячные сводки</a>"
         f"<a href='{prefix}raw/index.html'>Сырые материалы</a>"
         f"<a href='{prefix}maps/index.html'>Карты из источников</a>"
         f"<a href='{prefix}status/index.html'>Статус сбора</a>"

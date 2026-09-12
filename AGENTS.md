@@ -49,7 +49,7 @@ Agent-authored summaries must not reconstruct details that the public digest red
 1. work on a dedicated branch;
 2. run `python -m scripts.validate`;
 3. run a targeted source smoke first, for example:
-   `python -m scripts.collect --force --lookback-hours 168 --sources ua-general-staff-tg,bellingcat-rss,cit-web`;
+   `python -m scripts.collect --force --lookback-hours 168 --sources ua-general-staff-tg,bbc-ukraine-rss,cit-web`;
 4. inspect `data/state.json`, `data/errors/`, generated `site/status.json` and `site/status/index.html`;
 5. run `python -m scripts.continuous_loop --once` only after the targeted smoke is understood;
 6. inspect the generated digest, source pages, status page and outbound links;
@@ -60,9 +60,9 @@ Only `ok` or `idle` is clean. `partial`, `blocked`, `failed`, stale status, a no
 
 ## X evidence
 
-Non-X jobs must never receive `X_BEARER_TOKEN`. Same-repository pull requests use a separate X job that checks both a watched account (`ua-general-staff-x`) and recent search (`x-discovery-1`), with the secret scoped only to the collection step and pagination bounded for smoke use.
+Non-X jobs must never receive `X_BEARER_TOKEN`. Same-repository pull requests use a separate X job that checks both a watched account (`ua-general-staff-x`) and recent search (`x-discovery-1`) when the secret is configured, with the secret scoped only to credential-detection/collection steps and pagination bounded for smoke use.
 
-While X sources/search queries remain enabled, a missing secret is a red configuration blocker, not a green skip. Without inspected account and search evidence, describe X as configured but unproven, or explicitly disable X and remove its working-coverage claim.
+If `X_BEARER_TOKEN` is missing, the PR X live probe is explicitly skipped rather than failing unrelated changes. This skip is not success evidence: without an inspected credentialed account/search run, describe X as configured but unproven, or explicitly disable X and remove its working-coverage claim.
 
 The manual `Source smoke test` workflow is a post-merge/default-branch rerun surface; do not rely on a branch-only `workflow_dispatch` file as pre-merge evidence.
 
@@ -107,7 +107,7 @@ A collector/publication change is done only when:
 - public output matches `schemas/raw-item.schema.json` and, when applicable, `schemas/public-status.schema.json`;
 - no full HTML/raw payload, content-derived redaction side channel, credential or unsafe error detail reaches public output;
 - one representative Telegram/RSS/web smoke run has been inspected;
-- X account/search smoke has been inspected whenever X remains enabled or working X coverage is claimed;
+- X account/search smoke has been inspected whenever a change touches X or working X coverage is claimed;
 - documentation, `data/state.json`, `status.json`, preview artifacts and the deployed UI are described without conflating them;
 - the PR remains draft until required evidence and external configuration decisions are recorded.
 

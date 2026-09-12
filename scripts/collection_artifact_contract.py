@@ -9,7 +9,7 @@ from typing import Any
 
 MANIFEST_SCHEMA = "war-reporter-collection-artifact-v1"
 ALLOWED_ROOTS = {"data", "reports"}
-NON_ARTIFACT_PREFIXES = {"reports/summary", "reports/weekly"}
+NON_ARTIFACT_PREFIXES = {"reports/summary", "reports/weekly", "reports/monthly"}
 MANIFEST_FIELDS = {
     "schema",
     "state_status",

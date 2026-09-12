@@ -38,6 +38,7 @@ class CollectionArtifactContractTests(unittest.TestCase):
             "reports/daily/latest.md",
             "reports/summary/2026-08-06.md",
             "reports/weekly/2026-08-03_2026-08-09.md",
+            "reports/monthly/2026-08.md",
             "reports/../secret.md",
         )
         for path in allowed:
@@ -52,6 +53,7 @@ class CollectionArtifactContractTests(unittest.TestCase):
         self.assertTrue(
             artifact_path_ignored("reports/weekly/2026-08-03_2026-08-09.md")
         )
+        self.assertTrue(artifact_path_ignored("reports/monthly/2026-08.md"))
         self.assertFalse(artifact_path_ignored("reports/daily/2026-08-06.md"))
         self.assertFalse(artifact_path_ignored("data/debug-response.html"))
 
@@ -72,6 +74,7 @@ class CollectionArtifactContractTests(unittest.TestCase):
         (root / "data").mkdir()
         (root / "reports/summary").mkdir(parents=True)
         (root / "reports/weekly").mkdir(parents=True)
+        (root / "reports/monthly").mkdir(parents=True)
         (root / "data/state.json").write_text("{}")
         summary = root / "reports/summary/2026-08-06.md"
         weekly = root / "reports/weekly/2026-08-03_2026-08-09.md"

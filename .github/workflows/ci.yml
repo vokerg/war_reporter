@@ -28,6 +28,8 @@ jobs:
             python -m scripts.build_report "$day"
           done
       - run: python -m scripts.build_site
+      - run: python -m scripts.build_weekly_site
+      - run: python -m scripts.build_monthly_site
       - uses: actions/upload-artifact@v4
         with:
           name: site-preview-${{ github.sha }}

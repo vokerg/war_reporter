@@ -139,7 +139,7 @@ The image excludes `.env`, Git metadata and generated/runtime data from the buil
 
 Scheduled GitHub collection runs dependencies in a read-only job, validates generated output, creates a strict path/size/SHA-256 manifest, and passes only that artifact to a minimal write job. The write job independently verifies the file set and revalidates after rebase before push. Pages build and deployment credentials are separated the same way.
 
-One source failure never terminates service mode. Scheduled collection persists structurally valid successful and partial projections, then leaves incomplete runs red.
+One source failure never terminates service mode. Scheduled collection persists structurally valid successful and partial projections. A `partial` run remains visibly degraded in `data/state.json` and the status page but does not fail the workflow; `blocked` and `failed` terminal states remain red.
 
 ## Read the source cards and status
 

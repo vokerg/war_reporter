@@ -19,7 +19,7 @@ class CollectionWorkflowGateTests(unittest.TestCase):
         package = workflow.index(
             "python -m scripts.package_collection_artifact"
         )
-        upload = workflow.index("uses: actions/upload-artifact@v4")
+        upload = workflow.index("uses: actions/upload-artifact@")
         self.assertLess(package, upload)
         self.assertIn("if: always()", workflow[:upload])
         self.assertIn(
@@ -67,7 +67,7 @@ class CollectionWorkflowGateTests(unittest.TestCase):
         self.assertIn("Enforce collector terminal status", workflow)
         self.assertIn('status == "partial"', workflow)
         self.assertIn('status in {"blocked", "failed"}', workflow)
-        upload = workflow.index("uses: actions/upload-artifact@v4")
+        upload = workflow.index("uses: actions/upload-artifact@")
         enforce = workflow.index("Enforce collector terminal status")
         self.assertLess(upload, enforce)
 
